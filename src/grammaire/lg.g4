@@ -11,7 +11,7 @@ typeRef : (ID |id_externe );
 attribut : ID '='  tmpCode ;
 attributs : attribut * ;
 code :(  ('(' code ')' ) |  (appel| objet | var  | ('(' (  si) ')' ) ) ) operationOuAcces *    ;
-var :  (ID |id_externe);
+var :  ID ;
 appel :  ( ID | id_externe )   '(' tmpCode * ')' ;
 objet :  ( ID| id_externe ) '{' attributs  '}';
 id_externe : ID '$' ID;

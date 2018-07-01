@@ -26,9 +26,11 @@ import grammaire.lgParser.FonctionContext;
 import grammaire.lgParser.Id_externeContext;
 import grammaire.lgParser.ModuleContext;
 import grammaire.lgParser.ObjetContext;
+import grammaire.lgParser.OperationOuAccesContext;
 import grammaire.lgParser.SiContext;
 import grammaire.lgParser.TmpCodeContext;
 import grammaire.lgParser.TypeContext;
+import model.Acces;
 import model.Appel;
 import model.Expression;
 import model.FonctionDef;
@@ -77,17 +79,26 @@ public class Parseur implements ANTLRErrorListener {
 		error = false;
 		Univers u = new Univers();
 		for (Map.Entry<String, String> e : sources.entrySet()) {
-			lgLexer lgLexer = new lgLexer(org.antlr.v4.runtime.CharStreams.fromString(e.getValue()));
-			CommonTokenStream tokens = new CommonTokenStream(lgLexer);
-			lgParser parser = new lgParser(tokens);
-			parser.addErrorListener(this);
-			if (error) {
-				return null;
+
+			Module module = this.lireModule(e.getValue());
+			if (module != null) {
+				u.modules.put(e.getKey(), module);
 			}
-			Module module = this.transformer(parser.module());
-			u.modules.put(e.getKey(), module);
 		}
 		return u;
+
+	}
+
+	public Module lireModule(String src) {
+		error = false;
+		lgLexer lgLexer = new lgLexer(org.antlr.v4.runtime.CharStreams.fromString(src));
+		CommonTokenStream tokens = new CommonTokenStream(lgLexer);
+		lgParser parser = new lgParser(tokens);
+		parser.addErrorListener(this);
+		if (error) {
+			return null;
+		}
+		return this.transformer(parser.module());
 
 	}
 
@@ -136,6 +147,8 @@ public class Parseur implements ANTLRErrorListener {
 		} else {
 			fonction.nom = fd.ID().getText();
 		}
+		fonction.params = this.transformer(fd.champs());
+		fonction.expression = this.transformer(fd.tmpCode());
 		return fonction;
 
 	}
@@ -174,10 +187,10 @@ public class Parseur implements ANTLRErrorListener {
 		return ref;
 
 	}
-	
+
 	public Objet transformer(ObjetContext objetContext) {
-		Ref typeRef=null;
-		
+		Ref typeRef = null;
+
 		if (objetContext.id_externe() != null) {
 			typeRef = this.transformer(objetContext.id_externe());
 		}
@@ -185,19 +198,19 @@ public class Parseur implements ANTLRErrorListener {
 			typeRef = new Ref(objetContext.ID().getText());
 		}
 		Objet objet = new Objet();
-		
+
 		objet.type = typeRef;
-		for(AttributContext attributContext:objetContext.attributs().attribut()) {
+		for (AttributContext attributContext : objetContext.attributs().attribut()) {
 			ObjetParam op = new ObjetParam();
 			op.nom = attributContext.ID().getText();
-			op.expression =this.transformer(attributContext.tmpCode() );
+			op.expression = this.transformer(attributContext.tmpCode());
 			objet.params.add(op);
 		}
 		return objet;
-		
+
 	}
 
-	public Expression transformer(CodeContext codeContext) {
+	public Expression transformerDebut(CodeContext codeContext) {
 		if (codeContext.appel() != null) {
 			return this.transformer(codeContext.appel());
 		}
@@ -209,13 +222,43 @@ public class Parseur implements ANTLRErrorListener {
 		}
 		if (codeContext.objet() != null) {
 			return this.transformer(codeContext.objet());
-			
+
 		}
 		if (codeContext.var() != null) {
 			VarRef varRef = new VarRef();
-			
+			varRef.nom = codeContext.var().ID().getText();
+			return varRef;
+
 		}
+
 		return null;
+	}
+
+	public Expression transformer(CodeContext codeContext) {
+		Expression expression = this.transformerDebut(codeContext);
+		if (codeContext.operationOuAcces() == null) {
+			return expression;
+		}
+		for (OperationOuAccesContext val : codeContext.operationOuAcces()) {
+			if (val.operation() != null) {
+				Appel appel = new Appel();
+				appel.nom = new Ref(val.operation().operateur().getText());
+				appel.params.add(expression);
+				appel.params.add(this.transformer(val.operation().tmpCode()));
+				expression = appel;
+
+			}
+			if (val.acces() != null) {
+				Acces acces = new Acces();
+				acces.cible = expression;
+				acces.nom = val.acces().ID().getText();
+				expression = acces;
+
+			}
+
+		}
+		return expression;
+
 	}
 
 	public Expression transformer(TmpCodeContext tmpCode) {
