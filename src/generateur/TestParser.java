@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import model.Appel;
 import model.Module;
 import model.Objet;
 import model.TestEgalite;
@@ -325,6 +326,141 @@ class TestParser {
 		assertTrue(varRef.nom.equals("o"));
 	}
 	
+	@Test
+	void testFonctionOperateur() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction + toto$o:x lili:m | si x est lala alors nini { m= a {} } sinon o");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("+"));
+		assertTrue(module.fonctions.get(0).expression != null);
+		assertTrue(module.fonctions.get(0).expression instanceof TestType);
+
+		assertTrue(module.fonctions.get(0).params.size() == 2);
+		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
+		assertTrue(module.fonctions.get(0).params.get(0).type.module.equals("toto"));
+		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
+
+		assertTrue(module.fonctions.get(0).params.get(1).type.nom.equals("lili"));
+		assertTrue(module.fonctions.get(0).params.get(1).type.module == null);
+		assertTrue(module.fonctions.get(0).params.get(1).nom.equals("m"));
+		
+		TestType testType = (TestType) module.fonctions.get(0).expression;
+		assertTrue(testType.typeRef.module == null);
+		assertTrue(testType.typeRef.nom.equals("lala"));
+		assertTrue(testType.alors != null);
+		assertTrue(testType.alors instanceof Objet);
+		Objet objet = (Objet) testType.alors;
+		assertTrue(objet.type.nom.equals("nini"));
+		
+		VarRef varRef = (VarRef) testType.sinon;
+		assertTrue(varRef.nom.equals("o"));
+	}
+	
+	@Test
+	void testAppelFonctionOperateur() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f toto$o:x lili:m | x > m + o");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+
+
+		assertTrue(module.fonctions.get(0).params.size() == 2);
+		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
+		assertTrue(module.fonctions.get(0).params.get(0).type.module.equals("toto"));
+		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
+
+		assertTrue(module.fonctions.get(0).params.get(1).type.nom.equals("lili"));
+		assertTrue(module.fonctions.get(0).params.get(1).type.module == null);
+		assertTrue(module.fonctions.get(0).params.get(1).nom.equals("m"));
+		assertTrue(module.fonctions.get(0).expression instanceof Appel);
+		Appel appel = (Appel) module.fonctions.get(0).expression;
+		assertTrue(appel.nom.nom.equals(">"));
+		assertTrue(appel.params.size() == 2);
+		assertTrue(appel.params.get(1) instanceof Appel);
+		Appel appel2 = (Appel)(appel.params.get(1));
+		assertTrue(appel2.nom.nom.equals("+"));
+		assertTrue(appel2.params.get(0) instanceof VarRef);
+		VarRef varRef = (VarRef) appel2.params.get(0);
+		assertTrue(varRef.nom.equals("m"));
+		assertTrue(appel2.params.get(1) instanceof VarRef);
+		varRef = (VarRef) appel2.params.get(1);
+		assertTrue(varRef.nom.equals("o"));
+	
+	}
+	
+	@Test
+	void testAppelFonctionOperateurAvecParenthese() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f toto$o:x lili:m | a > ( m + o )");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+
+
+		assertTrue(module.fonctions.get(0).params.size() == 2);
+		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
+		assertTrue(module.fonctions.get(0).params.get(0).type.module.equals("toto"));
+		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
+
+		assertTrue(module.fonctions.get(0).params.get(1).type.nom.equals("lili"));
+		assertTrue(module.fonctions.get(0).params.get(1).type.module == null);
+		assertTrue(module.fonctions.get(0).params.get(1).nom.equals("m"));
+		assertTrue(module.fonctions.get(0).expression instanceof Appel);
+		Appel appel = (Appel) module.fonctions.get(0).expression;
+		assertTrue(appel.nom.nom.equals(">"));
+		assertTrue(appel.params.size() == 2);
+		assertTrue(appel.params.get(0) instanceof VarRef);
+		assertTrue(appel.params.get(1) instanceof Appel);
+		Appel appel2 = (Appel)(appel.params.get(1));
+		assertTrue(appel2.nom.nom.equals("+"));
+		
+		assertTrue(appel2.params.get(0) instanceof VarRef);
+		VarRef varRef = (VarRef) appel2.params.get(0);
+		assertTrue(varRef.nom.equals("m"));
+		assertTrue(appel2.params.get(1) instanceof VarRef);
+		varRef = (VarRef) appel2.params.get(1);
+		assertTrue(varRef.nom.equals("o"));
+	
+	}
+	@Test
+	void testAppelFonctionOperateurAvecParenthese2() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f toto$o:x lili:m | ( a > m ) + o ");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+
+
+		assertTrue(module.fonctions.get(0).params.size() == 2);
+		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
+		assertTrue(module.fonctions.get(0).params.get(0).type.module.equals("toto"));
+		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
+
+		assertTrue(module.fonctions.get(0).params.get(1).type.nom.equals("lili"));
+		assertTrue(module.fonctions.get(0).params.get(1).type.module == null);
+		assertTrue(module.fonctions.get(0).params.get(1).nom.equals("m"));
+		assertTrue(module.fonctions.get(0).expression instanceof Appel);
+		Appel appel = (Appel) module.fonctions.get(0).expression;
+		assertTrue(appel.nom.nom.equals("+"));
+		assertTrue(appel.params.size() == 2);
+		assertTrue(appel.params.get(1) instanceof VarRef);
+		assertTrue(appel.params.get(0) instanceof Appel);
+		Appel appel2 = (Appel)(appel.params.get(0));
+		assertTrue(appel2.nom.nom.equals(">"));
+		
+		assertTrue(appel2.params.get(0) instanceof VarRef);
+		VarRef varRef = (VarRef) appel2.params.get(0);
+		assertTrue(varRef.nom.equals("a"));
+		assertTrue(appel2.params.get(1) instanceof VarRef);
+		varRef = (VarRef) appel2.params.get(1);
+		assertTrue(varRef.nom.equals("m"));
+	
+	}
 	
 
 }

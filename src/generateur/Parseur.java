@@ -239,20 +239,21 @@ public class Parseur implements ANTLRErrorListener {
 		if (codeContext.operationOuAcces() == null) {
 			return expression;
 		}
-		for (OperationOuAccesContext val : codeContext.operationOuAcces()) {
+		if ( codeContext.operationOuAcces() != null) {
+			OperationOuAccesContext val = codeContext.operationOuAcces();
 			if (val.operation() != null) {
 				Appel appel = new Appel();
 				appel.nom = new Ref(val.operation().operateur().getText());
 				appel.params.add(expression);
 				appel.params.add(this.transformer(val.operation().tmpCode()));
-				expression = appel;
+				return appel;
 
 			}
 			if (val.acces() != null) {
 				Acces acces = new Acces();
 				acces.cible = expression;
 				acces.nom = val.acces().ID().getText();
-				expression = acces;
+			return acces;
 
 			}
 
@@ -275,6 +276,12 @@ public class Parseur implements ANTLRErrorListener {
 		if (tmpCode.tmpCode() != null) {
 			return this.transformer(tmpCode.tmpCode());
 		}
+		/*if (tmpCode.var() != null) {
+			VarRef varRef = new VarRef();
+			varRef.nom = tmpCode.var().ID().getText();
+			return varRef;
+
+		}*/
 		return null;
 
 	}

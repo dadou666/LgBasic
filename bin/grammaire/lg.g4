@@ -10,14 +10,14 @@ champ : typeRef ':' ID ;
 typeRef : (ID |id_externe );
 attribut : ID '='  tmpCode ;
 attributs : attribut * ;
-code :(  ('(' code ')' ) |  (appel| objet | var  | ('(' (  si) ')' ) ) ) operationOuAcces *    ;
+code :(  ('(' code ')' ) |  (appel| objet | var  | ('(' (  si) ')' ) ) ) (operationOuAcces | )    ;
 var :  ID ;
 appel :  ( ID | id_externe )   '(' tmpCode * ')' ;
 objet :  ( ID| id_externe ) '{' attributs  '}';
 id_externe : ID '$' ID;
 acces :  '.' ID ;
 operation : operateur tmpCode;
-operationOuAcces :  (acces |operation )  ;
+operationOuAcces :  (operation  | acces)  ;
 operateur : '->' |'=>' | '+' | '-' |'*' |'/'|'>' | '<'  | '&' |'|' |'=' ;
 testType : code 'est' negation typeRef    ;
 testEgalite : code '==' code;
@@ -26,7 +26,7 @@ si :  'si' (testType | testEgalite |testDifference) 'alors' code 'sinon' ( si |c
 negation : '!' | ;  
 fonction : 'fonction'   (ID|operateur)  champs '|' tmpCode;
 
-tmpCode :  appel | si  |code | '(' tmpCode ')'  ;
+tmpCode :     appel |si  |code |  '(' tmpCode ')'  ;
 
 
     // match keyword hello followed by an identifier
