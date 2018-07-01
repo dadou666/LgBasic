@@ -309,8 +309,8 @@ public class Parseur implements ANTLRErrorListener {
 		}
 		if (siContext.testDifference() != null) {
 			TestEgalite r = new TestEgalite();
-			r.a = this.transformer(siContext.testEgalite().code(0));
-			r.b = this.transformer(siContext.testEgalite().code(1));
+			r.a = this.transformer(siContext.testDifference().code(0));
+			r.b = this.transformer(siContext.testDifference().code(1));
 
 			r.alors = this.transformer(siContext.code(1));
 			r.sinon = this.transformer(siContext.code(0));
@@ -321,7 +321,7 @@ public class Parseur implements ANTLRErrorListener {
 		if (siContext.testType() != null) {
 			TestType r = new TestType();
 			r.cible = this.transformer(siContext.testType().code());
-			if (siContext.testType().negation() == null) {
+			if (siContext.testType().negation().getText().equals("!")) {
 				r.alors = this.transformer(siContext.code(1));
 				r.sinon = this.transformer(siContext.code(0));
 

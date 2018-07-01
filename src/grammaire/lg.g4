@@ -21,7 +21,7 @@ operationOuAcces :  (acces |operation )  ;
 operateur : '->' |'=>' | '+' | '-' |'*' |'/'|'>' | '<'  | '&' |'|' |'=' ;
 testType : code 'est' negation typeRef    ;
 testEgalite : code '==' code;
-testDifference : code '!=' code;
+testDifference : code '<>' code;
 si :  'si' (testType | testEgalite |testDifference) 'alors' code 'sinon' ( si |code );
 negation : '!' | ;  
 fonction : 'fonction'   (ID|operateur)  champs '|' tmpCode;
