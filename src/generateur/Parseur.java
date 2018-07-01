@@ -321,7 +321,7 @@ public class Parseur implements ANTLRErrorListener {
 		if (siContext.testType() != null) {
 			TestType r = new TestType();
 			r.cible = this.transformer(siContext.testType().code());
-			if (siContext.testType().negation() != null) {
+			if (siContext.testType().negation() == null) {
 				r.alors = this.transformer(siContext.code(1));
 				r.sinon = this.transformer(siContext.code(0));
 

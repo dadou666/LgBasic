@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import model.Module;
+import model.TestType;
 import model.VarRef;
 
 class TestParser {
@@ -120,10 +121,65 @@ class TestParser {
 		assertTrue(varRef.nom.equals("x"));
 		assertTrue(module.fonctions.get(0).params.size()==1);
 		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
-		assertTrue(module.fonctions.get(0).params.get(0).type.module == null);
+		assertTrue(module.fonctions.get(0).params.get(0).type.module.equals("toto"));
 		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
 	}
 	
+	@Test
+	void testFonctionAvecTestType() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f toto$o:x | si x est momo  alors q sinon m");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1 );
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+		assertTrue(module.fonctions.get(0).expression instanceof TestType );
+	
+		assertTrue(module.fonctions.get(0).params.size()==1);
+		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
+		assertTrue(module.fonctions.get(0).params.get(0).type.module.equals("toto"));
+		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
+		
+		TestType testType = (TestType) module.fonctions.get(0).expression;
+		assertTrue( testType.typeRef.module == null);
+		assertTrue( testType.typeRef.nom.equals("momo"));
+		assertTrue(testType.alors != null);
+		assertTrue(testType.alors instanceof VarRef);
+		VarRef varRef = (VarRef) testType.alors;
+		assertTrue(varRef.nom.equals("q"));
+		varRef = (VarRef) testType.sinon;
+		assertTrue(varRef.nom.equals("m"));
+		
+		
+	}
+	
+	@Test
+	void testFonctionAvecTestTypeEtNegation() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f toto$o:x | si x est !momo  alors q sinon m");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1 );
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+		assertTrue(module.fonctions.get(0).expression instanceof TestType );
+	
+		assertTrue(module.fonctions.get(0).params.size()==1);
+		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
+		assertTrue(module.fonctions.get(0).params.get(0).type.module.equals("toto"));
+		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
+		
+		TestType testType = (TestType) module.fonctions.get(0).expression;
+		assertTrue( testType.typeRef.module == null);
+		assertTrue( testType.typeRef.nom.equals("momo"));
+		assertTrue(testType.alors != null);
+		assertTrue(testType.alors instanceof VarRef);
+		VarRef varRef = (VarRef) testType.alors;
+		assertTrue(varRef.nom.equals("m"));
+		varRef = (VarRef) testType.sinon;
+		assertTrue(varRef.nom.equals("q"));
+		
+		
+	}
 	
 	
 
