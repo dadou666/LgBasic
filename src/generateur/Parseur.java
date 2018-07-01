@@ -42,6 +42,7 @@ import model.TestType;
 import model.TypeDef;
 import model.Univers;
 import model.Var;
+import model.VarRef;
 
 public class Parseur implements ANTLRErrorListener {
 
@@ -208,6 +209,10 @@ public class Parseur implements ANTLRErrorListener {
 		}
 		if (codeContext.objet() != null) {
 			return this.transformer(codeContext.objet());
+			
+		}
+		if (codeContext.var() != null) {
+			VarRef varRef = new VarRef();
 			
 		}
 		return null;
