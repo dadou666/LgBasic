@@ -27,7 +27,8 @@ negation : '!' | ;
 fonction : 'fonction'   (ID|operateur)  champs '|' tmpCode;
 
 tmpCode :     literal|appel |si  |code |  '(' tmpCode ')'  ;
-literal :'[' ID ID* ']';
+ref: (ID| id_externe);
+literal :'[' ref ref* ']';
 
 
 ID : [a-zA-Z0-9_][a-zA-Z0-9_]*  ;             // match lower-case identifiers

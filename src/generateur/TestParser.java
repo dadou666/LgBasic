@@ -124,17 +124,18 @@ class TestParser {
 	@Test
 	void testFonctionQuiRetourneLiteral() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f o:x | [ x m  ]");
+		Module module = parseur.lireModule("fonction f o:x | [ x m  tot$m ]");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
 		assertTrue(module.fonctions.get(0).expression != null);
 		assertTrue(module.fonctions.get(0).expression instanceof Literal);
 		Literal literal = (Literal) module.fonctions.get(0).expression;
-		assertTrue(literal.mots.size() == 2);
-		assertTrue(literal.mots.get(0).equals("x"));
-		assertTrue(literal.mots.get(1).equals("m"));
-	
+		assertTrue(literal.mots.size() == 3);
+		assertTrue(literal.mots.get(0).nom.equals("x"));
+		assertTrue(literal.mots.get(1).nom.equals("m"));
+		assertTrue(literal.mots.get(2).module.equals("tot"));
+		assertTrue(literal.mots.get(2).nom.equals("m"));
 	}
 	@Test
 	void testFonctionIdentiteParamAvecAutreModule() {

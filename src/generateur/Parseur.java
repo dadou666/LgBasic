@@ -27,6 +27,7 @@ import grammaire.lgParser.Id_externeContext;
 import grammaire.lgParser.ModuleContext;
 import grammaire.lgParser.ObjetContext;
 import grammaire.lgParser.OperationOuAccesContext;
+import grammaire.lgParser.RefContext;
 import grammaire.lgParser.SiContext;
 import grammaire.lgParser.TmpCodeContext;
 import grammaire.lgParser.TypeContext;
@@ -279,8 +280,14 @@ public class Parseur implements ANTLRErrorListener {
 		}
 		if (tmpCode.literal() != null) {
 			Literal r = new Literal();
-			for(TerminalNode id:tmpCode.literal().ID()) {
-				r.mots.add(id.getText());
+			for(RefContext id:tmpCode.literal().ref()) {
+				if (id.ID() != null) {
+					r.mots.add(new Ref(id.ID().getText()));
+				}
+				if (id.id_externe() != null) {
+					r.mots.add(this.transformer(id.id_externe()));
+				}
+			//	r.mots.add(id.getText());
 			}
 			return r;
 		}
