@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import model.Acces;
 import model.Appel;
+import model.Literal;
 import model.Module;
 import model.Objet;
 import model.TestEgalite;
@@ -20,6 +22,17 @@ class TestParser {
 		assertTrue(module != null);
 		assertTrue(module.types.size() == 1);
 		assertTrue(module.types.get(0).nom.equals("a"));
+		assertTrue(module.types.get(0).vars.isEmpty());
+
+	}
+	
+	@Test
+	void testTypeAvecNonChiffre() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("type 45 { } ");
+		assertTrue(module != null);
+		assertTrue(module.types.size() == 1);
+		assertTrue(module.types.get(0).nom.equals("45"));
 		assertTrue(module.types.get(0).vars.isEmpty());
 
 	}
@@ -108,7 +121,21 @@ class TestParser {
 		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
 		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
 	}
-
+	@Test
+	void testFonctionQuiRetourneLiteral() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f o:x | [ x m  ]");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+		assertTrue(module.fonctions.get(0).expression instanceof Literal);
+		Literal literal = (Literal) module.fonctions.get(0).expression;
+		assertTrue(literal.mots.size() == 2);
+		assertTrue(literal.mots.get(0).equals("x"));
+		assertTrue(literal.mots.get(1).equals("m"));
+	
+	}
 	@Test
 	void testFonctionIdentiteParamAvecAutreModule() {
 		Parseur parseur = new Parseur();
@@ -460,6 +487,54 @@ class TestParser {
 		varRef = (VarRef) appel2.params.get(1);
 		assertTrue(varRef.nom.equals("m"));
 	
+	}
+	@Test
+	void testAcces() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f toto$o:x lili:m | a.lolo ");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+		assertTrue(module.fonctions.get(0).expression instanceof Acces);
+		Acces acces = (Acces) module.fonctions.get(0).expression;
+		assertTrue( acces.nom.equals("lolo"));
+		assertTrue(acces.cible instanceof VarRef);
+		
+		
+	}
+	
+	@Test
+	void testAccesSurSi() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f toto$o:x lili:m | ( si a==b alors a sinon b).lolo ");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+		assertTrue(module.fonctions.get(0).expression instanceof Acces);
+		Acces acces = (Acces) module.fonctions.get(0).expression;
+		assertTrue( acces.nom.equals("lolo"));
+		assertTrue(acces.cible instanceof TestEgalite);
+		
+		
+	}
+	
+	@Test
+	void testOperateurSurSi() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f toto$o:x lili:m | ( si a==b alors a sinon b)+lolo ");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+		assertTrue(module.fonctions.get(0).expression instanceof Appel);
+		Appel appel = (Appel) module.fonctions.get(0).expression;
+		assertTrue( appel.nom.nom.equals("+"));
+		assertTrue(appel.params.size() == 2);
+		assertTrue(appel.params.get(0) instanceof TestEgalite);
+		
+		
 	}
 	
 

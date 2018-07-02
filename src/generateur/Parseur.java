@@ -34,6 +34,7 @@ import model.Acces;
 import model.Appel;
 import model.Expression;
 import model.FonctionDef;
+import model.Literal;
 import model.Module;
 import model.Objet;
 import model.ObjetParam;
@@ -276,6 +277,14 @@ public class Parseur implements ANTLRErrorListener {
 		if (tmpCode.tmpCode() != null) {
 			return this.transformer(tmpCode.tmpCode());
 		}
+		if (tmpCode.literal() != null) {
+			Literal r = new Literal();
+			for(TerminalNode id:tmpCode.literal().ID()) {
+				r.mots.add(id.getText());
+			}
+			return r;
+		}
+		//if (tmpCode)
 		/*if (tmpCode.var() != null) {
 			VarRef varRef = new VarRef();
 			varRef.nom = tmpCode.var().ID().getText();

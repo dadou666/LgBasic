@@ -31,6 +31,9 @@ public class lgBaseListener implements lgListener {
 	@Override public void enterType(lgParser.TypeContext ctx) { }
 	@Override public void exitType(lgParser.TypeContext ctx) { }
 
+	@Override public void enterLiteral(lgParser.LiteralContext ctx) { }
+	@Override public void exitLiteral(lgParser.LiteralContext ctx) { }
+
 	@Override public void enterSi(lgParser.SiContext ctx) { }
 	@Override public void exitSi(lgParser.SiContext ctx) { }
 

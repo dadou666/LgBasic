@@ -28,6 +28,9 @@ public interface lgListener extends ParseTreeListener {
 	void enterType(lgParser.TypeContext ctx);
 	void exitType(lgParser.TypeContext ctx);
 
+	void enterLiteral(lgParser.LiteralContext ctx);
+	void exitLiteral(lgParser.LiteralContext ctx);
+
 	void enterSi(lgParser.SiContext ctx);
 	void exitSi(lgParser.SiContext ctx);
 

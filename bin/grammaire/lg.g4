@@ -26,12 +26,10 @@ si :  'si' (testType | testEgalite |testDifference) 'alors' code 'sinon' ( si |c
 negation : '!' | ;  
 fonction : 'fonction'   (ID|operateur)  champs '|' tmpCode;
 
-tmpCode :     appel |si  |code |  '(' tmpCode ')'  ;
+tmpCode :     literal|appel |si  |code |  '(' tmpCode ')'  ;
+literal :'[' ID ID* ']';
 
 
-    // match keyword hello followed by an identifier
-ENTIER : [1-9][0-9]*ID('$'ID|);
-ENTIER_EXTERNE : [1-9][0-9]*ID('$'ID|);
-ID : [a-zA-Z_][a-zA-Z0-9_]*  ;             // match lower-case identifiers
+ID : [a-zA-Z0-9_][a-zA-Z0-9_]*  ;             // match lower-case identifiers
 
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
