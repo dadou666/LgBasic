@@ -40,6 +40,9 @@ public interface lgListener extends ParseTreeListener {
 	void enterTestDifference(lgParser.TestDifferenceContext ctx);
 	void exitTestDifference(lgParser.TestDifferenceContext ctx);
 
+	void enterEstAbstrait(lgParser.EstAbstraitContext ctx);
+	void exitEstAbstrait(lgParser.EstAbstraitContext ctx);
+
 	void enterChamp(lgParser.ChampContext ctx);
 	void exitChamp(lgParser.ChampContext ctx);
 

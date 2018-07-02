@@ -127,6 +127,7 @@ public class Parseur implements ANTLRErrorListener {
 		if (tc.champs() != null) {
 			type.vars = this.transformer(tc.champs());
 		}
+		type.estAbstrait =! tc.estAbstrait().getText().isEmpty();
 		if (tc.superType() != null) {
 
 			if (tc.superType().id_externe() != null) {

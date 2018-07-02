@@ -23,9 +23,20 @@ class TestParser {
 		assertTrue(module.types.size() == 1);
 		assertTrue(module.types.get(0).nom.equals("a"));
 		assertTrue(module.types.get(0).vars.isEmpty());
+		assertTrue(!module.types.get(0).estAbstrait);
 
 	}
-	
+	@Test
+	void testTypeAbstrait() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("abstrait type a { } ");
+		assertTrue(module != null);
+		assertTrue(module.types.size() == 1);
+		assertTrue(module.types.get(0).nom.equals("a"));
+		assertTrue(module.types.get(0).vars.isEmpty());
+		assertTrue(module.types.get(0).estAbstrait);
+
+	}
 	@Test
 	void testTypeAvecNonChiffre() {
 		Parseur parseur = new Parseur();

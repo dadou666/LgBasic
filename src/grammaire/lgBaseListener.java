@@ -43,6 +43,9 @@ public class lgBaseListener implements lgListener {
 	@Override public void enterTestDifference(lgParser.TestDifferenceContext ctx) { }
 	@Override public void exitTestDifference(lgParser.TestDifferenceContext ctx) { }
 
+	@Override public void enterEstAbstrait(lgParser.EstAbstraitContext ctx) { }
+	@Override public void exitEstAbstrait(lgParser.EstAbstraitContext ctx) { }
+
 	@Override public void enterChamp(lgParser.ChampContext ctx) { }
 	@Override public void exitChamp(lgParser.ChampContext ctx) { }
 

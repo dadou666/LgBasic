@@ -2,8 +2,8 @@ grammar lg;
 module : ( element   )*;
 
 element : type | fonction ;
-type  :   'type'   ID  ( superType | )  '{' champs  '}' ;
-
+type  : estAbstrait  'type'   ID  ( superType | )  '{' champs  '}' ;
+estAbstrait :'abstrait'  | ;
 superType :      (':' (ID | id_externe ) )  ;
 champs : champ *;
 champ : typeRef ':' ID ;
