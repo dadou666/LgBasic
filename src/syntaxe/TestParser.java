@@ -1,4 +1,4 @@
-package generateur;
+package syntaxe;
 
 import static org.junit.jupiter.api.Assertions.*;
 

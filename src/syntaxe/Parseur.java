@@ -1,4 +1,4 @@
-package generateur;
+package syntaxe;
 
 import java.util.ArrayList;
 import java.util.BitSet;

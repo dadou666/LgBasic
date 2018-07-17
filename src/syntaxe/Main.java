@@ -1,4 +1,4 @@
-package generateur;
+package syntaxe;
 
 public class Main {
 
