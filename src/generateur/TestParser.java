@@ -143,6 +143,7 @@ class TestParser {
 		assertTrue(module.fonctions.get(0).expression instanceof Literal);
 		Literal literal = (Literal) module.fonctions.get(0).expression;
 		assertTrue(literal.mots.size() == 3);
+		
 		assertTrue(literal.mots.get(0).nom.equals("x"));
 		assertTrue(literal.mots.get(1).nom.equals("m"));
 		assertTrue(literal.mots.get(2).module.equals("tot"));

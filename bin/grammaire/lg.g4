@@ -28,6 +28,7 @@ fonction : 'fonction'   (ID|operateur)  champs '|' tmpCode;
 
 tmpCode :     literal|appel |si  |code |  '(' tmpCode ')'  ;
 ref: (ID| id_externe);
+
 literal :'[' ref ref* ']';
 
 

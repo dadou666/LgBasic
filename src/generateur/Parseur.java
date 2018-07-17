@@ -85,6 +85,7 @@ public class Parseur implements ANTLRErrorListener {
 			Module module = this.lireModule(e.getValue());
 			if (module != null) {
 				u.modules.put(e.getKey(), module);
+				module.initNomModule(e.getKey());
 			}
 		}
 		return u;
@@ -228,8 +229,8 @@ public class Parseur implements ANTLRErrorListener {
 
 		}
 		if (codeContext.var() != null) {
-			VarRef varRef = new VarRef();
-			varRef.nom = codeContext.var().ID().getText();
+			VarRef varRef = new VarRef( codeContext.var().ID().getText());
+	
 			return varRef;
 
 		}
