@@ -1,7 +1,10 @@
 package execution;
 
+import java.util.List;
+
 public class M {
 	public T types[];
+	public List<String> symbols;
 	public String nomTypes[];
 	public Objet fonctions[];
 	public String nomFonctions[];
@@ -11,8 +14,11 @@ public class M {
 		if (pile[adr1] != pile[adr2]) {
 			return false;
 		}
+		if (pile[adr1] > types.length ) {
+			return true;
+		}
 		T type = types[pile[adr1]];
-		for(int i=0;i < type.valeurs.length;i++) {
+		for(int i=0;i < type.size;i++) {
 			if (!comparer(pile[adr1+1+i],pile[adr2+1+i])) {
 				return false;
 			}
@@ -22,9 +28,12 @@ public class M {
 	}
 	
 	public int taille(int adr) {
+		if (pile[adr] >= types.length) {
+			return 1;
+		}
 		T type = types[pile[adr]];
-		int t =1+type.valeurs.length;
-		for(int i=0;i < type.valeurs.length ;i++) {
+		int t =1+type.size;
+		for(int i=0;i < type.size ;i++) {
 			t+=taille(pile[adr+1+i]);
 		}
 		return t;
