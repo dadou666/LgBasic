@@ -7,9 +7,12 @@ import java.util.Map;
 
 import model.Acces;
 import model.Appel;
+import model.Expression;
+import model.FonctionDef;
 import model.Literal;
 import model.Module;
 import model.Objet;
+import model.ObjetParam;
 import model.Ref;
 import model.TestEgalite;
 import model.TestType;
@@ -22,9 +25,64 @@ import model.Visiteur;
 public class Verificateur implements Visiteur {
 	public Map<String, TypeDef> types = new HashMap<>();
 	public Map<String, VerificationType> verificationTypes = new HashMap<>();
+	public Map<String, VerificationFonction> fonctions = new HashMap<>();
+	public List<Erreur> erreurs = new ArrayList<>();
+	public String nomRef;
 
-	List<Erreur> executer(Univers univers) {
-		List<Erreur> erreurs = new ArrayList<>();
+	void executerPourFonctions(Univers univers) {
+		boolean erreur = false;
+		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
+			for (FonctionDef fonction : module.getValue().fonctions) {
+				String nomRef = module.getKey() + "$" + fonction.nom;
+				if (fonctions.get(nomRef) != null) {
+					DoublonNomFonction doublon = new DoublonNomFonction();
+					doublon.nom = nomRef;
+
+					erreurs.add(doublon);
+					erreur = true;
+
+				} else {
+					VerificationFonction vf = new VerificationFonction();
+					vf.fonction = fonction;
+					fonctions.put(nomRef, vf);
+				}
+			}
+
+		}
+		if (erreur) {
+			return;
+		}
+		for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
+			FonctionDef fonction = vf.getValue().fonction;
+			List<String> noms = new ArrayList<>();
+			for (Var var : fonction.params) {
+				if (noms.contains(var.nom)) {
+					DoublonParamFonction e = new DoublonParamFonction();
+					e.nom = var.nom;
+					e.nomFonction = vf.getKey();
+					erreurs.add(e);
+					erreur = true;
+
+				} else {
+					noms.add(var.nom);
+				}
+				if (types.get(var.type.nomRef()) == null) {
+					TypeInexistant typeInexistant = new TypeInexistant();
+					typeInexistant.nomRef = vf.getKey();
+					typeInexistant.nom = var.type.nomRef();
+					typeInexistant.expression = new VarRef(var.nom);
+					erreurs.add(typeInexistant);
+					erreur = true;
+				}
+			}
+		}
+		if (erreur) {
+			return;
+		}
+	}
+
+	void executerPourTypes(Univers univers) {
+
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
 			for (TypeDef type : module.getValue().types) {
 				if (type.nom.equals("symbol")) {
@@ -35,6 +93,7 @@ public class Verificateur implements Visiteur {
 					if (types.get(nom) != null) {
 						DoublonNomType doublon = new DoublonNomType();
 						doublon.nom = nom;
+
 						erreurs.add(doublon);
 
 					} else {
@@ -46,30 +105,36 @@ public class Verificateur implements Visiteur {
 			}
 
 		}
-		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
-			for (TypeDef type : module.getValue().types) {
+		for (Map.Entry<String, TypeDef> e : types.entrySet()) {
 
-				if (type.superType != null) {
-					if (types.get(type.superType.nomRef()) == null) {
-						TypeInexistant typeInexistant = new TypeInexistant();
-						typeInexistant.def = type;
-						typeInexistant.nom = type.superType.nomRef();
-						typeInexistant.expression = null;
-						erreurs.add(typeInexistant);
+			TypeDef type = e.getValue();
 
-					}
-					for (Var var : type.vars) {
-						if (!var.type.nom.equals("symbol") && types.get(var.type.nomRef()) == null) {
-							TypeInexistant typeInexistant = new TypeInexistant();
-							typeInexistant.def = type;
-							typeInexistant.nom = var.type.nomRef();
-							typeInexistant.expression = new VarRef(var.nom);
-							erreurs.add(typeInexistant);
-						}
-					}
+			if (type.superType != null) {
+				if (types.get(type.superType.nomRef()) == null) {
+					TypeInexistant typeInexistant = new TypeInexistant();
+					typeInexistant.nomRef = e.getKey();
+					typeInexistant.estFonction = false;
+					typeInexistant.nom = type.superType.nomRef();
+					typeInexistant.expression = null;
+					erreurs.add(typeInexistant);
 
 				}
+				for (Var var : type.vars) {
+					if (!var.type.nom.equals("symbol") && types.get(var.type.nomRef()) == null) {
+						TypeInexistant typeInexistant = new TypeInexistant();
+						typeInexistant.nomRef = e.getKey();
+						typeInexistant.estFonction = false;
+						typeInexistant.nom = var.type.nomRef();
+						typeInexistant.expression = new VarRef(var.nom);
+						erreurs.add(typeInexistant);
+					}
+				}
+
 			}
+
+		}
+		for (String nomType : types.keySet()) {
+			this.verifierDoublonVar(nomType);
 		}
 		Map<String, List<String>> composants = new HashMap<>();
 		for (Map.Entry<String, VerificationType> e : this.verificationTypes.entrySet()) {
@@ -114,13 +179,10 @@ public class Verificateur implements Visiteur {
 				ErreurTypeNonArbre erreur = new ErreurTypeNonArbre();
 				erreur.nom = type;
 				erreurs.add(erreur);
-				
+
 			}
-			
+
 		}
-	
-		
-		return erreurs;
 
 	}
 
@@ -151,33 +213,134 @@ public class Verificateur implements Visiteur {
 
 	}
 
+	public void listeVar(String nomRef, List<String> r) {
+		TypeDef td = this.types.get(nomRef);
+		for (Var var : td.vars) {
+			r.add(var.nom);
+		}
+		if (td.superType != null) {
+			this.listeVar(td.superType.nomRef(), r);
+		}
+
+	}
+
+	public void verifierDoublonVar(String nomType) {
+		TypeDef type = this.types.get(nomType);
+		List<String> nomsHeritage = new ArrayList<>();
+		if (type.superType != null) {
+			this.listeVar(type.superType.nomRef(), nomsHeritage);
+		}
+		VerificationType vt = this.verificationTypes.get(nomType);
+		vt.champs.addAll(nomsHeritage);
+
+		List<String> noms = new ArrayList<>();
+		for (Var var : type.vars) {
+			if (noms.contains(var.nom)) {
+				DoublonChampType erreur = new DoublonChampType();
+				erreur.nom = var.nom;
+				erreur.nomType = nomType;
+				erreur.heritage = false;
+				erreurs.add(erreur);
+			} else {
+				noms.add(var.nom);
+				if (nomsHeritage.contains(var.nom)) {
+					DoublonChampType erreur = new DoublonChampType();
+					erreur.nom = var.nom;
+					erreur.nomType = nomType;
+					erreur.heritage = true;
+					erreurs.add(erreur);
+				}
+
+			}
+
+		}
+		vt.champs.addAll(noms);
+
+	}
+
 	@Override
 	public void visiter(Objet objet) {
 		// TODO Auto-generated method stub
+		TypeDef typeDef = types.get(objet.type.nomRef());
+		if (typeDef == null) {
+			TypeInexistant typeInexistant = new TypeInexistant();
+			typeInexistant.nomRef = nomRef;
+			typeInexistant.estFonction = true;
+			typeInexistant.nom = objet.type.nomRef();
+			typeInexistant.expression = objet;
+			erreurs.add(typeInexistant);
+			return;
+
+		}
+		List<String> champs = this.verificationTypes.get(objet.type.nomRef()).champs;
+		for (ObjetParam op : objet.params) {
+			if (!champs.contains(op.nom)) { 
+				AccesChampInexistant erreur =new AccesChampInexistant();
+				erreur.acces = op;
+				erreur.nomRef = nomRef;
+				erreurs.add(erreur);
+				
+			}
+				op.expression.visiter(this);
+			
+		}
 
 	}
 
 	@Override
 	public void visiter(Appel appel) {
 		// TODO Auto-generated method stub
+		if (fonctions.get(appel.nom.nomRef()) == null) {
+			FonctionInexistante fonctionInexistante = new FonctionInexistante();
+			fonctionInexistante.nom = appel.nom.nomRef();
+			fonctionInexistante.nomRef = nomRef;
+			erreurs.add(fonctionInexistante);
+			
+			
+		}
+		for(Expression e:appel.params) {
+			e.visiter(this);
+		}
+		
 
 	}
 
 	@Override
 	public void visiter(TestEgalite testEgalite) {
 		// TODO Auto-generated method stub
+		testEgalite.a.visiter(this);
+		testEgalite.b.visiter(this);
+		testEgalite.alors.visiter(this);
+		testEgalite.sinon.visiter(this);
 
 	}
 
 	@Override
 	public void visiter(TestType testType) {
 		// TODO Auto-generated method stub
+		
+		TypeDef typeDef = types.get(testType.typeRef.nomRef());
+		if (typeDef == null) {
+			TypeInexistant typeInexistant = new TypeInexistant();
+			typeInexistant.nomRef = nomRef;
+			typeInexistant.estFonction = true;
+			typeInexistant.nom = testType.typeRef.nomRef();
+			typeInexistant.expression = testType;
+			erreurs.add(typeInexistant);
+			
+
+		}
+		testType.alors.visiter(this);
+		testType.sinon.visiter(this);
+		testType.cible.visiter(this);
+		
 
 	}
 
 	@Override
 	public void visiter(Acces acces) {
 		// TODO Auto-generated method stub
+		acces.cible.visiter(this);
 
 	}
 
