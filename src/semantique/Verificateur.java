@@ -349,6 +349,47 @@ public class Verificateur implements Visiteur {
 		// TODO Auto-generated method stub
 
 	}
+	
+	public String superTypeCommun(String nomType1,String nomType2) {
+		if (nomType1 == null) {
+			return null;
+		}
+		if (nomType2 == null) {
+			return null;
+		}
+		if (nomType1.equals(nomType2)) {
+			return nomType1;
+		}
+		TypeDef type1 = this.types.get(nomType1);
+		TypeDef type2 = this.types.get(nomType2);
+		if (type1.superType != null) {
+			String r = superTypeCommun(type1.superType.nomRef(), nomType2);
+			if (r != null) {
+				return r;
+			}
+		}
+		if (type2.superType != null) {
+			String r = superTypeCommun(nomType1, type2.superType.nomRef());
+			if (r != null) {
+				return r;
+			}
+		}
+		return null;
+		
+	}
+	public String typeVar(String nomType,String var) {
+		TypeDef type  = this.types.get(nomType);
+		for(Var v:type.vars) {
+			if (v.nom.equals(var)) {
+				return v.type.nomRef();
+			}
+			
+		}
+		if (type.superType == null) {
+			return null;
+		}
+		return typeVar(type.superType.nomRef(),var);
+	}
 
 	@Override
 	public void visiter(Literal literal) {
