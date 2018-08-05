@@ -79,6 +79,9 @@ public class Verificateur implements Visiteur {
 		if (erreur) {
 			return;
 		}
+		for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
+
+		}
 	}
 
 	void executerPourTypes(Univers univers) {
@@ -272,36 +275,78 @@ public class Verificateur implements Visiteur {
 			return;
 
 		}
+		List<String> tmp = new ArrayList<String>();
+
+		for (ObjetParam op : objet.params) {
+
+			if (tmp.contains(op.nom)) {
+				DoublonObjetParam erreur = new DoublonObjetParam();
+				erreur.nom = op.nom;
+				erreur.nomFonction = nomRef;
+				erreur.objet = objet;
+				erreurs.add(erreur);
+			}
+		}
 		List<String> champs = this.verificationTypes.get(objet.type.nomRef()).champs;
 		for (ObjetParam op : objet.params) {
-			if (!champs.contains(op.nom)) { 
-				AccesChampInexistant erreur =new AccesChampInexistant();
+			if (!champs.contains(op.nom)) {
+				AccesChampInexistant erreur = new AccesChampInexistant();
 				erreur.acces = op;
 				erreur.nomRef = nomRef;
 				erreurs.add(erreur);
-				
+
 			}
-				op.expression.visiter(this);
-			
+			op.expression.visiter(this);
+
+		}
+		if (!erreurs.isEmpty()) {
+			return;
+		}
+
+		for (ObjetParam op : objet.params) {
+			CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
+			String type = this.typeVar(objet.type.nomRef(), op.nom);
+			op.expression.visiter(calculerTypeRetour);
+			if (calculerTypeRetour.type != null) {
+				if (!herite(calculerTypeRetour.type, type)) {
+					TypeExpressionInvalideDansObjet erreur = new TypeExpressionInvalideDansObjet();
+					erreur.nomFonction = nomRef;
+					erreur.expression = op.expression;
+					erreur.objet = objet;
+					erreurs.add(erreur);
+				}
+			}
+
 		}
 
 	}
 
+	public boolean herite(String type1, String type2) {
+		if (type1.equals(type2)) {
+			return true;
+		}
+		TypeDef td = this.types.get(type1);
+		if (td.superType == null) {
+			return false;
+		}
+		return this.herite(td.superType.nomRef(), type2);
+	}
+
 	@Override
 	public void visiter(Appel appel) {
-		// TODO Auto-generated method stub
+		VerificationFonction fd=fonctions.get(appel.nom.nomRef());
 		if (fonctions.get(appel.nom.nomRef()) == null) {
 			FonctionInexistante fonctionInexistante = new FonctionInexistante();
 			fonctionInexistante.nom = appel.nom.nomRef();
 			fonctionInexistante.nomRef = nomRef;
 			erreurs.add(fonctionInexistante);
-			
-			
+
 		}
-		for(Expression e:appel.params) {
+		int idx = 0;
+		for (Expression e : appel.params) {
+			fd.fonction.params.get(idx);
 			e.visiter(this);
 		}
-		
 
 	}
 
@@ -318,7 +363,7 @@ public class Verificateur implements Visiteur {
 	@Override
 	public void visiter(TestType testType) {
 		// TODO Auto-generated method stub
-		
+
 		TypeDef typeDef = types.get(testType.typeRef.nomRef());
 		if (typeDef == null) {
 			TypeInexistant typeInexistant = new TypeInexistant();
@@ -327,13 +372,11 @@ public class Verificateur implements Visiteur {
 			typeInexistant.nom = testType.typeRef.nomRef();
 			typeInexistant.expression = testType;
 			erreurs.add(typeInexistant);
-			
 
 		}
 		testType.alors.visiter(this);
 		testType.sinon.visiter(this);
 		testType.cible.visiter(this);
-		
 
 	}
 
@@ -349,8 +392,8 @@ public class Verificateur implements Visiteur {
 		// TODO Auto-generated method stub
 
 	}
-	
-	public String superTypeCommun(String nomType1,String nomType2) {
+
+	public String superTypeCommun(String nomType1, String nomType2) {
 		if (nomType1 == null) {
 			return null;
 		}
@@ -375,20 +418,21 @@ public class Verificateur implements Visiteur {
 			}
 		}
 		return null;
-		
+
 	}
-	public String typeVar(String nomType,String var) {
-		TypeDef type  = this.types.get(nomType);
-		for(Var v:type.vars) {
+
+	public String typeVar(String nomType, String var) {
+		TypeDef type = this.types.get(nomType);
+		for (Var v : type.vars) {
 			if (v.nom.equals(var)) {
 				return v.type.nomRef();
 			}
-			
+
 		}
 		if (type.superType == null) {
 			return null;
 		}
-		return typeVar(type.superType.nomRef(),var);
+		return typeVar(type.superType.nomRef(), var);
 	}
 
 	@Override

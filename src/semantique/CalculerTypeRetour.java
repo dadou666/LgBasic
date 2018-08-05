@@ -14,6 +14,7 @@ import model.Var;
 import model.VarRef;
 import model.Visiteur;
 
+
 public class CalculerTypeRetour implements Visiteur {
 	public Verificateur verificateur;
 	public String type;
