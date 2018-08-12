@@ -92,6 +92,11 @@ public class Parseur implements ANTLRErrorListener {
 
 	}
 
+/*	static public Module lireModule(String src) {
+		return null;
+
+	}*/
+
 	public Module lireModule(String src) {
 		error = false;
 		lgLexer lgLexer = new lgLexer(org.antlr.v4.runtime.CharStreams.fromString(src));
@@ -128,7 +133,7 @@ public class Parseur implements ANTLRErrorListener {
 		if (tc.champs() != null) {
 			type.vars = this.transformer(tc.champs());
 		}
-		type.estAbstrait =! tc.estAbstrait().getText().isEmpty();
+		type.estAbstrait = !tc.estAbstrait().getText().isEmpty();
 		if (tc.superType() != null) {
 
 			if (tc.superType().id_externe() != null) {
@@ -229,8 +234,8 @@ public class Parseur implements ANTLRErrorListener {
 
 		}
 		if (codeContext.var() != null) {
-			VarRef varRef = new VarRef( codeContext.var().ID().getText());
-	
+			VarRef varRef = new VarRef(codeContext.var().ID().getText());
+
 			return varRef;
 
 		}
@@ -243,7 +248,7 @@ public class Parseur implements ANTLRErrorListener {
 		if (codeContext.operationOuAcces() == null) {
 			return expression;
 		}
-		if ( codeContext.operationOuAcces() != null) {
+		if (codeContext.operationOuAcces() != null) {
 			OperationOuAccesContext val = codeContext.operationOuAcces();
 			if (val.operation() != null) {
 				Appel appel = new Appel();
@@ -257,7 +262,7 @@ public class Parseur implements ANTLRErrorListener {
 				Acces acces = new Acces();
 				acces.cible = expression;
 				acces.nom = val.acces().ID().getText();
-			return acces;
+				return acces;
 
 			}
 
@@ -282,24 +287,24 @@ public class Parseur implements ANTLRErrorListener {
 		}
 		if (tmpCode.literal() != null) {
 			Literal r = new Literal();
-			for(RefContext id:tmpCode.literal().ref()) {
+			for (RefContext id : tmpCode.literal().ref()) {
 				if (id.ID() != null) {
 					r.mots.add(new Ref(id.ID().getText()));
 				}
 				if (id.id_externe() != null) {
 					r.mots.add(this.transformer(id.id_externe()));
 				}
-			//	r.mots.add(id.getText());
+				// r.mots.add(id.getText());
 			}
 			return r;
 		}
-		//if (tmpCode)
-		/*if (tmpCode.var() != null) {
-			VarRef varRef = new VarRef();
-			varRef.nom = tmpCode.var().ID().getText();
-			return varRef;
-
-		}*/
+		// if (tmpCode)
+		/*
+		 * if (tmpCode.var() != null) { VarRef varRef = new VarRef(); varRef.nom =
+		 * tmpCode.var().ID().getText(); return varRef;
+		 * 
+		 * }
+		 */
 		return null;
 
 	}

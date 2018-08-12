@@ -1,4 +1,4 @@
-package syntaxe;
+package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,6 +12,7 @@ import model.Objet;
 import model.TestEgalite;
 import model.TestType;
 import model.VarRef;
+import syntaxe.Parseur;
 
 class TestParser {
 

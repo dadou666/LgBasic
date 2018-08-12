@@ -9,8 +9,8 @@ public class Appel extends Code {
 		int newParamIdx = machine.sp;
 
 		for (int i = 0; i < params.length; i++) {
-			int idx = this.params[i].executer(machine, paramIdx);
-			machine.pile[machine.sp] = idx;
+			int j = this.params[i].executer(machine, paramIdx);
+			machine.pile[machine.sp] = j;
 			machine.sp++;
 
 		}

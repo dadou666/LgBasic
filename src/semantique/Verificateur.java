@@ -28,8 +28,9 @@ public class Verificateur implements Visiteur {
 	public Map<String, VerificationFonction> fonctions = new HashMap<>();
 	public List<Erreur> erreurs = new ArrayList<>();
 	public String nomRef;
+	public Map<String, String> variables = new HashMap<>();
 
-	void executerPourFonctions(Univers univers) {
+	public void executerPourFonctions(Univers univers) {
 		boolean erreur = false;
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
 			for (FonctionDef fonction : module.getValue().fonctions) {
@@ -80,11 +81,17 @@ public class Verificateur implements Visiteur {
 			return;
 		}
 		for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
+			this.variables = new HashMap<String, String>();
+			for (Var var : vf.getValue().fonction.params) {
+				this.variables.put(var.nom, var.type.nomRef());
+			}
+			this.nomRef = vf.getKey();
+			vf.getValue().fonction.expression.visiter(this);
 
 		}
 	}
 
-	void executerPourTypes(Univers univers) {
+	public void executerPourTypes(Univers univers) {
 
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
 			for (TypeDef type : module.getValue().types) {
@@ -122,22 +129,24 @@ public class Verificateur implements Visiteur {
 					erreurs.add(typeInexistant);
 
 				}
-				for (Var var : type.vars) {
-					if (!var.type.nom.equals("symbol") && types.get(var.type.nomRef()) == null) {
-						TypeInexistant typeInexistant = new TypeInexistant();
-						typeInexistant.nomRef = e.getKey();
-						typeInexistant.estFonction = false;
-						typeInexistant.nom = var.type.nomRef();
-						typeInexistant.expression = new VarRef(var.nom);
-						erreurs.add(typeInexistant);
-					}
+			}
+			for (Var var : type.vars) {
+				if (!var.type.nom.equals("symbol") && types.get(var.type.nomRef()) == null) {
+					TypeInexistant typeInexistant = new TypeInexistant();
+					typeInexistant.nomRef = e.getKey();
+					typeInexistant.estFonction = false;
+					typeInexistant.nom = var.type.nomRef();
+					typeInexistant.expression = new VarRef(var.nom);
+					erreurs.add(typeInexistant);
 				}
-
 			}
 
 		}
 		for (String nomType : types.keySet()) {
 			this.verifierDoublonVar(nomType);
+		}
+		if (!this.erreurs.isEmpty()) {
+			return;
 		}
 		Map<String, List<String>> composants = new HashMap<>();
 		for (Map.Entry<String, VerificationType> e : this.verificationTypes.entrySet()) {
@@ -170,7 +179,8 @@ public class Verificateur implements Visiteur {
 			if (!typeDef.estAbstrait) {
 				List<String> composant = composants.get(e.getKey());
 				for (String s : composant) {
-					e.getValue().composants.add(this.verificationTypes.get(s).sousTypes);
+					VerificationType vt = this.verificationTypes.get(s);
+					e.getValue().composants.add(vt.sousTypes);
 				}
 
 			}
@@ -305,6 +315,7 @@ public class Verificateur implements Visiteur {
 
 		for (ObjetParam op : objet.params) {
 			CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
+			calculerTypeRetour.variables = this.variables;
 			String type = this.typeVar(objet.type.nomRef(), op.nom);
 			op.expression.visiter(calculerTypeRetour);
 			if (calculerTypeRetour.type != null) {
@@ -334,7 +345,7 @@ public class Verificateur implements Visiteur {
 
 	@Override
 	public void visiter(Appel appel) {
-		VerificationFonction fd=fonctions.get(appel.nom.nomRef());
+		VerificationFonction fd = fonctions.get(appel.nom.nomRef());
 		if (fonctions.get(appel.nom.nomRef()) == null) {
 			FonctionInexistante fonctionInexistante = new FonctionInexistante();
 			fonctionInexistante.nom = appel.nom.nomRef();
@@ -343,9 +354,35 @@ public class Verificateur implements Visiteur {
 
 		}
 		int idx = 0;
+		if (appel.params.size() != fd.fonction.params.size()) {
+			NombreParametreInvalide erreur = new NombreParametreInvalide();
+			erreur.appel = appel;
+			erreur.nomFonction = this.nomRef;
+			erreurs.add(erreur);
+			return;
+		}
+
 		for (Expression e : appel.params) {
-			fd.fonction.params.get(idx);
+			Var var = fd.fonction.params.get(idx);
+			idx++;
+			CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
+			calculerTypeRetour.variables = this.variables;
+			int nbErreur = this.erreurs.size();
 			e.visiter(this);
+			if (nbErreur == this.erreurs.size()) {
+				e.visiter(calculerTypeRetour);
+				if (calculerTypeRetour.type != null) {
+					if (!this.herite(calculerTypeRetour.type, var.type.nomRef())) {
+						TypeParametreFonctionInvalide erreur = new TypeParametreFonctionInvalide();
+						erreur.nomFonction = this.nomRef;
+						erreur.appel = appel;
+						erreur.idx = idx;
+						erreurs.add(erreur);
+					}
+				}
+
+			}
+
 		}
 
 	}
