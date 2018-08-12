@@ -142,12 +142,13 @@ public class Verificateur implements Visiteur {
 			}
 
 		}
-		for (String nomType : types.keySet()) {
-			this.verifierDoublonVar(nomType);
-		}
 		if (!this.erreurs.isEmpty()) {
 			return;
 		}
+		for (String nomType : types.keySet()) {
+			this.verifierDoublonVar(nomType);
+		}
+	
 		Map<String, List<String>> composants = new HashMap<>();
 		for (Map.Entry<String, VerificationType> e : this.verificationTypes.entrySet()) {
 			TypeDef typeDef = this.types.get(e.getKey());
