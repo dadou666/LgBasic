@@ -16,7 +16,7 @@ public class Module {
 		init.module = nom;
 		for (FonctionDef fd : fonctions) {
 			for (Var var : fd.params) {
-				if (var.type.module == null) {
+				if (var.type.module == null && !var.type.nom.equals("symbol")) {
 					var.type.module = nom;
 				}
 			}

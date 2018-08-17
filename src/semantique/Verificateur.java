@@ -67,7 +67,7 @@ public class Verificateur implements Visiteur {
 				} else {
 					noms.add(var.nom);
 				}
-				if (types.get(var.type.nomRef()) == null) {
+				if (!var.type.nom.equals("symbol") && types.get(var.type.nomRef()) == null) {
 					TypeInexistant typeInexistant = new TypeInexistant();
 					typeInexistant.nomRef = vf.getKey();
 					typeInexistant.nom = var.type.nomRef();
@@ -424,6 +424,7 @@ public class Verificateur implements Visiteur {
 	public void visiter(Acces acces) {
 		CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
 		calculerTypeRetour.variables = this.variables;
+		calculerTypeRetour.verificateur = this;
 
 		acces.cible.visiter(this);
 		if (this.erreurs.isEmpty()) {
