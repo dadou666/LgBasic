@@ -34,10 +34,10 @@ public class Verificateur implements Visiteur {
 		boolean erreur = false;
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
 			for (FonctionDef fonction : module.getValue().fonctions) {
-				String nomRef = module.getKey() + "$" + fonction.nom;
-				if (fonctions.get(nomRef) != null) {
+				String nomRefTmp = module.getKey() + "$" + fonction.nom;
+				if (fonctions.get(nomRefTmp) != null) {
 					DoublonNomFonction doublon = new DoublonNomFonction();
-					doublon.nom = nomRef;
+					doublon.nom = nomRefTmp;
 
 					erreurs.add(doublon);
 					erreur = true;
@@ -45,7 +45,7 @@ public class Verificateur implements Visiteur {
 				} else {
 					VerificationFonction vf = new VerificationFonction();
 					vf.fonction = fonction;
-					fonctions.put(nomRef, vf);
+					fonctions.put(nomRefTmp, vf);
 				}
 			}
 
@@ -98,6 +98,7 @@ public class Verificateur implements Visiteur {
 				if (type.nom.equals("symbol")) {
 					NomTypeReserve nomTypeReserve = new NomTypeReserve();
 					nomTypeReserve.nom = type.nom;
+					erreurs.add(nomTypeReserve);
 				} else {
 					String nom = module.getKey() + "$" + type.nom;
 					if (types.get(nom) != null) {
@@ -148,7 +149,7 @@ public class Verificateur implements Visiteur {
 		for (String nomType : types.keySet()) {
 			this.verifierDoublonVar(nomType);
 		}
-	
+
 		Map<String, List<String>> composants = new HashMap<>();
 		for (Map.Entry<String, VerificationType> e : this.verificationTypes.entrySet()) {
 			TypeDef typeDef = this.types.get(e.getKey());
@@ -156,19 +157,21 @@ public class Verificateur implements Visiteur {
 				List<String> composant = new ArrayList<>();
 				Ref superType = typeDef.superType;
 				for (Var var : typeDef.vars) {
-
-					composant.add(var.type.nomRef());
+					if (!var.type.nom.equals("symbol")) {
+						composant.add(var.type.nomRef());
+					}
 				}
 				e.getValue().sousTypes.add(e.getKey());
 				while (superType != null) {
-					String nomRef = superType.nomRef();
-					TypeDef sousTypeDef = types.get(nomRef);
+					String nomRefTmp = superType.nomRef();
+					TypeDef sousTypeDef = types.get(nomRefTmp);
 					for (Var var : sousTypeDef.vars) {
-
-						composant.add(var.type.nomRef());
+						if (!var.type.nom.equals("symbol")) {
+							composant.add(var.type.nomRef());
+						}
 					}
-					this.verificationTypes.get(nomRef).sousTypes.add(e.getKey());
-					superType = this.types.get(nomRef).superType;
+					this.verificationTypes.get(nomRefTmp).sousTypes.add(e.getKey());
+					superType = this.types.get(nomRefTmp).superType;
 
 				}
 				composants.put(e.getKey(), composant);
@@ -400,7 +403,6 @@ public class Verificateur implements Visiteur {
 
 	@Override
 	public void visiter(TestType testType) {
-		// TODO Auto-generated method stub
 
 		TypeDef typeDef = types.get(testType.typeRef.nomRef());
 		if (typeDef == null) {
@@ -420,8 +422,25 @@ public class Verificateur implements Visiteur {
 
 	@Override
 	public void visiter(Acces acces) {
-		// TODO Auto-generated method stub
+		CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
+		calculerTypeRetour.variables = this.variables;
+
 		acces.cible.visiter(this);
+		if (this.erreurs.isEmpty()) {
+			acces.cible.visiter(calculerTypeRetour);
+			if (calculerTypeRetour.type != null) {
+				List<String> liste = this.verificationTypes.get(calculerTypeRetour.type).champs;
+				if (!liste.contains(acces.nom)) {
+					AccesChampInexistant erreur = new AccesChampInexistant();
+					erreur.acces = acces;
+					erreur.nomRef = nomRef;
+					erreurs.add(erreur);
+
+				}
+
+			}
+
+		}
 
 	}
 

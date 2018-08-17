@@ -8,20 +8,26 @@ import semantique.InitModuleRef;
 
 public class Module {
 	public boolean estAPI;
-	public List<FonctionDef> fonctions= new ArrayList<FonctionDef>();
-	public List<TypeDef> types= new ArrayList<TypeDef>();
+	public List<FonctionDef> fonctions = new ArrayList<FonctionDef>();
+	public List<TypeDef> types = new ArrayList<TypeDef>();
+
 	public void initNomModule(String nom) {
 		InitModuleRef init = new InitModuleRef();
 		init.module = nom;
-		for(FonctionDef fd:fonctions) {
+		for (FonctionDef fd : fonctions) {
+			for (Var var : fd.params) {
+				if (var.type.module == null) {
+					var.type.module = nom;
+				}
+			}
 			fd.expression.visiter(init);
 		}
-		for(TypeDef td:types ) {
+		for (TypeDef td : types) {
 			if (td.superType != null && td.superType.module == null) {
 				td.superType.module = nom;
-				
+
 			}
-			for( Var var:td.vars) {
+			for (Var var : td.vars) {
 				if (var.type.module == null) {
 					var.type.module = nom;
 				}
