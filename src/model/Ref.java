@@ -15,6 +15,9 @@ public class Ref {
 	}
 
 	public String nomRef() {
+		if (nom.equals("symbol")) {
+			return nom;
+		}
 		return module + "$" + nom;
 	}
 }
