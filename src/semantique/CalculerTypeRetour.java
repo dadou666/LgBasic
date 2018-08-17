@@ -38,11 +38,13 @@ public class CalculerTypeRetour implements Visiteur {
 				CalculerTypeRetour calculer = new CalculerTypeRetour();
 				calculer.verificateur = this.verificateur;
 				calculer.nomRef = appel.nom.nomRef();
+			
 				for (Var v : vf.fonction.params) {
 					calculer.variables.put(v.nom, v.type.nomRef());
 
 				}
 				vf.fonction.expression.visiter(calculer);
+				vf.typeRetour = calculer.type;
 				this.type = vf.typeRetour;
 			}
 		}

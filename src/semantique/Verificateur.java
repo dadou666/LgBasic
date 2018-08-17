@@ -299,6 +299,8 @@ public class Verificateur implements Visiteur {
 				erreur.nomFonction = nomRef;
 				erreur.objet = objet;
 				erreurs.add(erreur);
+			} else {
+				tmp.add(op.nom);
 			}
 		}
 		List<String> champs = this.verificationTypes.get(objet.type.nomRef()).champs;
@@ -322,14 +324,14 @@ public class Verificateur implements Visiteur {
 			calculerTypeRetour.variables = this.variables;
 			String type = this.typeVar(objet.type.nomRef(), op.nom);
 			op.expression.visiter(calculerTypeRetour);
-			if (calculerTypeRetour.type != null) {
-				if (!herite(calculerTypeRetour.type, type)) {
-					TypeExpressionInvalideDansObjet erreur = new TypeExpressionInvalideDansObjet();
-					erreur.nomFonction = nomRef;
-					erreur.expression = op.expression;
-					erreur.objet = objet;
-					erreurs.add(erreur);
-				}
+			if (calculerTypeRetour.type != null && !herite(calculerTypeRetour.type, type)) {
+				TypeExpressionInvalideDansObjet erreur = new TypeExpressionInvalideDansObjet();
+				erreur.nomFonction = nomRef;
+				erreur.expression = op.expression;
+				erreur.objet = objet;
+				erreur.nom = op.nom;
+				
+				erreurs.add(erreur);
 			}
 
 		}
@@ -339,6 +341,9 @@ public class Verificateur implements Visiteur {
 	public boolean herite(String type1, String type2) {
 		if (type1.equals(type2)) {
 			return true;
+		}
+		if (type1.equals("symbol")) {
+			return false;
 		}
 		TypeDef td = this.types.get(type1);
 		if (td.superType == null) {
@@ -355,6 +360,7 @@ public class Verificateur implements Visiteur {
 			fonctionInexistante.nom = appel.nom.nomRef();
 			fonctionInexistante.nomRef = nomRef;
 			erreurs.add(fonctionInexistante);
+			return;
 
 		}
 		int idx = 0;
@@ -371,6 +377,7 @@ public class Verificateur implements Visiteur {
 			idx++;
 			CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
 			calculerTypeRetour.variables = this.variables;
+			calculerTypeRetour.verificateur = this;
 			int nbErreur = this.erreurs.size();
 			e.visiter(this);
 			if (nbErreur == this.erreurs.size()) {
