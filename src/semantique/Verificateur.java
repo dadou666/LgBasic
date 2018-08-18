@@ -2,8 +2,10 @@ package semantique;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import model.Acces;
 import model.Appel;
@@ -28,13 +30,58 @@ public class Verificateur implements Visiteur {
 	public Map<String, VerificationFonction> fonctions = new HashMap<>();
 	public List<Erreur> erreurs = new ArrayList<>();
 	public String nomRef;
+	public List<String> modules = new ArrayList<>();
 	public Map<String, String> variables = new HashMap<>();
+	public VerificationFonction recuperer(Appel appel) {
+		if (appel.nom.moduleInit) {
+			VerificationFonction vf = fonctions.get(appel.nomRef());
+			if (vf != null) {
+				return vf;
+				
+			}
+			List<String> noms = new ArrayList<>();
+			for(String module:modules) {
+				String nomRefTmp=module+"$"+appel.nomRefPartiel();
+				
+				vf = fonctions.get(nomRefTmp);
+				if (vf != null) { noms.add(nomRefTmp); }
+			}
+			if (noms.isEmpty()) {
+				FonctionInexistante fonctionInexistante = new FonctionInexistante();
+				fonctionInexistante.nom = appel.nomRef();
+				fonctionInexistante.nomRef = nomRef;
+				erreurs.add(fonctionInexistante);
+				return null;
+			}
+			if (noms.size() == 1) {
+				appel.nom.moduleInit = false;
+				appel.nom.module = noms.get(0);
+				return vf;
+			}
+			MultipleDefinition md = new MultipleDefinition();
+			md.nomFonction = nomRef;
+			md.appel=appel;
+			erreurs.add(md);
+			return null;
+			
+		}
+		
+		VerificationFonction vf= fonctions.get(appel.nomRef());
+		if (vf == null) {
+			FonctionInexistante fonctionInexistante = new FonctionInexistante();
+			fonctionInexistante.nom = appel.nom.nomRef();
+			fonctionInexistante.nomRef = nomRef;
+			erreurs.add(fonctionInexistante);
+			return null;
+		}
+		return vf;
+	}
 
 	public void executerPourFonctions(Univers univers) {
 		boolean erreur = false;
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
 			for (FonctionDef fonction : module.getValue().fonctions) {
-				String nomRefTmp = module.getKey() + "$" + fonction.nom;
+				String nomRefTmp = module.getKey() + "$" + fonction.nom+"/"+fonction.params.size();
 				if (fonctions.get(nomRefTmp) != null) {
 					DoublonNomFonction doublon = new DoublonNomFonction();
 					doublon.nom = nomRefTmp;
@@ -92,6 +139,7 @@ public class Verificateur implements Visiteur {
 	}
 
 	public void executerPourTypes(Univers univers) {
+		this.modules.addAll(univers.modules.keySet());
 
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
 			for (TypeDef type : module.getValue().types) {
@@ -354,12 +402,8 @@ public class Verificateur implements Visiteur {
 
 	@Override
 	public void visiter(Appel appel) {
-		VerificationFonction fd = fonctions.get(appel.nom.nomRef());
-		if (fonctions.get(appel.nom.nomRef()) == null) {
-			FonctionInexistante fonctionInexistante = new FonctionInexistante();
-			fonctionInexistante.nom = appel.nom.nomRef();
-			fonctionInexistante.nomRef = nomRef;
-			erreurs.add(fonctionInexistante);
+		VerificationFonction fd =this.recuperer(appel);
+		if (fd == null) {
 			return;
 
 		}

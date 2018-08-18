@@ -29,7 +29,7 @@ public class CalculerTypeRetour implements Visiteur {
 
 	@Override
 	public void visiter(Appel appel) {
-		VerificationFonction vf = verificateur.fonctions.get(appel.nom.nomRef());
+		VerificationFonction vf = verificateur.recuperer(appel);
 		if (vf.typeRetour != null) {
 			type = vf.typeRetour;
 		} else {

@@ -10,7 +10,7 @@ public class Ref {
 	}
 
 	public Ref(String nom) {
-		moduleInit = true;
+	
 		this.nom = nom;
 	}
 

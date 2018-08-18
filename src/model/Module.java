@@ -18,6 +18,7 @@ public class Module {
 			for (Var var : fd.params) {
 				if (var.type.module == null && !var.type.nom.equals("symbol")) {
 					var.type.module = nom;
+					var.type.moduleInit = true;
 				}
 			}
 			fd.expression.visiter(init);
@@ -25,11 +26,13 @@ public class Module {
 		for (TypeDef td : types) {
 			if (td.superType != null && td.superType.module == null) {
 				td.superType.module = nom;
+				td.superType.moduleInit = true;
 
 			}
 			for (Var var : td.vars) {
 				if (var.type.module == null) {
 					var.type.module = nom;
+					var.type.moduleInit = true;
 				}
 			}
 		}

@@ -20,6 +20,7 @@ public class InitModuleRef implements Visiteur{
 
 		if (objet.type.module == null) {
 			objet.type.module = module;
+			objet.type.moduleInit = true;
 		}
 		for(ObjetParam op:objet.params) {
 			op.expression.visiter(this);
@@ -31,6 +32,7 @@ public class InitModuleRef implements Visiteur{
 	public void visiter(Appel appel) {
 		if (appel.nom.module == null) {
 			appel.nom.module = module;
+			appel.nom.moduleInit = true;
 		}
 		for(Expression e:appel.params) {
 			e.visiter(this);
@@ -52,6 +54,7 @@ public class InitModuleRef implements Visiteur{
 	public void visiter(TestType testType) {
 		if (testType.typeRef.module == null) {
 			testType.typeRef.module =module;
+			testType.typeRef.moduleInit = true;
 		}
 		testType.cible.visiter(this);
 		testType.alors.visiter(this);
@@ -78,6 +81,7 @@ public class InitModuleRef implements Visiteur{
 		for(Ref ref:literal.mots) {
 			if ( ref.module == null ) {
 				ref.module = module;
+				ref.moduleInit = true;
 			}
 			
 		}
