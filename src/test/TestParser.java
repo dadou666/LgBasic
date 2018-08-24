@@ -9,7 +9,7 @@ import model.Appel;
 import model.Literal;
 import model.Module;
 import model.Objet;
-import model.TestEgalite;
+
 import model.TestType;
 import model.VarRef;
 import syntaxe.Parseur;
@@ -194,71 +194,9 @@ class TestParser {
 
 	}
 
-	@Test
-	void testFonctionAvecTestEgalite() {
-		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x | si x == m  alors q sinon m");
-		assertTrue(module != null);
-		assertTrue(module.fonctions.size() == 1);
-		assertTrue(module.fonctions.get(0).nom.equals("f"));
-		assertTrue(module.fonctions.get(0).expression != null);
-		assertTrue(module.fonctions.get(0).expression instanceof TestEgalite);
 
-		assertTrue(module.fonctions.get(0).params.size() == 1);
-		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
-		assertTrue(module.fonctions.get(0).params.get(0).type.module.equals("toto"));
-		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
-
-		TestEgalite testType = (TestEgalite) module.fonctions.get(0).expression;
-		assertTrue(testType.a instanceof VarRef);
-		assertTrue(testType.b instanceof VarRef);
-		VarRef a = (VarRef) testType.a;
-		VarRef b = (VarRef) testType.b;
-		
-		assertTrue(a.nom.equals("x"));
-		assertTrue(b.nom.equals("m"));
-		
-		assertTrue(testType.alors != null);
-		assertTrue(testType.alors instanceof VarRef);
-		VarRef varRef = (VarRef) testType.alors;
-		assertTrue(varRef.nom.equals("q"));
-		varRef = (VarRef) testType.sinon;
-		assertTrue(varRef.nom.equals("m"));
-
-	}
 	
-	@Test
-	void testFonctionAvecTestDifference() {
-		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x | si x <> m  alors q sinon m");
-		assertTrue(module != null);
-		assertTrue(module.fonctions.size() == 1);
-		assertTrue(module.fonctions.get(0).nom.equals("f"));
-		assertTrue(module.fonctions.get(0).expression != null);
-		assertTrue(module.fonctions.get(0).expression instanceof TestEgalite);
 
-		assertTrue(module.fonctions.get(0).params.size() == 1);
-		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
-		assertTrue(module.fonctions.get(0).params.get(0).type.module.equals("toto"));
-		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
-
-		TestEgalite testType = (TestEgalite) module.fonctions.get(0).expression;
-		assertTrue(testType.a instanceof VarRef);
-		assertTrue(testType.b instanceof VarRef);
-		VarRef a = (VarRef) testType.a;
-		VarRef b = (VarRef) testType.b;
-		
-		assertTrue(a.nom.equals("x"));
-		assertTrue(b.nom.equals("m"));
-		
-		assertTrue(testType.alors != null);
-		assertTrue(testType.alors instanceof VarRef);
-		VarRef varRef = (VarRef) testType.alors;
-		assertTrue(varRef.nom.equals("m"));
-		varRef = (VarRef) testType.sinon;
-		assertTrue(varRef.nom.equals("q"));
-
-	}
 
 	@Test
 	void testFonctionAvecTestTypeEtNegation() {
@@ -518,38 +456,9 @@ class TestParser {
 		
 	}
 	
-	@Test
-	void testAccesSurSi() {
-		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x lili:m | ( si a==b alors a sinon b).lolo ");
-		assertTrue(module != null);
-		assertTrue(module.fonctions.size() == 1);
-		assertTrue(module.fonctions.get(0).nom.equals("f"));
-		assertTrue(module.fonctions.get(0).expression != null);
-		assertTrue(module.fonctions.get(0).expression instanceof Acces);
-		Acces acces = (Acces) module.fonctions.get(0).expression;
-		assertTrue( acces.nom.equals("lolo"));
-		assertTrue(acces.cible instanceof TestEgalite);
-		
-		
-	}
+
 	
-	@Test
-	void testOperateurSurSi() {
-		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x lili:m | ( si a==b alors a sinon b)+lolo ");
-		assertTrue(module != null);
-		assertTrue(module.fonctions.size() == 1);
-		assertTrue(module.fonctions.get(0).nom.equals("f"));
-		assertTrue(module.fonctions.get(0).expression != null);
-		assertTrue(module.fonctions.get(0).expression instanceof Appel);
-		Appel appel = (Appel) module.fonctions.get(0).expression;
-		assertTrue( appel.nom.nom.equals("+"));
-		assertTrue(appel.params.size() == 2);
-		assertTrue(appel.params.get(0) instanceof TestEgalite);
-		
-		
-	}
+
 	
 
 }

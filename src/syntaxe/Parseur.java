@@ -41,7 +41,7 @@ import model.Objet;
 import model.ObjetParam;
 import model.Ref;
 import model.Test;
-import model.TestEgalite;
+
 import model.TestType;
 import model.TypeDef;
 import model.Univers;
@@ -327,27 +327,7 @@ public class Parseur implements ANTLRErrorListener {
 
 	public Test transformer(SiContext siContext) {
 
-		if (siContext.testEgalite() != null) {
-			TestEgalite r = new TestEgalite();
-			r.a = this.transformer(siContext.testEgalite().code(0));
-			r.b = this.transformer(siContext.testEgalite().code(1));
-
-			r.alors = this.transformer(siContext.code(0));
-			r.sinon = this.transformer(siContext.code(1));
-			return r;
-
-		}
-		if (siContext.testDifference() != null) {
-			TestEgalite r = new TestEgalite();
-			r.a = this.transformer(siContext.testDifference().code(0));
-			r.b = this.transformer(siContext.testDifference().code(1));
-
-			r.alors = this.transformer(siContext.code(1));
-			r.sinon = this.transformer(siContext.code(0));
-			return r;
-
-		}
-
+	
 		if (siContext.testType() != null) {
 			TestType r = new TestType();
 			r.cible = this.transformer(siContext.testType().code());

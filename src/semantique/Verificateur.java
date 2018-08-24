@@ -16,7 +16,7 @@ import model.Module;
 import model.Objet;
 import model.ObjetParam;
 import model.Ref;
-import model.TestEgalite;
+
 import model.TestType;
 import model.TypeDef;
 import model.Univers;
@@ -26,25 +26,92 @@ import model.Visiteur;
 
 public class Verificateur implements Visiteur {
 	public Map<String, TypeDef> types = new HashMap<>();
+	public Set<String> typeReserve = new HashSet<>();
 	public Map<String, VerificationType> verificationTypes = new HashMap<>();
 	public Map<String, VerificationFonction> fonctions = new HashMap<>();
 	public List<Erreur> erreurs = new ArrayList<>();
 	public String nomRef;
 	public List<String> modules = new ArrayList<>();
 	public Map<String, String> variables = new HashMap<>();
+
+	public Verificateur() {
+		modules.add("base");
+		this.typeReserve.add("base$symbol");
+
+	}
+
+	public boolean trouverType(Ref ref, boolean estFonction, String nom) {
+		if (ref.moduleInit) {
+			if (this.types.get(ref.nomRef()) != null) {
+				return true;
+			}
+			if (this.typeReserve.contains(ref.nomRef())) {
+				return true;
+			}
+
+			List<String> noms = new ArrayList<>();
+			String tmp = null;
+			for (String module : modules) {
+				String nomRefTmp = module + "$" + ref.nom;
+
+				if (types.get(nomRefTmp) != null || typeReserve.contains(nomRefTmp)) {
+					tmp = module;
+					noms.add(nomRefTmp);
+				}
+			}
+			if (noms.isEmpty()) {
+				TypeInexistant typeInexistant = new TypeInexistant();
+				typeInexistant.nomRef = nom;
+				typeInexistant.estFonction = estFonction;
+				typeInexistant.nom = ref.nomRef();
+				typeInexistant.expression = new VarRef(ref.nom);
+				erreurs.add(typeInexistant);
+				return false;
+			}
+			if (noms.size() == 1) {
+				ref.moduleInit = false;
+				ref.module = tmp;
+
+				return true;
+			}
+			MultipleDefinitionType erreur = new MultipleDefinitionType();
+			erreur.ref = ref;
+			erreur.estFonction = estFonction;
+			erreur.nom = nom;
+			erreur.types = noms;
+			erreurs.add(erreur);
+			return false;
+		}
+		boolean r = types.get(ref.nomRef()) != null || typeReserve.contains(ref.nomRef());
+		if (!r) {
+			TypeInexistant typeInexistant = new TypeInexistant();
+			typeInexistant.nomRef = nom;
+			typeInexistant.estFonction = estFonction;
+			typeInexistant.nom = ref.nomRef();
+			typeInexistant.expression = new VarRef(ref.nom);
+			erreurs.add(typeInexistant);
+			return false;
+		}
+		return true;
+	}
+
 	public VerificationFonction recuperer(Appel appel) {
 		if (appel.nom.moduleInit) {
 			VerificationFonction vf = fonctions.get(appel.nomRef());
 			if (vf != null) {
 				return vf;
-				
+
 			}
 			List<String> noms = new ArrayList<>();
-			for(String module:modules) {
-				String nomRefTmp=module+"$"+appel.nomRefPartiel();
-				
+			String tmp = null;
+			for (String module : modules) {
+				String nomRefTmp = module + "$" + appel.nomRefPartiel();
+
 				vf = fonctions.get(nomRefTmp);
-				if (vf != null) { noms.add(nomRefTmp); }
+				if (vf != null) {
+					tmp = module;
+					noms.add(nomRefTmp);
+				}
 			}
 			if (noms.isEmpty()) {
 				FonctionInexistante fonctionInexistante = new FonctionInexistante();
@@ -55,18 +122,20 @@ public class Verificateur implements Visiteur {
 			}
 			if (noms.size() == 1) {
 				appel.nom.moduleInit = false;
-				appel.nom.module = noms.get(0);
+
+				appel.nom.module = tmp;
 				return vf;
 			}
-			MultipleDefinition md = new MultipleDefinition();
+			MultipleDefinitionFonction md = new MultipleDefinitionFonction();
 			md.nomFonction = nomRef;
-			md.appel=appel;
+			md.appel = appel;
+			md.fonctions = noms;
 			erreurs.add(md);
 			return null;
-			
+
 		}
-		
-		VerificationFonction vf= fonctions.get(appel.nomRef());
+
+		VerificationFonction vf = fonctions.get(appel.nomRef());
 		if (vf == null) {
 			FonctionInexistante fonctionInexistante = new FonctionInexistante();
 			fonctionInexistante.nom = appel.nom.nomRef();
@@ -81,7 +150,7 @@ public class Verificateur implements Visiteur {
 		boolean erreur = false;
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
 			for (FonctionDef fonction : module.getValue().fonctions) {
-				String nomRefTmp = module.getKey() + "$" + fonction.nom+"/"+fonction.params.size();
+				String nomRefTmp = module.getKey() + "$" + fonction.nom + "/" + fonction.params.size();
 				if (fonctions.get(nomRefTmp) != null) {
 					DoublonNomFonction doublon = new DoublonNomFonction();
 					doublon.nom = nomRefTmp;
@@ -114,12 +183,7 @@ public class Verificateur implements Visiteur {
 				} else {
 					noms.add(var.nom);
 				}
-				if (!var.type.nom.equals("symbol") && types.get(var.type.nomRef()) == null) {
-					TypeInexistant typeInexistant = new TypeInexistant();
-					typeInexistant.nomRef = vf.getKey();
-					typeInexistant.nom = var.type.nomRef();
-					typeInexistant.expression = new VarRef(var.nom);
-					erreurs.add(typeInexistant);
+				if (!this.trouverType(var.type, true, vf.getKey())) {
 					erreur = true;
 				}
 			}
@@ -143,22 +207,17 @@ public class Verificateur implements Visiteur {
 
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
 			for (TypeDef type : module.getValue().types) {
-				if (type.nom.equals("symbol")) {
-					NomTypeReserve nomTypeReserve = new NomTypeReserve();
-					nomTypeReserve.nom = type.nom;
-					erreurs.add(nomTypeReserve);
+
+				String nom = module.getKey() + "$" + type.nom;
+				if (types.get(nom) != null) {
+					DoublonNomType doublon = new DoublonNomType();
+					doublon.nom = nom;
+
+					erreurs.add(doublon);
+
 				} else {
-					String nom = module.getKey() + "$" + type.nom;
-					if (types.get(nom) != null) {
-						DoublonNomType doublon = new DoublonNomType();
-						doublon.nom = nom;
-
-						erreurs.add(doublon);
-
-					} else {
-						types.put(nom, type);
-						verificationTypes.put(nom, new VerificationType());
-					}
+					types.put(nom, type);
+					verificationTypes.put(nom, new VerificationType());
 				}
 
 			}
@@ -169,25 +228,16 @@ public class Verificateur implements Visiteur {
 			TypeDef type = e.getValue();
 
 			if (type.superType != null) {
-				if (types.get(type.superType.nomRef()) == null) {
-					TypeInexistant typeInexistant = new TypeInexistant();
-					typeInexistant.nomRef = e.getKey();
-					typeInexistant.estFonction = false;
-					typeInexistant.nom = type.superType.nomRef();
-					typeInexistant.expression = null;
-					erreurs.add(typeInexistant);
+
+				if (trouverType(type.superType, false, e.getKey()) && typeReserve.contains(type.superType.nomRef())) {
+					NomTypeReserve erreur = new NomTypeReserve();
+					erreur.nom = type.superType.nomRef();
+					erreurs.add(erreur);
 
 				}
 			}
 			for (Var var : type.vars) {
-				if (!var.type.nom.equals("symbol") && types.get(var.type.nomRef()) == null) {
-					TypeInexistant typeInexistant = new TypeInexistant();
-					typeInexistant.nomRef = e.getKey();
-					typeInexistant.estFonction = false;
-					typeInexistant.nom = var.type.nomRef();
-					typeInexistant.expression = new VarRef(var.nom);
-					erreurs.add(typeInexistant);
-				}
+				this.trouverType(var.type, false, e.getKey());
 			}
 
 		}
@@ -205,7 +255,7 @@ public class Verificateur implements Visiteur {
 				List<String> composant = new ArrayList<>();
 				Ref superType = typeDef.superType;
 				for (Var var : typeDef.vars) {
-					if (!var.type.nom.equals("symbol")) {
+					if (!this.typeReserve.contains(var.type.nomRef())) {
 						composant.add(var.type.nomRef());
 					}
 				}
@@ -214,7 +264,7 @@ public class Verificateur implements Visiteur {
 					String nomRefTmp = superType.nomRef();
 					TypeDef sousTypeDef = types.get(nomRefTmp);
 					for (Var var : sousTypeDef.vars) {
-						if (!var.type.nom.equals("symbol")) {
+						if (!typeReserve.contains(var.type.nomRef())) {
 							composant.add(var.type.nomRef());
 						}
 					}
@@ -325,18 +375,19 @@ public class Verificateur implements Visiteur {
 
 	@Override
 	public void visiter(Objet objet) {
-		// TODO Auto-generated method stub
-		TypeDef typeDef = types.get(objet.type.nomRef());
-		if (typeDef == null) {
-			TypeInexistant typeInexistant = new TypeInexistant();
-			typeInexistant.nomRef = nomRef;
-			typeInexistant.estFonction = true;
-			typeInexistant.nom = objet.type.nomRef();
-			typeInexistant.expression = objet;
-			erreurs.add(typeInexistant);
+
+		if (!this.trouverType(objet.type, true, nomRef)) {
+			return;
+		}
+		if (typeReserve.contains(objet.type.nomRef())) {
+			OperationInvalideSurTypeReserve erreur = new OperationInvalideSurTypeReserve();
+			erreur.nomFonction = nomRef;
+			erreur.expression = objet;
+			erreurs.add(erreur);
 			return;
 
 		}
+
 		List<String> tmp = new ArrayList<String>();
 
 		for (ObjetParam op : objet.params) {
@@ -378,7 +429,7 @@ public class Verificateur implements Visiteur {
 				erreur.expression = op.expression;
 				erreur.objet = objet;
 				erreur.nom = op.nom;
-				
+
 				erreurs.add(erreur);
 			}
 
@@ -390,7 +441,7 @@ public class Verificateur implements Visiteur {
 		if (type1.equals(type2)) {
 			return true;
 		}
-		if (type1.equals("symbol")) {
+		if (typeReserve.contains(type1)) {
 			return false;
 		}
 		TypeDef td = this.types.get(type1);
@@ -402,7 +453,7 @@ public class Verificateur implements Visiteur {
 
 	@Override
 	public void visiter(Appel appel) {
-		VerificationFonction fd =this.recuperer(appel);
+		VerificationFonction fd = this.recuperer(appel);
 		if (fd == null) {
 			return;
 
@@ -442,19 +493,21 @@ public class Verificateur implements Visiteur {
 
 	}
 
-	@Override
-	public void visiter(TestEgalite testEgalite) {
-		// TODO Auto-generated method stub
-		testEgalite.a.visiter(this);
-		testEgalite.b.visiter(this);
-		testEgalite.alors.visiter(this);
-		testEgalite.sinon.visiter(this);
 
-	}
 
 	@Override
 	public void visiter(TestType testType) {
+		if (!this.trouverType(testType.typeRef, true, nomRef)) {
+			return;
+		}
+		if (typeReserve.contains(testType.typeRef.nomRef())) {
+			OperationInvalideSurTypeReserve erreur = new OperationInvalideSurTypeReserve();
+			erreur.nomFonction = nomRef;
+			erreur.expression = testType;
+			erreurs.add(erreur);
+			return;
 
+		}
 		TypeDef typeDef = types.get(testType.typeRef.nomRef());
 		if (typeDef == null) {
 			TypeInexistant typeInexistant = new TypeInexistant();

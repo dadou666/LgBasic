@@ -7,7 +7,7 @@ import model.Acces;
 import model.Appel;
 import model.Literal;
 import model.Objet;
-import model.TestEgalite;
+
 import model.TestType;
 import model.TypeDef;
 import model.Var;
@@ -51,56 +51,6 @@ public class CalculerTypeRetour implements Visiteur {
 
 	}
 
-	@Override
-	public void visiter(TestEgalite testEgalite) {
-		CalculerTypeRetour calculer = new CalculerTypeRetour();
-		calculer.verificateur = this.verificateur;
-		calculer.variables = this.variables;
-		calculer.nomRef = nomRef;
-		testEgalite.a.visiter(calculer);
-
-		calculer = new CalculerTypeRetour();
-		calculer.verificateur = this.verificateur;
-		calculer.variables = this.variables;
-		calculer.nomRef = nomRef;
-		testEgalite.b.visiter(calculer);
-
-		CalculerTypeRetour calculerAlors = new CalculerTypeRetour();
-		calculerAlors.verificateur = this.verificateur;
-		calculerAlors.variables = this.variables;
-		calculerAlors.nomRef = nomRef;
-		testEgalite.alors.visiter(calculerAlors);
-
-		CalculerTypeRetour calculerSinon = new CalculerTypeRetour();
-		calculerSinon.verificateur = this.verificateur;
-		calculerSinon.variables = this.variables;
-		calculerSinon.nomRef = nomRef;
-		testEgalite.sinon.visiter(calculerSinon);
-		if (calculerAlors.type == null && calculerSinon.type == null) {
-			TypeIndetermine erreur = new TypeIndetermine();
-			erreur.e = testEgalite;
-			erreur.nomRef = nomRef;
-			this.verificateur.erreurs.add(erreur);
-			return;
-
-		}
-		if (calculerAlors.type == null) {
-			this.type = calculerAlors.type;
-			return;
-		}
-
-		if (calculerSinon.type == null) {
-			this.type = calculerSinon.type;
-			return;
-		}
-		this.type = this.verificateur.superTypeCommun(calculerAlors.type, calculerSinon.type);
-		if (this.type == null) {
-			TypeIndetermine typeIndetermine = new TypeIndetermine();
-			typeIndetermine.e = testEgalite;
-			this.verificateur.erreurs.add(typeIndetermine);
-		}
-
-	}
 
 	@Override
 	public void visiter(TestType testType) {
@@ -167,8 +117,8 @@ public class CalculerTypeRetour implements Visiteur {
 			this.verificateur.erreurs.add(typeIndetermine);
 			return;
 		}
-		if (calculer.type.equals(TypeDef.Symbol)) {
-			AccesSurSymbol erreur = new AccesSurSymbol();
+		if (this.verificateur.typeReserve.contains(calculer.type)) {
+			OperationInvalideSurTypeReserve erreur = new OperationInvalideSurTypeReserve();
 			erreur.nomFonction = nomRef;
 			verificateur.erreurs.add(erreur);
 			return;
@@ -186,9 +136,7 @@ public class CalculerTypeRetour implements Visiteur {
 	@Override
 	public void visiter(VarRef varRef) {
 		this.type = this.variables.get(varRef.nom);
-		if (this.type == null) {
-			this.type = TypeDef.Symbol;
-		}
+	
 
 	}
 

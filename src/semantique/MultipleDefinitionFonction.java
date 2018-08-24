@@ -7,8 +7,8 @@ import java.util.Set;
 
 import model.Appel;
 
-public class MultipleDefinition extends Erreur {
+public class MultipleDefinitionFonction extends Erreur {
 	public Appel appel;
 	public String nomFonction;
-	public Set<String> fonctions= new HashSet<>();
+	public List<String> fonctions= new ArrayList<>();
 }

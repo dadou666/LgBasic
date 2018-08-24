@@ -7,7 +7,7 @@ import model.Literal;
 import model.Objet;
 import model.ObjetParam;
 import model.Ref;
-import model.TestEgalite;
+
 import model.TestType;
 import model.VarRef;
 import model.Visiteur;
@@ -41,14 +41,6 @@ public class InitModuleRef implements Visiteur{
 		
 	}
 
-	@Override
-	public void visiter(TestEgalite testEgalite) {
-		testEgalite.a.visiter(this);
-		testEgalite.b.visiter(this);
-		testEgalite.alors.visiter(this);
-		testEgalite.sinon.visiter(this);
-		
-	}
 
 	@Override
 	public void visiter(TestType testType) {

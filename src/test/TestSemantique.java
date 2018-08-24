@@ -22,8 +22,11 @@ import semantique.DoublonParamFonction;
 import semantique.Erreur;
 import semantique.ErreurTypeNonArbre;
 import semantique.FonctionInexistante;
+import semantique.MultipleDefinitionFonction;
+import semantique.MultipleDefinitionType;
 import semantique.NomTypeReserve;
 import semantique.NombreParametreInvalide;
+import semantique.OperationInvalideSurTypeReserve;
 import semantique.TypeExpressionInvalideDansObjet;
 import semantique.TypeInexistant;
 import semantique.Verificateur;
@@ -57,7 +60,7 @@ class TestSemantique {
 		assertTrue(erreur instanceof TypeInexistant);
 		TypeInexistant ti = (TypeInexistant) erreur;
 		VarRef v = (VarRef) ti.expression;
-		assertTrue(v.nom.equals("m"));
+		assertTrue(v.nom.equals("a"));
 
 	}
 
@@ -171,7 +174,7 @@ class TestSemantique {
 	void testTypeReserve() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type symbol {}");
+		sources.put("m1", "type m :  symbol {}");
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
@@ -450,5 +453,114 @@ class TestSemantique {
 		TypeInexistant ti = (TypeInexistant) erreur;
 		assertTrue(ti.nomRef.equals("m1$f/1"));
 		assertTrue(ti.nom.equals("m1$momo"));
+	}
+	
+	@Test
+	void testFonctionAvecTestTypeInexistantAvecModule() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "type s { } " + "  fonction f s:a | si a est m1$momo alors s {} sinon a  ");
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size() == 1);
+		Erreur erreur = verif.erreurs.get(0);
+		assertTrue(erreur instanceof TypeInexistant);
+		TypeInexistant ti = (TypeInexistant) erreur;
+		assertTrue(ti.nomRef.equals("m1$f/1"));
+		assertTrue(ti.nom.equals("m1$momo"));
+	}
+	@Test
+	void testResolutionTypeDansTypeDef() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "type s { m:x} " );
+		sources.put("m2","type m {} ");
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.isEmpty());
+	}
+	
+	@Test
+	void testResolutionTypeDansFonction() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "fonction u symbol:s | m(s)" );
+		sources.put("m2","fonction m symbol:s | m(s) ");
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.isEmpty());
+	}
+
+	@Test
+	void testMultipleDefinitionFonction() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "fonction u symbol:s | m(s)" );
+		sources.put("m2","fonction m symbol:s | m(s) ");
+		sources.put("m3","fonction m symbol:s | m(s) ");
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof MultipleDefinitionFonction);
+		MultipleDefinitionFonction erreur = (MultipleDefinitionFonction) verif.erreurs.get(0);
+		assertTrue(erreur.fonctions.contains("m2$m/1"));
+		assertTrue(erreur.fonctions.contains("m3$m/1"));
+		assertTrue(erreur.nomFonction.equals("m1$u/1"));
+		assertTrue(erreur.fonctions.size()==2);
+	}
+	@Test
+	void testMultipleDefinitionTypeDansType() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "type s { symbol:x} " );
+		sources.put("m2","type symbol {} ");
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof MultipleDefinitionType);
+		MultipleDefinitionType erreur = (MultipleDefinitionType)verif.erreurs.get(0) ;
+		assertTrue(erreur.nom.equals("m1$s"));
+		assertTrue(!erreur.estFonction);
+		assertTrue(erreur.types.contains("base$symbol"));
+		assertTrue(erreur.types.contains("m2$symbol"));
+		assertTrue(erreur.types.size() == 2);
+	}
+	@Test
+	void testCreationSymbol() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "fonction f symbol:s | symbol { e=m } " );
+		
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof OperationInvalideSurTypeReserve);
+
+	}
+	@Test
+	void testTestSurSymbol() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "fonction f symbol:s | si s est symbol alors s sinon s " );
+		
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof OperationInvalideSurTypeReserve);
+
 	}
 }
