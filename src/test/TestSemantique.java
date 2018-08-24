@@ -17,6 +17,7 @@ import model.VarRef;
 import semantique.AccesChampInexistant;
 import semantique.DoublonChampType;
 import semantique.DoublonNomFonction;
+import semantique.DoublonNomType;
 import semantique.DoublonObjetParam;
 import semantique.DoublonParamFonction;
 import semantique.Erreur;
@@ -376,7 +377,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1",
-				"type momo :toto { } type toto {} type nini { toto:m } fonction f symbol:a | nini {m=momo{}} ");
+				"type momo :toto { } type toto { symbol:s} type nini { toto:m } fonction f symbol:a | nini {m=momo{s=a}} ");
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
@@ -561,6 +562,36 @@ class TestSemantique {
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.size()==1);
 		assertTrue(verif.erreurs.get(0) instanceof OperationInvalideSurTypeReserve);
+
+	}
+	@Test
+	void testDoublonType() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "type a  {} type a  {} " );
+		
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof DoublonNomType);
+		
+
+	}
+	@Test
+	void testHeritageProfondeur3() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "type a:b  {} type b:c  {symbol:b}  type c { symbol:a}" );
+		
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.isEmpty());
+	
+		
 
 	}
 }
