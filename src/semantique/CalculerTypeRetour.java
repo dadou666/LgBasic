@@ -119,6 +119,7 @@ public class CalculerTypeRetour implements Visiteur {
 			typeIndetermine.e = acces.cible;
 			typeIndetermine.nomRef = nomRef;
 			this.verificateur.erreurs.add(typeIndetermine);
+			
 			return;
 		}
 		this.type = this.verificateur.typeVar(calculer.type, acces.nom);
