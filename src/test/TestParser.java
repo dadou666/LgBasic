@@ -456,6 +456,24 @@ class TestParser {
 		
 	}
 	
+	@Test
+	void testAccesEnCascade() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f t:x  | (a.lolo).momo ");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+		assertTrue(module.fonctions.get(0).expression instanceof Acces);
+		Acces acces = (Acces) module.fonctions.get(0).expression;
+		assertTrue( acces.nom.equals("momo"));
+		assertTrue(acces.cible instanceof Acces);
+		acces = (Acces) acces.cible;
+		assertTrue( acces.nom.equals("lolo"));
+		
+		
+	}
+	
 
 	
 

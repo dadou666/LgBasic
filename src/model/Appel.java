@@ -5,6 +5,7 @@ import java.util.List;
 
 public class Appel extends Expression {
 	public Ref nom;
+	public boolean erreur = false;
 
 	public String nomRef() {
 		return nom.nomRef() + "/" + params.size();

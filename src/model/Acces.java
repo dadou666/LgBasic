@@ -3,6 +3,7 @@ package model;
 public class Acces extends Expression implements AccesChamp{
 	public Expression cible;
 	public String nom;
+	public boolean erreur=false;
 	@Override
 	public void visiter(Visiteur visiteur) {
 		visiteur.visiter(this);

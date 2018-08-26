@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
+import org.junit.runners.parameterized.ParametersRunnerFactory;
 
 import model.Acces;
 import model.Module;
@@ -29,7 +30,9 @@ import semantique.NomTypeReserve;
 import semantique.NombreParametreInvalide;
 import semantique.OperationInvalideSurTypeReserve;
 import semantique.TypeExpressionInvalideDansObjet;
+import semantique.TypeIndetermine;
 import semantique.TypeInexistant;
+import semantique.TypeParametreFonctionInvalide;
 import semantique.Verificateur;
 import semantique.VerificationFonction;
 import syntaxe.Parseur;
@@ -421,23 +424,6 @@ class TestSemantique {
 		assertTrue(ti.nomRef.equals("m1$f/1"));
 		assertTrue(ti.nom.equals("m1$m/1"));
 	}
-@Ignore
-	@Test
-	void testFonctionAvecNombreParametreKo() {
-		Parseur parser = new Parseur();
-		Map<String, String> sources = new HashMap<>();
-		sources.put("m1",
-				"type s { symbol:a symbol:b } fonction u symbol:a symbol:b | s{a=a b=b } fonction f symbol:a | u(a) ");
-		Univers univers = parser.lireSourceCode(sources);
-		Verificateur verif = new Verificateur();
-		verif.executerPourTypes(univers);
-		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size() == 1);
-		Erreur erreur = verif.erreurs.get(0);
-	/*	assertTrue(erreur instanceof NombreParametreInvalide);
-		NombreParametreInvalide ti = (NombreParametreInvalide) erreur;
-		assertTrue(ti.nomFonction.equals("m1$f"));*/
-	}
 
 	@Test
 	void testFonctionAvecTestTypeInexistant() {
@@ -594,4 +580,116 @@ class TestSemantique {
 		
 
 	}
+	@Test 
+	void testReferenceFonctionInexistante() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "fonction f symbol:s | m2$f(s)" );
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof FonctionInexistante);
+		
+		
+	}
+	
+	@Test 
+	void testReferenceExterneFonctionExistante() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "fonction f symbol:s | m2$f(s)" );
+		sources.put("m2", "fonction f symbol:s | s" );
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.isEmpty());
+
+		
+		
+	}
+	
+	@Test 
+	void testReferenceExterneTypeExistant() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "type t { m2$a:x }" );
+		sources.put("m2", "type a {}" );
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.isEmpty());
+
+		
+		
+	}
+	
+	@Test 
+	void testParametreFonctionInvalide() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "fonction f symbol:s | m2$f(s)" );
+		sources.put("m2", "type a {} fonction f a:s | s" );
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof TypeParametreFonctionInvalide);
+
+		
+		
+	}
+	@Test 
+	void testInferenceTypeImpossible() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "  type a {}  type b {}   type c {} fonction f  c:a | si a est c alors a {} sinon b {}  "   );
+	
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof TypeIndetermine);
+		
+		
+		
+	}
+	@Test 
+	void testAccesSurTypeReserve() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", " fonction f  symbol:s | s.a "   );
+	
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof OperationInvalideSurTypeReserve);
+		
+		
+		
+	}
+	@Test 
+	void testAccesSurTypeReserveDansObjet() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", " type m {symbol:s } fonction f  m:s | (s.s).p "   );
+	
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof OperationInvalideSurTypeReserve);
+		
+		
+		
+	}
+	
 }

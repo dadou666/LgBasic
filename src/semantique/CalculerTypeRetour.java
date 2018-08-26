@@ -14,7 +14,6 @@ import model.Var;
 import model.VarRef;
 import model.Visiteur;
 
-
 public class CalculerTypeRetour implements Visiteur {
 	public Verificateur verificateur;
 	public String type;
@@ -30,6 +29,9 @@ public class CalculerTypeRetour implements Visiteur {
 	@Override
 	public void visiter(Appel appel) {
 		VerificationFonction vf = verificateur.recuperer(appel);
+		if (vf == null) {
+			return;
+		}
 		if (vf.typeRetour != null) {
 			type = vf.typeRetour;
 		} else {
@@ -38,7 +40,7 @@ public class CalculerTypeRetour implements Visiteur {
 				CalculerTypeRetour calculer = new CalculerTypeRetour();
 				calculer.verificateur = this.verificateur;
 				calculer.nomRef = appel.nom.nomRef();
-			
+
 				for (Var v : vf.fonction.params) {
 					calculer.variables.put(v.nom, v.type.nomRef());
 
@@ -50,7 +52,6 @@ public class CalculerTypeRetour implements Visiteur {
 		}
 
 	}
-
 
 	@Override
 	public void visiter(TestType testType) {
@@ -105,6 +106,9 @@ public class CalculerTypeRetour implements Visiteur {
 
 	@Override
 	public void visiter(Acces acces) {
+		if (acces.erreur) {
+			return;
+		}
 		CalculerTypeRetour calculer = new CalculerTypeRetour();
 		calculer.verificateur = this.verificateur;
 		calculer.variables = this.variables;
@@ -117,26 +121,14 @@ public class CalculerTypeRetour implements Visiteur {
 			this.verificateur.erreurs.add(typeIndetermine);
 			return;
 		}
-		if (this.verificateur.typeReserve.contains(calculer.type)) {
-			OperationInvalideSurTypeReserve erreur = new OperationInvalideSurTypeReserve();
-			erreur.nomFonction = nomRef;
-			verificateur.erreurs.add(erreur);
-			return;
-
-		}
 		this.type = this.verificateur.typeVar(calculer.type, acces.nom);
-		if (type == null) {
-			AccesChampInexistant erreur = new AccesChampInexistant();
-			erreur.acces = acces;
-			erreur.nomRef = this.nomRef;
-		}
+	
 
 	}
 
 	@Override
 	public void visiter(VarRef varRef) {
 		this.type = this.variables.get(varRef.nom);
-	
 
 	}
 

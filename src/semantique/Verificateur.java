@@ -96,6 +96,9 @@ public class Verificateur implements Visiteur {
 	}
 
 	public VerificationFonction recuperer(Appel appel) {
+		if (appel.erreur) {
+			return null;
+		}
 		if (appel.nom.moduleInit) {
 			VerificationFonction vf = fonctions.get(appel.nomRef());
 			if (vf != null) {
@@ -117,6 +120,7 @@ public class Verificateur implements Visiteur {
 				FonctionInexistante fonctionInexistante = new FonctionInexistante();
 				fonctionInexistante.nom = appel.nomRef();
 				fonctionInexistante.nomRef = nomRef;
+				appel.erreur = true;
 				erreurs.add(fonctionInexistante);
 				return null;
 			}
@@ -130,6 +134,7 @@ public class Verificateur implements Visiteur {
 			md.nomFonction = nomRef;
 			md.appel = appel;
 			md.fonctions = noms;
+			appel.erreur = true;
 			erreurs.add(md);
 			return null;
 
@@ -140,6 +145,7 @@ public class Verificateur implements Visiteur {
 			FonctionInexistante fonctionInexistante = new FonctionInexistante();
 			fonctionInexistante.nom = appel.nom.nomRef();
 			fonctionInexistante.nomRef = nomRef;
+			appel.erreur = true;
 			erreurs.add(fonctionInexistante);
 			return null;
 		}
@@ -198,6 +204,14 @@ public class Verificateur implements Visiteur {
 			}
 			this.nomRef = vf.getKey();
 			vf.getValue().fonction.expression.visiter(this);
+			CalculerTypeRetour calculerTypeRetour=new CalculerTypeRetour();
+			calculerTypeRetour.variables.putAll(variables);
+			calculerTypeRetour.verificateur = this;
+			vf.getValue().fonction.expression.visiter(calculerTypeRetour);
+			vf.getValue().typeRetour =calculerTypeRetour.type;
+			
+			
+			
 
 		}
 	}
@@ -459,13 +473,6 @@ public class Verificateur implements Visiteur {
 
 		}
 		int idx = 0;
-		if (appel.params.size() != fd.fonction.params.size()) {
-			NombreParametreInvalide erreur = new NombreParametreInvalide();
-			erreur.appel = appel;
-			erreur.nomFonction = this.nomRef;
-			erreurs.add(erreur);
-			return;
-		}
 
 		for (Expression e : appel.params) {
 			Var var = fd.fonction.params.get(idx);
@@ -508,16 +515,6 @@ public class Verificateur implements Visiteur {
 			return;
 
 		}
-		TypeDef typeDef = types.get(testType.typeRef.nomRef());
-		if (typeDef == null) {
-			TypeInexistant typeInexistant = new TypeInexistant();
-			typeInexistant.nomRef = nomRef;
-			typeInexistant.estFonction = true;
-			typeInexistant.nom = testType.typeRef.nomRef();
-			typeInexistant.expression = testType;
-			erreurs.add(typeInexistant);
-
-		}
 		testType.alors.visiter(this);
 		testType.sinon.visiter(this);
 		testType.cible.visiter(this);
@@ -526,6 +523,9 @@ public class Verificateur implements Visiteur {
 
 	@Override
 	public void visiter(Acces acces) {
+		if (acces.erreur) {
+			return;
+		}
 		CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
 		calculerTypeRetour.variables = this.variables;
 		calculerTypeRetour.verificateur = this;
@@ -534,11 +534,20 @@ public class Verificateur implements Visiteur {
 		if (this.erreurs.isEmpty()) {
 			acces.cible.visiter(calculerTypeRetour);
 			if (calculerTypeRetour.type != null) {
+				if (this.typeReserve.contains(calculerTypeRetour.type)) {
+					OperationInvalideSurTypeReserve erreur = new OperationInvalideSurTypeReserve();
+					erreur.nomFonction = nomRef;
+					acces.erreur = true;
+					erreurs.add(erreur);
+					return;
+
+				}
 				List<String> liste = this.verificationTypes.get(calculerTypeRetour.type).champs;
 				if (!liste.contains(acces.nom)) {
 					AccesChampInexistant erreur = new AccesChampInexistant();
 					erreur.acces = acces;
 					erreur.nomRef = nomRef;
+					acces.erreur = true;
 					erreurs.add(erreur);
 
 				}
