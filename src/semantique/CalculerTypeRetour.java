@@ -130,6 +130,16 @@ public class CalculerTypeRetour implements Visiteur {
 	@Override
 	public void visiter(VarRef varRef) {
 		this.type = this.variables.get(varRef.nom);
+		if (this.type == null) {
+			for(String typeReserve:this.verificateur.typeReserve) {
+				TypeReserveValidation validation = this.verificateur.validations.get(typeReserve);
+				if (validation !=null && validation.valider(varRef.nom)) {
+					this.type = typeReserve;
+					return;
+					
+				}
+			}
+		}
 
 	}
 

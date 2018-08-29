@@ -32,6 +32,7 @@ public class Verificateur implements Visiteur {
 	public List<Erreur> erreurs = new ArrayList<>();
 	public String nomRef;
 	public List<String> modules = new ArrayList<>();
+	public Map<String, TypeReserveValidation> validations = new HashMap<>();
 	public Map<String, String> variables = new HashMap<>();
 
 	public Verificateur() {
@@ -204,14 +205,11 @@ public class Verificateur implements Visiteur {
 			}
 			this.nomRef = vf.getKey();
 			vf.getValue().fonction.expression.visiter(this);
-			CalculerTypeRetour calculerTypeRetour=new CalculerTypeRetour();
+			CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
 			calculerTypeRetour.variables.putAll(variables);
 			calculerTypeRetour.verificateur = this;
 			vf.getValue().fonction.expression.visiter(calculerTypeRetour);
-			vf.getValue().typeRetour =calculerTypeRetour.type;
-			
-			
-			
+			vf.getValue().typeRetour = calculerTypeRetour.type;
 
 		}
 	}
@@ -500,8 +498,6 @@ public class Verificateur implements Visiteur {
 
 	}
 
-
-
 	@Override
 	public void visiter(TestType testType) {
 		if (!this.trouverType(testType.typeRef, true, nomRef)) {
@@ -560,7 +556,7 @@ public class Verificateur implements Visiteur {
 
 	@Override
 	public void visiter(VarRef varRef) {
-		// TODO Auto-generated method stub
+		varRef.estLibre = this.variables.get(varRef.nom) == null;
 
 	}
 
@@ -608,7 +604,66 @@ public class Verificateur implements Visiteur {
 
 	@Override
 	public void visiter(Literal literal) {
-		// TODO Auto-generated method stub
+		if (literal.expression == null) {
+			idxLiteral = 0;
+			literal.expression = this.creerObjet(literal.mots);
+
+		}
+
+	}
+
+	public int idxLiteral;
+
+	public Objet creerObjet(List<Ref> refs) {
+		Ref ref = refs.get(idxLiteral);
+		idxLiteral++;
+		if (this.trouverType(ref, true, this.nomRef)) {
+			Objet objet = new Objet();
+			objet.type = ref;
+
+			List<String> champs = this.verificationTypes.get(ref.nomRef()).champs;
+			for (String champ : champs) {
+				ObjetParam op = new ObjetParam();
+				op.nom = champ;
+				String type = this.typeVar(ref.nomRef(), champ);
+				Ref opRef = refs.get(idxLiteral);
+				if (this.variables.get(opRef.nom) != null) {
+					op.expression = new VarRef(refs.get(idxLiteral).nom);
+				} else if (this.typeReserve.contains(type)) {
+					TypeReserveValidation validation = this.validations.get(type);
+					if (validation == null) {
+						CreationTypeReserve erreur = new CreationTypeReserve();
+						erreur.idx = idxLiteral;
+						erreur.refs = refs;
+						erreur.type = type;
+						this.erreurs.add(erreur);
+						return null;
+
+					}
+					if (validation.valider(opRef.nom)) {
+						op.expression = new VarRef(refs.get(idxLiteral).nom);
+						idxLiteral++;
+					} else {
+						TypeReserveInvalideDansLiteral erreur = new TypeReserveInvalideDansLiteral();
+
+						erreur.idx = idxLiteral;
+						erreur.refs = refs;
+						erreur.type = type;
+						this.erreurs.add(erreur);
+						return null;
+					}
+
+				} else {
+					op.expression = this.creerObjet(refs);
+					if (op.expression == null) {
+						return null;
+					}
+				}
+
+			}
+			return objet;
+		}
+		return null;
 
 	}
 }

@@ -16,6 +16,7 @@ import syntaxe.Parseur;
 
 class TestParser {
 
+	
 	@Test
 	void testTypeVide() {
 		Parseur parseur = new Parseur();
@@ -116,7 +117,22 @@ class TestParser {
 		assertTrue(module.types.get(0).superType.module == null);
 
 	}
-
+	@Test
+	void testFonctionIdentiteNomChiffre() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f o:5 | 5");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression != null);
+		assertTrue(module.fonctions.get(0).expression instanceof VarRef);
+		VarRef varRef = (VarRef) module.fonctions.get(0).expression;
+		assertTrue(varRef.nom.equals("5"));
+		assertTrue(module.fonctions.get(0).params.size() == 1);
+		assertTrue(module.fonctions.get(0).params.get(0).type.module == null);
+		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
+		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("5"));
+	}
 	@Test
 	void testFonctionIdentite() {
 		Parseur parseur = new Parseur();

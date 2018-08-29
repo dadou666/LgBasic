@@ -687,9 +687,23 @@ class TestSemantique {
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.size()==1);
 		assertTrue(verif.erreurs.get(0) instanceof OperationInvalideSurTypeReserve);
-		
-		
-		
+	}
+	
+	@Test 
+	void testVarLibreSymbol() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", "abstrait type  bool {} type true:bool { } type false:bool {}  fonction f  bool:b | si b est true alors true sinon false "   );
+	
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol",(String s)->true);
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.isEmpty());
+		VerificationFonction vf =verif.fonctions.get("m1$f/1");
+		assertTrue(vf.typeRetour.equals("base$symbol"));
+	
 	}
 	
 }
