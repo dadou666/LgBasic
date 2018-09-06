@@ -691,6 +691,7 @@ class TestSemantique {
 	
 	@Test 
 	void testVarLibreSymbol() {
+		
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "abstrait type  bool {} type true:bool { } type false:bool {}  fonction f  bool:b | si b est true alors true sinon false "   );
