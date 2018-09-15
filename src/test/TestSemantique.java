@@ -10,12 +10,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.runners.parameterized.ParametersRunnerFactory;
 
 import model.Acces;
+import model.Literal;
 import model.Module;
+import model.Objet;
 import model.ObjetParam;
 import model.Univers;
 import model.Var;
 import model.VarRef;
 import semantique.AccesChampInexistant;
+import semantique.CreationTypeReserve;
 import semantique.DoublonChampType;
 import semantique.DoublonNomFonction;
 import semantique.DoublonNomType;
@@ -32,7 +35,9 @@ import semantique.OperationInvalideSurTypeReserve;
 import semantique.TypeExpressionInvalideDansObjet;
 import semantique.TypeIndetermine;
 import semantique.TypeInexistant;
+import semantique.TypeInvalideDansLiteral;
 import semantique.TypeParametreFonctionInvalide;
+import semantique.TypeReserveInvalideDansLiteral;
 import semantique.Verificateur;
 import semantique.VerificationFonction;
 import syntaxe.Parseur;
@@ -441,7 +446,7 @@ class TestSemantique {
 		assertTrue(ti.nomRef.equals("m1$f/1"));
 		assertTrue(ti.nom.equals("m1$momo"));
 	}
-	
+
 	@Test
 	void testFonctionAvecTestTypeInexistantAvecModule() {
 		Parseur parser = new Parseur();
@@ -458,25 +463,26 @@ class TestSemantique {
 		assertTrue(ti.nomRef.equals("m1$f/1"));
 		assertTrue(ti.nom.equals("m1$momo"));
 	}
+
 	@Test
 	void testResolutionTypeDansTypeDef() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type s { m:x} " );
-		sources.put("m2","type m {} ");
+		sources.put("m1", "type s { m:x} ");
+		sources.put("m2", "type m {} ");
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.isEmpty());
 	}
-	
+
 	@Test
 	void testResolutionTypeDansFonction() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction u symbol:s | m(s)" );
-		sources.put("m2","fonction m symbol:s | m(s) ");
+		sources.put("m1", "fonction u symbol:s | m(s)");
+		sources.put("m2", "fonction m symbol:s | m(s) ");
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
@@ -488,223 +494,362 @@ class TestSemantique {
 	void testMultipleDefinitionFonction() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction u symbol:s | m(s)" );
-		sources.put("m2","fonction m symbol:s | m(s) ");
-		sources.put("m3","fonction m symbol:s | m(s) ");
+		sources.put("m1", "fonction u symbol:s | m(s)");
+		sources.put("m2", "fonction m symbol:s | m(s) ");
+		sources.put("m3", "fonction m symbol:s | m(s) ");
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof MultipleDefinitionFonction);
 		MultipleDefinitionFonction erreur = (MultipleDefinitionFonction) verif.erreurs.get(0);
 		assertTrue(erreur.fonctions.contains("m2$m/1"));
 		assertTrue(erreur.fonctions.contains("m3$m/1"));
 		assertTrue(erreur.nomFonction.equals("m1$u/1"));
-		assertTrue(erreur.fonctions.size()==2);
+		assertTrue(erreur.fonctions.size() == 2);
 	}
+
 	@Test
 	void testMultipleDefinitionTypeDansType() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type s { symbol:x} " );
-		sources.put("m2","type symbol {} ");
+		sources.put("m1", "type s { symbol:x} ");
+		sources.put("m2", "type symbol {} ");
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof MultipleDefinitionType);
-		MultipleDefinitionType erreur = (MultipleDefinitionType)verif.erreurs.get(0) ;
+		MultipleDefinitionType erreur = (MultipleDefinitionType) verif.erreurs.get(0);
 		assertTrue(erreur.nom.equals("m1$s"));
 		assertTrue(!erreur.estFonction);
 		assertTrue(erreur.types.contains("base$symbol"));
 		assertTrue(erreur.types.contains("m2$symbol"));
 		assertTrue(erreur.types.size() == 2);
 	}
+
 	@Test
 	void testCreationSymbol() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:s | symbol { e=m } " );
-		
+		sources.put("m1", "fonction f symbol:s | symbol { e=m } ");
+
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof OperationInvalideSurTypeReserve);
 
 	}
+
 	@Test
 	void testTestSurSymbol() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:s | si s est symbol alors s sinon s " );
-		
+		sources.put("m1", "fonction f symbol:s | si s est symbol alors s sinon s ");
+
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof OperationInvalideSurTypeReserve);
 
 	}
+
 	@Test
 	void testDoublonType() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type a  {} type a  {} " );
-		
+		sources.put("m1", "type a  {} type a  {} ");
+
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof DoublonNomType);
-		
 
 	}
+
 	@Test
 	void testHeritageProfondeur3() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type a:b  {} type b:c  {symbol:b}  type c { symbol:a}" );
-		
+		sources.put("m1", "type a:b  {} type b:c  {symbol:b}  type c { symbol:a}");
+
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.isEmpty());
-	
-		
 
 	}
-	@Test 
+
+	@Test
 	void testReferenceFonctionInexistante() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:s | m2$f(s)" );
+		sources.put("m1", "fonction f symbol:s | m2$f(s)");
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof FonctionInexistante);
-		
-		
+
 	}
-	
-	@Test 
+
+	@Test
 	void testReferenceExterneFonctionExistante() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:s | m2$f(s)" );
-		sources.put("m2", "fonction f symbol:s | s" );
+		sources.put("m1", "fonction f symbol:s | m2$f(s)");
+		sources.put("m2", "fonction f symbol:s | s");
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.isEmpty());
 
-		
-		
 	}
-	
-	@Test 
+
+	@Test
 	void testReferenceExterneTypeExistant() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type t { m2$a:x }" );
-		sources.put("m2", "type a {}" );
+		sources.put("m1", "type t { m2$a:x }");
+		sources.put("m2", "type a {}");
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.isEmpty());
 
-		
-		
 	}
-	
-	@Test 
+
+	@Test
 	void testParametreFonctionInvalide() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:s | m2$f(s)" );
-		sources.put("m2", "type a {} fonction f a:s | s" );
+		sources.put("m1", "fonction f symbol:s | m2$f(s)");
+		sources.put("m2", "type a {} fonction f a:s | s");
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof TypeParametreFonctionInvalide);
 
-		
-		
 	}
-	@Test 
+
+	@Test
 	void testInferenceTypeImpossible() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "  type a {}  type b {}   type c {} fonction f  c:a | si a est c alors a {} sinon b {}  "   );
-	
+		sources.put("m1", "  type a {}  type b {}   type c {} fonction f  c:a | si a est c alors a {} sinon b {}  ");
+
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof TypeIndetermine);
-		
-		
-		
+
 	}
-	@Test 
+
+	@Test
 	void testAccesSurTypeReserve() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " fonction f  symbol:s | s.a "   );
-	
+		sources.put("m1", " fonction f  symbol:s | s.a ");
+
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof OperationInvalideSurTypeReserve);
-		
-		
-		
+
 	}
-	@Test 
+
+	@Test
 	void testAccesSurTypeReserveDansObjet() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " type m {symbol:s } fonction f  m:s | (s.s).p "   );
-	
+		sources.put("m1", " type m {symbol:s } fonction f  m:s | (s.s).p ");
+
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof OperationInvalideSurTypeReserve);
 	}
-	
-	@Test 
+
+	@Test
 	void testVarLibreSymbol() {
-		
+
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "abstrait type  bool {} type true:bool { } type false:bool {}  fonction f  bool:b | si b est true alors true sinon false "   );
-	
+		sources.put("m1",
+				"abstrait type  bool {} type true:bool { } type false:bool {}  fonction f  bool:b | si b est true alors true sinon false ");
+
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
-		verif.validations.put("base$symbol",(String s)->true);
+		verif.validations.put("base$symbol", (String s) -> true);
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.isEmpty());
-		VerificationFonction vf =verif.fonctions.get("m1$f/1");
+		VerificationFonction vf = verif.fonctions.get("m1$f/1");
 		assertTrue(vf.typeRetour.equals("base$symbol"));
-	
+
+	}
+
+	@Test
+	void testLiteral() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", " type a {symbol:a symbol:b }  fonction f symbol:u symbol:v | [a u v] ");
+
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> true);
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		VerificationFonction vf = verif.fonctions.get("m1$f/2");
+		Literal l = (Literal) vf.fonction.expression;
+		assertTrue(l.expression != null);
+		Objet o = l.expression;
+		assertTrue(o.type.nomRef().equals("m1$a"));
+		assertTrue(o.params.get(0).nom.equals("a"));
+		assertTrue(o.params.get(0).expression instanceof VarRef);
+		VarRef vr = (VarRef) o.params.get(0).expression;
+		assertTrue(vr.nom.equals("u"));
+		assertTrue(o.params.get(1).nom.equals("b"));
+		assertTrue(o.params.get(1).expression instanceof VarRef);
+		vr = (VarRef) o.params.get(1).expression;
+		assertTrue(vr.nom.equals("v"));
+
+	}
+
+	@Test
+	void testLiteralAvecErreurTypeVariable() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", " type a {symbol:a symbol:b } type b {} fonction f symbol:u b:v | [a u v] ");
+
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> true);
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		VerificationFonction vf = verif.fonctions.get("m1$f/2");
+		Literal l = (Literal) vf.fonction.expression;
+		assertTrue(l.expression == null);
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0) instanceof TypeInvalideDansLiteral);
+		TypeInvalideDansLiteral erreur = (TypeInvalideDansLiteral) verif.erreurs.get(0);
+		assertTrue(erreur.idx == 2);
+
+	}
+
+	@Test
+	void testLiteralAvecErreurTypeObjet() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", " type a {symbol:a b:b } type b {} fonction f symbol:u symbol:v | [a u a u b] ");
+
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> true);
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		VerificationFonction vf = verif.fonctions.get("m1$f/2");
+		Literal l = (Literal) vf.fonction.expression;
+		assertTrue(l.expression == null);
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0) instanceof TypeInvalideDansLiteral);
+		TypeInvalideDansLiteral erreur = (TypeInvalideDansLiteral) verif.erreurs.get(0);
+		assertTrue(erreur.idx == 2);
 	}
 	
+	@Test
+	void testLiteralAvec2Objet() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u symbol:v | [a u b u v] ");
+
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> true);
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		VerificationFonction vf = verif.fonctions.get("m1$f/2");
+		Literal l = (Literal) vf.fonction.expression;
+		assertTrue(l.expression != null);
+	
+	}
+	@Test
+	void testLiteralAvec2ObjetEtUneVariableLibre() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u  | [a u b u totot] ");
+
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> true);
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		VerificationFonction vf = verif.fonctions.get("m1$f/1");
+		Literal l = (Literal) vf.fonction.expression;
+		assertTrue(l.expression != null);
+	
+	}
+	@Test
+	void testLiteralAvecErreurValidation() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u  | [a u b u totot] ");
+
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		VerificationFonction vf = verif.fonctions.get("m1$f/1");
+		Literal l = (Literal) vf.fonction.expression;
+		assertTrue(l.expression == null);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof TypeReserveInvalideDansLiteral);
+	
+	}
+	@Test
+	void testLiteralAvecErreurCreationTypeReserve() {
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u  | [a u b u totot] ");
+
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		//verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		VerificationFonction vf = verif.fonctions.get("m1$f/1");
+		Literal l = (Literal) vf.fonction.expression;
+		assertTrue(l.expression == null);
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof CreationTypeReserve);
+	
+	}
 }

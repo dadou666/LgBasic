@@ -607,6 +607,9 @@ public class Verificateur implements Visiteur {
 		if (literal.expression == null) {
 			idxLiteral = 0;
 			literal.expression = this.creerObjet(literal.mots);
+			if (literal.expression != null) {
+				// literal.expression.visiter(this);
+			}
 
 		}
 
@@ -627,8 +630,19 @@ public class Verificateur implements Visiteur {
 				op.nom = champ;
 				String type = this.typeVar(ref.nomRef(), champ);
 				Ref opRef = refs.get(idxLiteral);
-				if (this.variables.get(opRef.nom) != null) {
+				String typeVar = this.variables.get(opRef.nom);
+				if (typeVar != null) {
 					op.expression = new VarRef(refs.get(idxLiteral).nom);
+					
+					if (!herite(typeVar, type)) {
+						TypeInvalideDansLiteral erreur = new TypeInvalideDansLiteral();
+						erreur.idx = idxLiteral;
+						erreur.refs =refs;
+						this.erreurs.add(erreur);
+						return null;
+					}
+
+					idxLiteral++;
 				} else if (this.typeReserve.contains(type)) {
 					TypeReserveValidation validation = this.validations.get(type);
 					if (validation == null) {
@@ -654,11 +668,21 @@ public class Verificateur implements Visiteur {
 					}
 
 				} else {
-					op.expression = this.creerObjet(refs);
+					int idxOld = this.idxLiteral;
+					Objet o =this.creerObjet(refs);
+					op.expression = o;
 					if (op.expression == null) {
 						return null;
 					}
+					if (!herite(o.type.nomRef(), type)) {
+						TypeInvalideDansLiteral erreur = new TypeInvalideDansLiteral();
+						erreur.idx = idxOld;
+						erreur.refs =refs;
+						this.erreurs.add(erreur);
+						return null;
+					}
 				}
+				objet.params.add(op);
 
 			}
 			return objet;
