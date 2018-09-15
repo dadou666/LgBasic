@@ -8,5 +8,6 @@ public interface Visiteur {
 	public void visiter(Acces acces);
 	public void visiter(VarRef varRef);
 	public void visiter(Literal literal);
+	
 
 }
