@@ -850,6 +850,7 @@ class TestSemantique {
 		assertTrue(l.expression == null);
 		assertTrue(verif.erreurs.size()==1);
 		assertTrue(verif.erreurs.get(0) instanceof CreationTypeReserve);
+		
 	
 	}
 }
