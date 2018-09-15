@@ -1,6 +1,8 @@
 package model;
 
 public class ObjetParam implements AccesChamp{
+	public int debut;
+	public int fin;
 	public String nom;
 	public Expression expression;
 	@Override

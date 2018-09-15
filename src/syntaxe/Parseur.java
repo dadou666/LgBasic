@@ -26,6 +26,7 @@ import grammaire.lgParser.FonctionContext;
 import grammaire.lgParser.Id_externeContext;
 import grammaire.lgParser.ModuleContext;
 import grammaire.lgParser.ObjetContext;
+import grammaire.lgParser.OperateurContext;
 import grammaire.lgParser.OperationOuAccesContext;
 import grammaire.lgParser.RefContext;
 import grammaire.lgParser.SiContext;
@@ -92,10 +93,11 @@ public class Parseur implements ANTLRErrorListener {
 
 	}
 
-/*	static public Module lireModule(String src) {
-		return null;
-
-	}*/
+	/*
+	 * static public Module lireModule(String src) { return null;
+	 * 
+	 * }
+	 */
 
 	public Module lireModule(String src) {
 		error = false;
@@ -129,7 +131,10 @@ public class Parseur implements ANTLRErrorListener {
 
 	public TypeDef transformer(TypeContext tc) {
 		TypeDef type = new TypeDef();
-		type.nom = tc.ID().getText();
+		TerminalNode tn = tc.ID();
+		type.nom = tn.getText();
+		type.debut = tn.getSymbol().getStartIndex();
+		type.fin = tn.getSymbol().getStopIndex();
 		if (tc.champs() != null) {
 			type.vars = this.transformer(tc.champs());
 		}
@@ -141,7 +146,8 @@ public class Parseur implements ANTLRErrorListener {
 				type.superType = this.transformer(tc.superType().id_externe());
 			}
 			if (tc.superType().ID() != null) {
-				type.superType = new Ref(tc.superType().ID().getText());
+				tn = tc.superType().ID();
+				type.superType = new Ref(tn.getText(), tn.getSymbol().getStartIndex(), tn.getSymbol().getStopIndex());
 
 			}
 		}
@@ -152,9 +158,16 @@ public class Parseur implements ANTLRErrorListener {
 	public FonctionDef transformer(FonctionContext fd) {
 		FonctionDef fonction = new FonctionDef();
 		if (fd.operateur() != null) {
-			fonction.nom = fd.operateur().getText();
+			OperateurContext oc = fd.operateur();
+			fonction.nom = oc.getText();
+			fonction.debut = oc.getStart().getStartIndex();
+			fonction.fin = oc.getStop().getStopIndex();
+
 		} else {
-			fonction.nom = fd.ID().getText();
+			TerminalNode tn = fd.ID();
+			fonction.nom = tn.getText();
+			fonction.debut = tn.getSymbol().getStartIndex();
+			fonction.fin = tn.getSymbol().getStopIndex();
 		}
 		fonction.params = this.transformer(fd.champs());
 		fonction.expression = this.transformer(fd.tmpCode());
@@ -173,13 +186,16 @@ public class Parseur implements ANTLRErrorListener {
 
 	public Var transformer(ChampContext champ) {
 		Var var = new Var();
-
-		var.nom = champ.ID().getText();
+		TerminalNode tn = champ.ID();
+		var.debut = tn.getSymbol().getStartIndex();
+		var.fin = tn.getSymbol().getStopIndex();
+		var.nom = tn.getText();
 		if (champ.typeRef().id_externe() != null) {
 			var.type = this.transformer(champ.typeRef().id_externe());
 		}
 		if (champ.typeRef().ID() != null) {
-			var.type = new Ref(champ.typeRef().ID().getText());
+			tn = champ.typeRef().ID();
+			var.type = new Ref(tn.getText(), tn.getSymbol().getStartIndex(), tn.getSymbol().getStopIndex());
 
 		}
 
@@ -204,14 +220,18 @@ public class Parseur implements ANTLRErrorListener {
 			typeRef = this.transformer(objetContext.id_externe());
 		}
 		if (objetContext.ID() != null) {
-			typeRef = new Ref(objetContext.ID().getText());
+			TerminalNode tn = objetContext.ID();
+			typeRef = new Ref(tn.getText(), tn.getSymbol().getStartIndex(), tn.getSymbol().getStopIndex());
 		}
 		Objet objet = new Objet();
 
 		objet.type = typeRef;
 		for (AttributContext attributContext : objetContext.attributs().attribut()) {
 			ObjetParam op = new ObjetParam();
-			op.nom = attributContext.ID().getText();
+			TerminalNode tn = attributContext.ID();
+			op.nom = tn.getText();
+			op.debut = tn.getSymbol().getStartIndex();
+			op.fin = tn.getSymbol().getStopIndex();
 			op.expression = this.transformer(attributContext.tmpCode());
 			objet.params.add(op);
 		}
@@ -234,7 +254,11 @@ public class Parseur implements ANTLRErrorListener {
 
 		}
 		if (codeContext.var() != null) {
-			VarRef varRef = new VarRef(codeContext.var().ID().getText());
+			TerminalNode tn = codeContext.var().ID();
+
+			VarRef varRef = new VarRef(tn.getText());
+			varRef.debut = tn.getSymbol().getStartIndex();
+			varRef.fin = tn.getSymbol().getStopIndex();
 
 			return varRef;
 
@@ -252,7 +276,8 @@ public class Parseur implements ANTLRErrorListener {
 			OperationOuAccesContext val = codeContext.operationOuAcces();
 			if (val.operation() != null) {
 				Appel appel = new Appel();
-				appel.nom = new Ref(val.operation().operateur().getText());
+				OperateurContext oc = val.operation().operateur();
+				appel.nom = new Ref(oc.getText(), oc.getStart().getStartIndex(), oc.getStop().getStopIndex());
 				appel.params.add(expression);
 				appel.params.add(this.transformer(val.operation().tmpCode()));
 				return appel;
@@ -261,7 +286,10 @@ public class Parseur implements ANTLRErrorListener {
 			if (val.acces() != null) {
 				Acces acces = new Acces();
 				acces.cible = expression;
-				acces.nom = val.acces().ID().getText();
+				TerminalNode tn = val.acces().ID();
+				acces.nom = tn.getText();
+				acces.debut = tn.getSymbol().getStartIndex();
+				acces.fin = tn.getSymbol().getStopIndex();
 				return acces;
 
 			}
@@ -289,9 +317,12 @@ public class Parseur implements ANTLRErrorListener {
 			Literal r = new Literal();
 			for (RefContext id : tmpCode.literal().ref()) {
 				if (id.ID() != null) {
-					r.mots.add(new Ref(id.ID().getText()));
+					TerminalNode tn = id.ID();
+
+					r.mots.add(new Ref(tn.getText(), tn.getSymbol().getStartIndex(), tn.getSymbol().getStopIndex()));
 				}
 				if (id.id_externe() != null) {
+
 					r.mots.add(this.transformer(id.id_externe()));
 				}
 				// r.mots.add(id.getText());
@@ -316,7 +347,8 @@ public class Parseur implements ANTLRErrorListener {
 			appel.nom = this.transformer(appelContext.id_externe());
 		}
 		if (appelContext.ID() != null) {
-			appel.nom = new Ref(appelContext.ID().getText());
+			TerminalNode tn = appelContext.ID();
+			appel.nom = new Ref(tn.getText(), tn.getSymbol().getStartIndex(), tn.getSymbol().getStopIndex());
 		}
 		for (TmpCodeContext tcc : appelContext.tmpCode()) {
 			appel.params.add(this.transformer(tcc));
@@ -327,7 +359,6 @@ public class Parseur implements ANTLRErrorListener {
 
 	public Test transformer(SiContext siContext) {
 
-	
 		if (siContext.testType() != null) {
 			TestType r = new TestType();
 			r.cible = this.transformer(siContext.testType().code());
@@ -344,7 +375,8 @@ public class Parseur implements ANTLRErrorListener {
 				r.typeRef = this.transformer(siContext.testType().typeRef().id_externe());
 			}
 			if (siContext.testType().typeRef().ID() != null) {
-				r.typeRef = new Ref(siContext.testType().typeRef().ID().getText());
+				TerminalNode tn = siContext.testType().typeRef().ID();
+				r.typeRef = new Ref(tn.getText(), tn.getSymbol().getStartIndex(), tn.getSymbol().getStopIndex());
 			}
 			return r;
 		}

@@ -490,6 +490,36 @@ class TestParser {
 		
 	}
 	
+	@Test
+	void testPositionDansSouce() {
+		Parseur parseur = new Parseur();
+		String source ="fonction f t:x  | mo(x)"; 
+		Module module = parseur.lireModule(source);
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+	
+		Appel acces = (Appel) module.fonctions.get(0).expression;
+		String n = source.substring(acces.nom.debut,acces.nom.fin+1);
+		assertTrue(n.equals("mo"));
+		
+		
+		
+	}
+	@Test
+	void testPositionOperateurDansSouce() {
+		Parseur parseur = new Parseur();
+		String source ="fonction f t:x  | x * x"; 
+		Module module = parseur.lireModule(source);
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+	
+		Appel acces = (Appel) module.fonctions.get(0).expression;
+		String n = source.substring(acces.nom.debut,acces.nom.fin+1);
+		assertTrue(n.equals("*"));
+		
+		
+		
+	}
 
 	
 

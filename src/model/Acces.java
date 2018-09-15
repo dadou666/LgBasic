@@ -1,6 +1,8 @@
 package model;
 
 public class Acces extends Expression implements AccesChamp{
+	public int debut;
+	public int fin;
 	public Expression cible;
 	public String nom;
 	public boolean erreur=false;
