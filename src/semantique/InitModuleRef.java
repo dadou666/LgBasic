@@ -23,6 +23,9 @@ public class InitModuleRef implements VisiteurExpression{
 			objet.type.moduleInit = true;
 		}
 		for(ObjetParam op:objet.params) {
+			if (op.expression == null) {
+				return;
+			}
 			op.expression.visiter(this);
 		}
 		

@@ -79,7 +79,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		output = new JTextPane();
 		streamOutput = new TextAreaOutputStream(output);
 		// System.setOut(new PrintStream(streamOutput));
-		System.setErr(new PrintStream(streamOutput));
+	//	System.setErr(new PrintStream(streamOutput));
 		JScrollPane outputScrollPane = new JScrollPane(output);
 		input = new JTextPane();
 
@@ -177,15 +177,23 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 	}
 
 	boolean colorer = false;
+	boolean erreur = false;
 
 	public void compiler() throws IOException {
+		if (erreur) {
+			return;
+		}
 		Parseur parseur = new Parseur();
 		String sel = list.getSelectedValue();
 		if (univers == null) {
+	
 			univers = parseur.lireSourceCode(sources);
 		} else {
 			Module module = parseur.lireModule(sources.get(sel));
 			univers.modules.put(sel, module);
+			if (parseur.error) {
+				return;
+			}
 			module.initNomModule(sel);
 
 		}
@@ -222,7 +230,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-
+		erreur = false;
 		String sel = list.getSelectedValue();
 
 		if (selection) {
@@ -242,8 +250,8 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		this.output.setText("");
 		try {
 			compiler();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
+		} catch (Throwable e2) {
+			erreur = true;
 			e2.printStackTrace();
 		}
 
@@ -279,8 +287,8 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 		try {
 			this.compiler();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Throwable e) {
+			erreur = true;
 			e.printStackTrace();
 		}
 
@@ -315,8 +323,8 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			this.compiler();
 			this.input.setCaretPosition(0);
 			selection = false;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Throwable e) {
+			erreur = true;
 			e.printStackTrace();
 		}
 

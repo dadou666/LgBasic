@@ -87,7 +87,8 @@ public class Parseur implements ANTLRErrorListener {
 			Module module = this.lireModule(e.getValue());
 			if (module != null) {
 				u.modules.put(e.getKey(), module);
-				module.initNomModule(e.getKey());
+				if (!error) {
+				module.initNomModule(e.getKey()); }
 			}
 		}
 		return u;
@@ -243,6 +244,9 @@ public class Parseur implements ANTLRErrorListener {
 	}
 
 	public Expression transformerDebut(CodeContext codeContext) {
+		if (codeContext == null) {
+			return null;
+		}
 		if (codeContext.appel() != null) {
 			return this.transformer(codeContext.appel());
 		}
@@ -272,6 +276,9 @@ public class Parseur implements ANTLRErrorListener {
 
 	public Expression transformer(CodeContext codeContext) {
 		Expression expression = this.transformerDebut(codeContext);
+		if (codeContext == null) {
+			return null;
+		}
 		if (codeContext.operationOuAcces() == null) {
 			return expression;
 		}
@@ -303,6 +310,9 @@ public class Parseur implements ANTLRErrorListener {
 	}
 
 	public Expression transformer(TmpCodeContext tmpCode) {
+		if (tmpCode == null) {
+			return null;
+		}
 		if (tmpCode.appel() != null) {
 			return this.transformer(tmpCode.appel());
 
