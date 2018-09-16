@@ -10,7 +10,7 @@ public class VarRef extends Expression {
 	}
 
 	@Override
-	public void visiter(Visiteur visiteur) {
+	public void visiter(VisiteurExpression visiteur) {
 		visiteur.visiter(this);
 
 	}

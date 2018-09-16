@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Literal extends Expression {
-	public List<Ref> mots= new ArrayList<Ref>();
+	public List<RefLiteral> mots= new ArrayList<RefLiteral>();
 	public Objet expression;
+	public Literal() {
+		
+	}
 
 	@Override
-	public void visiter(Visiteur visiteur) {
+	public void visiter(VisiteurExpression visiteur) {
 	  visiteur.visiter(this);
 	  
 		

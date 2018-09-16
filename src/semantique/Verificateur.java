@@ -16,15 +16,15 @@ import model.Module;
 import model.Objet;
 import model.ObjetParam;
 import model.Ref;
-
+import model.RefLiteral;
 import model.TestType;
 import model.TypeDef;
 import model.Univers;
 import model.Var;
 import model.VarRef;
-import model.Visiteur;
+import model.VisiteurExpression;
 
-public class Verificateur implements Visiteur {
+public class Verificateur implements VisiteurExpression {
 	public Map<String, TypeDef> types = new HashMap<>();
 	public Set<String> typeReserve = new HashSet<>();
 	public Map<String, VerificationType> verificationTypes = new HashMap<>();
@@ -617,7 +617,7 @@ public class Verificateur implements Visiteur {
 
 	public int idxLiteral;
 
-	public Objet creerObjet(List<Ref> refs) {
+	public Objet creerObjet(List<RefLiteral> refs) {
 		Ref ref = refs.get(idxLiteral);
 		idxLiteral++;
 		if (this.trouverType(ref, true, this.nomRef)) {
@@ -629,7 +629,7 @@ public class Verificateur implements Visiteur {
 				ObjetParam op = new ObjetParam();
 				op.nom = champ;
 				String type = this.typeVar(ref.nomRef(), champ);
-				Ref opRef = refs.get(idxLiteral);
+				RefLiteral opRef = refs.get(idxLiteral);
 				String typeVar = this.variables.get(opRef.nom);
 				if (typeVar != null) {
 					op.expression = new VarRef(refs.get(idxLiteral).nom);
@@ -641,7 +641,7 @@ public class Verificateur implements Visiteur {
 						this.erreurs.add(erreur);
 						return null;
 					}
-
+					opRef.type =RefLiteral.Type.Var;
 					idxLiteral++;
 				} else if (this.typeReserve.contains(type)) {
 					TypeReserveValidation validation = this.validations.get(type);
@@ -656,6 +656,7 @@ public class Verificateur implements Visiteur {
 					}
 					if (validation.valider(opRef.nom)) {
 						op.expression = new VarRef(refs.get(idxLiteral).nom);
+						opRef.type =RefLiteral.Type.Symbol;
 						idxLiteral++;
 					} else {
 						TypeReserveInvalideDansLiteral erreur = new TypeReserveInvalideDansLiteral();
@@ -681,6 +682,7 @@ public class Verificateur implements Visiteur {
 						this.erreurs.add(erreur);
 						return null;
 					}
+					opRef.type =RefLiteral.Type.Type;
 				}
 				objet.params.add(op);
 

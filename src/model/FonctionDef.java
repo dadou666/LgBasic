@@ -8,5 +8,9 @@ public class FonctionDef extends Def {
 	
 	public List<Var> params= new ArrayList<Var>();
 	public Expression expression;
+	public void visiter(VisiteurModule visiteur) {
+		visiteur.visiter(this);
+		
+	}
 
 }

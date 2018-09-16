@@ -41,6 +41,7 @@ import model.Module;
 import model.Objet;
 import model.ObjetParam;
 import model.Ref;
+import model.RefLiteral;
 import model.Test;
 
 import model.TestType;
@@ -209,6 +210,8 @@ public class Parseur implements ANTLRErrorListener {
 		Ref ref = new Ref();
 		ref.module = mn.getText();
 		ref.nom = tn.getText();
+		ref.debut = mn.getSymbol().getStartIndex();
+		ref.fin = mn.getSymbol().getStopIndex();
 		return ref;
 
 	}
@@ -319,11 +322,13 @@ public class Parseur implements ANTLRErrorListener {
 				if (id.ID() != null) {
 					TerminalNode tn = id.ID();
 
-					r.mots.add(new Ref(tn.getText(), tn.getSymbol().getStartIndex(), tn.getSymbol().getStopIndex()));
+					r.mots.add(new RefLiteral(tn.getText(), tn.getSymbol().getStartIndex(), tn.getSymbol().getStopIndex()));
 				}
 				if (id.id_externe() != null) {
-
-					r.mots.add(this.transformer(id.id_externe()));
+					Ref ref = this.transformer(id.id_externe());
+					RefLiteral refLiteral = new RefLiteral(ref.nom,ref.debut,ref.fin);
+					refLiteral.module = ref.module;
+					r.mots.add(refLiteral);
 				}
 				// r.mots.add(id.getText());
 			}

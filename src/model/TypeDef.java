@@ -8,5 +8,9 @@ public class TypeDef extends Def {
 	
 	public Ref superType;
 	public List<Var> vars;
+	public void visiter(VisiteurModule visiteur) {
+		visiteur.visiter(this);
+		
+	}
 
 }

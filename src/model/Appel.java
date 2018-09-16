@@ -18,7 +18,7 @@ public class Appel extends Expression {
 	public List<Expression> params = new ArrayList<>();
 
 	@Override
-	public void visiter(Visiteur visiteur) {
+	public void visiter(VisiteurExpression visiteur) {
 		visiteur.visiter(this);
 
 	}

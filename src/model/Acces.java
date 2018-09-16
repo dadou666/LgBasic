@@ -7,7 +7,7 @@ public class Acces extends Expression implements AccesChamp{
 	public String nom;
 	public boolean erreur=false;
 	@Override
-	public void visiter(Visiteur visiteur) {
+	public void visiter(VisiteurExpression visiteur) {
 		visiteur.visiter(this);
 		
 	}

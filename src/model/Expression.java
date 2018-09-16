@@ -2,6 +2,6 @@ package model;
 
 public abstract class Expression {
 
-	public abstract void visiter(Visiteur visiteur);
+	public abstract void visiter(VisiteurExpression visiteur);
 
 }

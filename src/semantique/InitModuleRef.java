@@ -10,9 +10,9 @@ import model.Ref;
 
 import model.TestType;
 import model.VarRef;
-import model.Visiteur;
+import model.VisiteurExpression;
 
-public class InitModuleRef implements Visiteur{
+public class InitModuleRef implements VisiteurExpression{
 	public String module;
 
 	@Override

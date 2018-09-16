@@ -1,6 +1,6 @@
 package model;
 
-public interface Visiteur {
+public interface VisiteurExpression {
 	public void visiter(Objet objet);
 	public void visiter(Appel appel);
 

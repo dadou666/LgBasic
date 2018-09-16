@@ -12,9 +12,9 @@ import model.TestType;
 import model.TypeDef;
 import model.Var;
 import model.VarRef;
-import model.Visiteur;
+import model.VisiteurExpression;
 
-public class CalculerTypeRetour implements Visiteur {
+public class CalculerTypeRetour implements VisiteurExpression {
 	public Verificateur verificateur;
 	public String type;
 	public Map<String, String> variables = new HashMap<>();
