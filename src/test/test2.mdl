@@ -1,0 +1,3 @@
+type b { a:x  }
+fonction f  a:x | x
+fonction = a:x a:t | b { x=x }

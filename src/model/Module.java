@@ -21,7 +21,10 @@ public class Module {
 					var.type.moduleInit = true;
 				}
 			}
-			fd.expression.visiter(init);
+			if (fd.expression != null) {
+				
+			
+			fd.expression.visiter(init); }
 		}
 		for (TypeDef td : types) {
 			if (td.superType != null && td.superType.module == null) {

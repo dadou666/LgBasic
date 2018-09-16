@@ -62,6 +62,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 	public static String chemin = "F://GitHub//LgBasic//src//test";
 	Map<Color, AttributeSet> asets = new HashMap<>();
 	public Map<String, String> sources;
+	public Univers univers;
 
 	/**
 	 * @param args
@@ -179,12 +180,18 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 	public void compiler() throws IOException {
 		Parseur parseur = new Parseur();
-		Univers univers = parseur.lireSourceCode(sources);
+		String sel = list.getSelectedValue();
+		if (univers == null) {
+			univers = parseur.lireSourceCode(sources);
+		} else {
+			Module module = parseur.lireModule(sources.get(sel));
+			univers.modules.put(sel, module);
+			module.initNomModule(sel);
+
+		}
 		if (parseur.error) {
 			return;
 		}
-	
-		String sel = list.getSelectedValue();
 
 		Verificateur verif = new Verificateur();
 		verif.executerPourTypes(univers);
@@ -193,23 +200,20 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		erreurs.addAll(verif.erreurs);
 		this.listErreurSemantique.setListData(erreurs);
 		if (erreurs.isEmpty()) {
-		
+
 			ColorierSource colorierSource = new ColorierSource();
 			Module module = univers.modules.get(sel);
-			colorierSource.tp =this.input;
+			colorierSource.tp = this.input;
 			colorierSource.visiter(module);
-			
+
 		}
 	}
 
 	public void keyPressed(KeyEvent e) {
-	/*	try {
-			this.compiler();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-*/
+		/*
+		 * try { this.compiler(); } catch (IOException e1) { // TODO Auto-generated
+		 * catch block e1.printStackTrace(); }
+		 */
 	}
 
 	String s = "";
@@ -218,23 +222,22 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+
 		String sel = list.getSelectedValue();
 
 		if (selection) {
 			return;
 		}
 		StyledDocument document = input.getStyledDocument();
-		String src="";
+		String src = "";
 		try {
 			src = document.getText(0, document.getLength());
 			this.sources.put(sel, src);
-		} catch (BadLocationException ex) {
+			Files.write(Paths.get(chemin, sel + ".mdl"), src.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+		} catch (BadLocationException | IOException ex) {
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
 		}
-	
-	
 
 		this.output.setText("");
 		try {
@@ -244,7 +247,6 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			e2.printStackTrace();
 		}
 
-	
 		this.streamOutput.flush();
 
 	}
@@ -266,7 +268,8 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 				}
 			}
 			try {
-				Files.write(Paths.get(chemin, nom+".mdl"), this.input.getText().getBytes(), StandardOpenOption.CREATE_NEW);
+				Files.write(Paths.get(chemin, nom + ".mdl"), this.input.getText().getBytes(),
+						StandardOpenOption.CREATE_NEW);
 				this.chargerSources();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -282,7 +285,19 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		}
 
 	}
+	public void clearColor(Color color) {
 
+		this.setColor(Color.black, 0, input.getStyledDocument().getLength());
+
+	}
+	public void setColor(Color c, int idx, int l) {
+		
+		JTextPane tp = this.input;
+
+
+		tp.getStyledDocument().setCharacterAttributes(idx , l, this.attributeSet(c), true);
+
+	}
 	@Override
 	public void valueChanged(ListSelectionEvent arg0) {
 		String sel = list.getSelectedValue();
@@ -296,6 +311,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			this.input.setEditable(true);
 
 			this.input.setText(this.sources.get(sel));
+			this.setColor(Color.black, 0, input.getStyledDocument().getLength());
 			this.compiler();
 			this.input.setCaretPosition(0);
 			selection = false;
