@@ -26,15 +26,15 @@ import model.VisiteurExpression;
 import model.VisiteurModule;
 
 public class ColorierSource implements VisiteurModule {
-	Color declarationFonction;
-	Color declarationType;
-	Color declarationFonctionParametre;
-	Color referenceFonctionParametre;
-	Color referenceType;
-	Color referenceFonction;
-	Color referenceAttribut;
-	Color declarationAttribut;
-	Color symbol;
+	Color declarationFonction = Color.red;
+	Color declarationType = Color.blue;
+	Color declarationFonctionParametre = Color.green;
+	Color referenceFonctionParametre = Color.ORANGE;
+	Color referenceType = Color.PINK;
+	Color referenceFonction = Color.CYAN;
+	Color referenceAttribut = Color.magenta;
+	Color declarationAttribut = Color.GRAY;
+	Color symbol = Color.BLACK;
 	JTextPane tp;
 	Map<Color, AttributeSet> asets = new HashMap<>();
 
@@ -68,10 +68,9 @@ public class ColorierSource implements VisiteurModule {
 
 	@Override
 	public void visiter(Acces acces) {
-		
+
 		this.setColor(this.referenceAttribut, acces.debut, acces.fin);
 		acces.cible.visiter(this);
-		
 
 	}
 
@@ -138,7 +137,9 @@ public class ColorierSource implements VisiteurModule {
 	@Override
 	public void visiter(TypeDef td) {
 		this.setColor(this.declarationType, td.debut, td.fin);
-		this.setColor(this.referenceType, td.superType.debut, td.superType.fin);
+		if (td.superType != null) {
+			this.setColor(this.referenceType, td.superType.debut, td.superType.fin);
+		}
 		for (Var v : td.vars) {
 			this.setColor(this.referenceType, v.type.debut, v.type.fin);
 			this.setColor(this.declarationAttribut, v.debut, v.fin);
