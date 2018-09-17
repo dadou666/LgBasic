@@ -20,12 +20,14 @@ class TestParser {
 		Parseur parseur = new Parseur();
 		Module module = parseur.lireModule("type zero {}\r\n"
 				+ "type n:zero { zero:n} fonction + zero:a zero:b | si a est n alors n { n=  a.n+b  } sinon b  ");
+		assertFalse(parseur.error);
 	}
 	@Test
 	void testFonction2() {
 		Parseur parseur = new Parseur();
 		Module module = parseur
 				.lireModule("type zero {}\r\n" + "type n:zero { zero:n} fonction + zero:a zero:b | a.n+b ");
+		assertFalse(parseur.error);
 	}
 
 	@Test
