@@ -15,8 +15,19 @@ import model.VarRef;
 import syntaxe.Parseur;
 
 class TestParser {
+	@Test
+	void testFonction() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("type zero {}\r\n"
+				+ "type n:zero { zero:n} fonction + zero:a zero:b | si a est n alors n { n=  a.n+b  } sinon b  ");
+	}
+	@Test
+	void testFonction2() {
+		Parseur parseur = new Parseur();
+		Module module = parseur
+				.lireModule("type zero {}\r\n" + "type n:zero { zero:n} fonction + zero:a zero:b | a.n+b ");
+	}
 
-	
 	@Test
 	void testTypeVide() {
 		Parseur parseur = new Parseur();
@@ -28,6 +39,7 @@ class TestParser {
 		assertTrue(!module.types.get(0).estAbstrait);
 
 	}
+
 	@Test
 	void testTypeAbstrait() {
 		Parseur parseur = new Parseur();
@@ -39,6 +51,7 @@ class TestParser {
 		assertTrue(module.types.get(0).estAbstrait);
 
 	}
+
 	@Test
 	void testTypeAvecNonChiffre() {
 		Parseur parseur = new Parseur();
@@ -117,6 +130,7 @@ class TestParser {
 		assertTrue(module.types.get(0).superType.module == null);
 
 	}
+
 	@Test
 	void testFonctionIdentiteNomChiffre() {
 		Parseur parseur = new Parseur();
@@ -133,6 +147,7 @@ class TestParser {
 		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
 		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("5"));
 	}
+
 	@Test
 	void testFonctionIdentite() {
 		Parseur parseur = new Parseur();
@@ -149,6 +164,7 @@ class TestParser {
 		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
 		assertTrue(module.fonctions.get(0).params.get(0).nom.equals("x"));
 	}
+
 	@Test
 	void testFonctionQuiRetourneLiteral() {
 		Parseur parseur = new Parseur();
@@ -160,12 +176,13 @@ class TestParser {
 		assertTrue(module.fonctions.get(0).expression instanceof Literal);
 		Literal literal = (Literal) module.fonctions.get(0).expression;
 		assertTrue(literal.mots.size() == 3);
-		
+
 		assertTrue(literal.mots.get(0).nom.equals("x"));
 		assertTrue(literal.mots.get(1).nom.equals("m"));
 		assertTrue(literal.mots.get(2).module.equals("tot"));
 		assertTrue(literal.mots.get(2).nom.equals("m"));
 	}
+
 	@Test
 	void testFonctionIdentiteParamAvecAutreModule() {
 		Parseur parseur = new Parseur();
@@ -209,10 +226,6 @@ class TestParser {
 		assertTrue(varRef.nom.equals("m"));
 
 	}
-
-
-	
-
 
 	@Test
 	void testFonctionAvecTestTypeEtNegation() {
@@ -289,11 +302,11 @@ class TestParser {
 		assertTrue(objet.type.module == null);
 		assertTrue(objet.params.get(0).nom.equals("m"));
 		assertTrue(objet.params.get(0).expression instanceof Objet);
-		Objet obj =  (Objet) objet.params.get(0).expression;
+		Objet obj = (Objet) objet.params.get(0).expression;
 		assertTrue(obj.type.nom.equals("a"));
 
 	}
-	
+
 	@Test
 	void testFonctionAvecObjetDansTestType() {
 		Parseur parseur = new Parseur();
@@ -316,11 +329,11 @@ class TestParser {
 		assertTrue(testType.alors instanceof Objet);
 		Objet objet = (Objet) testType.alors;
 		assertTrue(objet.type.nom.equals("nini"));
-		
+
 		VarRef varRef = (VarRef) testType.sinon;
 		assertTrue(varRef.nom.equals("o"));
 	}
-	
+
 	@Test
 	void testFonctionOperateur() {
 		Parseur parseur = new Parseur();
@@ -339,7 +352,7 @@ class TestParser {
 		assertTrue(module.fonctions.get(0).params.get(1).type.nom.equals("lili"));
 		assertTrue(module.fonctions.get(0).params.get(1).type.module == null);
 		assertTrue(module.fonctions.get(0).params.get(1).nom.equals("m"));
-		
+
 		TestType testType = (TestType) module.fonctions.get(0).expression;
 		assertTrue(testType.typeRef.module == null);
 		assertTrue(testType.typeRef.nom.equals("lala"));
@@ -347,20 +360,19 @@ class TestParser {
 		assertTrue(testType.alors instanceof Objet);
 		Objet objet = (Objet) testType.alors;
 		assertTrue(objet.type.nom.equals("nini"));
-		
+
 		VarRef varRef = (VarRef) testType.sinon;
 		assertTrue(varRef.nom.equals("o"));
 	}
-	
+
 	@Test
 	void testAppelFonctionOperateur() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x lili:m | x > m + o");
+		Module module = parseur.lireModule("fonction f toto$o:x lili:m | x.m > m + o");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
 		assertTrue(module.fonctions.get(0).expression != null);
-
 
 		assertTrue(module.fonctions.get(0).params.size() == 2);
 		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
@@ -375,7 +387,7 @@ class TestParser {
 		assertTrue(appel.nom.nom.equals(">"));
 		assertTrue(appel.params.size() == 2);
 		assertTrue(appel.params.get(1) instanceof Appel);
-		Appel appel2 = (Appel)(appel.params.get(1));
+		Appel appel2 = (Appel) (appel.params.get(1));
 		assertTrue(appel2.nom.nom.equals("+"));
 		assertTrue(appel2.params.get(0) instanceof VarRef);
 		VarRef varRef = (VarRef) appel2.params.get(0);
@@ -383,9 +395,9 @@ class TestParser {
 		assertTrue(appel2.params.get(1) instanceof VarRef);
 		varRef = (VarRef) appel2.params.get(1);
 		assertTrue(varRef.nom.equals("o"));
-	
+
 	}
-	
+
 	@Test
 	void testAppelFonctionOperateurAvecParenthese() {
 		Parseur parseur = new Parseur();
@@ -394,7 +406,6 @@ class TestParser {
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
 		assertTrue(module.fonctions.get(0).expression != null);
-
 
 		assertTrue(module.fonctions.get(0).params.size() == 2);
 		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
@@ -410,17 +421,18 @@ class TestParser {
 		assertTrue(appel.params.size() == 2);
 		assertTrue(appel.params.get(0) instanceof VarRef);
 		assertTrue(appel.params.get(1) instanceof Appel);
-		Appel appel2 = (Appel)(appel.params.get(1));
+		Appel appel2 = (Appel) (appel.params.get(1));
 		assertTrue(appel2.nom.nom.equals("+"));
-		
+
 		assertTrue(appel2.params.get(0) instanceof VarRef);
 		VarRef varRef = (VarRef) appel2.params.get(0);
 		assertTrue(varRef.nom.equals("m"));
 		assertTrue(appel2.params.get(1) instanceof VarRef);
 		varRef = (VarRef) appel2.params.get(1);
 		assertTrue(varRef.nom.equals("o"));
-	
+
 	}
+
 	@Test
 	void testAppelFonctionOperateurAvecParenthese2() {
 		Parseur parseur = new Parseur();
@@ -429,7 +441,6 @@ class TestParser {
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
 		assertTrue(module.fonctions.get(0).expression != null);
-
 
 		assertTrue(module.fonctions.get(0).params.size() == 2);
 		assertTrue(module.fonctions.get(0).params.get(0).type.nom.equals("o"));
@@ -445,17 +456,18 @@ class TestParser {
 		assertTrue(appel.params.size() == 2);
 		assertTrue(appel.params.get(1) instanceof VarRef);
 		assertTrue(appel.params.get(0) instanceof Appel);
-		Appel appel2 = (Appel)(appel.params.get(0));
+		Appel appel2 = (Appel) (appel.params.get(0));
 		assertTrue(appel2.nom.nom.equals(">"));
-		
+
 		assertTrue(appel2.params.get(0) instanceof VarRef);
 		VarRef varRef = (VarRef) appel2.params.get(0);
 		assertTrue(varRef.nom.equals("a"));
 		assertTrue(appel2.params.get(1) instanceof VarRef);
 		varRef = (VarRef) appel2.params.get(1);
 		assertTrue(varRef.nom.equals("m"));
-	
+
 	}
+
 	@Test
 	void testAcces() {
 		Parseur parseur = new Parseur();
@@ -466,12 +478,11 @@ class TestParser {
 		assertTrue(module.fonctions.get(0).expression != null);
 		assertTrue(module.fonctions.get(0).expression instanceof Acces);
 		Acces acces = (Acces) module.fonctions.get(0).expression;
-		assertTrue( acces.nom.equals("lolo"));
+		assertTrue(acces.nom.equals("lolo"));
 		assertTrue(acces.cible instanceof VarRef);
-		
-		
+
 	}
-	
+
 	@Test
 	void testAccesEnCascade() {
 		Parseur parseur = new Parseur();
@@ -482,47 +493,39 @@ class TestParser {
 		assertTrue(module.fonctions.get(0).expression != null);
 		assertTrue(module.fonctions.get(0).expression instanceof Acces);
 		Acces acces = (Acces) module.fonctions.get(0).expression;
-		assertTrue( acces.nom.equals("momo"));
+		assertTrue(acces.nom.equals("momo"));
 		assertTrue(acces.cible instanceof Acces);
 		acces = (Acces) acces.cible;
-		assertTrue( acces.nom.equals("lolo"));
-		
-		
+		assertTrue(acces.nom.equals("lolo"));
+
 	}
-	
+
 	@Test
 	void testPositionDansSouce() {
 		Parseur parseur = new Parseur();
-		String source ="fonction f t:x  | mo(x)"; 
+		String source = "fonction f t:x  | mo(x)";
 		Module module = parseur.lireModule(source);
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
-	
+
 		Appel acces = (Appel) module.fonctions.get(0).expression;
-		String n = source.substring(acces.nom.debut,acces.nom.fin+1);
+		String n = source.substring(acces.nom.debut, acces.nom.fin + 1);
 		assertTrue(n.equals("mo"));
-		
-		
-		
+
 	}
+
 	@Test
 	void testPositionOperateurDansSouce() {
 		Parseur parseur = new Parseur();
-		String source ="fonction f t:x  | x * x"; 
+		String source = "fonction f t:x  | x * x";
 		Module module = parseur.lireModule(source);
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
-	
+
 		Appel acces = (Appel) module.fonctions.get(0).expression;
-		String n = source.substring(acces.nom.debut,acces.nom.fin+1);
+		String n = source.substring(acces.nom.debut, acces.nom.fin + 1);
 		assertTrue(n.equals("*"));
-		
-		
-		
+
 	}
-
-	
-
-	
 
 }

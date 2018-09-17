@@ -283,14 +283,15 @@ public class Parseur implements ANTLRErrorListener {
 			return expression;
 		}
 		if (codeContext.operationOuAcces() != null) {
-			OperationOuAccesContext val = codeContext.operationOuAcces();
+			List<OperationOuAccesContext> valeurs = codeContext.operationOuAcces();
+			for(OperationOuAccesContext val:valeurs) {
 			if (val.operation() != null) {
 				Appel appel = new Appel();
 				OperateurContext oc = val.operation().operateur();
 				appel.nom = new Ref(oc.getText(), oc.getStart().getStartIndex(), oc.getStop().getStopIndex());
 				appel.params.add(expression);
 				appel.params.add(this.transformer(val.operation().tmpCode()));
-				return appel;
+				expression = appel;
 
 			}
 			if (val.acces() != null) {
@@ -300,9 +301,9 @@ public class Parseur implements ANTLRErrorListener {
 				acces.nom = tn.getText();
 				acces.debut = tn.getSymbol().getStartIndex();
 				acces.fin = tn.getSymbol().getStopIndex();
-				return acces;
+				expression=acces;
 
-			}
+			} }
 
 		}
 		return expression;
