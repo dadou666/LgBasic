@@ -853,4 +853,20 @@ class TestSemantique {
 		
 	
 	}
+	@Test
+	void testInferenceType() {
+		String source ="type zero {}\r\n" + 
+		"type n:zero { zero:n}\r\n" + 
+		"fonction + zero:a zero:b | si a est n alors n { n= a.n} sinon b  ";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		//verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.isEmpty());
+	}
 }

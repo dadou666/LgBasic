@@ -433,6 +433,7 @@ public class Verificateur implements VisiteurExpression {
 		for (ObjetParam op : objet.params) {
 			CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
 			calculerTypeRetour.variables = this.variables;
+			calculerTypeRetour.verificateur=this;
 			String type = this.typeVar(objet.type.nomRef(), op.nom);
 			op.expression.visiter(calculerTypeRetour);
 			if (calculerTypeRetour.type != null && !herite(calculerTypeRetour.type, type)) {
@@ -511,9 +512,22 @@ public class Verificateur implements VisiteurExpression {
 			return;
 
 		}
-		testType.alors.visiter(this);
-		testType.sinon.visiter(this);
 		testType.cible.visiter(this);
+		String oldType=null;
+		if (testType.cible instanceof VarRef) {
+			VarRef var = (VarRef) testType.cible;
+			oldType =variables.get(var.nom);
+			if (variables.get(var.nom) != null) {
+				variables.put(var.nom, testType.typeRef.nomRef());
+			}
+		}
+		testType.alors.visiter(this);
+		if (oldType != null) {
+			VarRef var = (VarRef) testType.cible;
+			variables.put(var.nom, oldType);
+		}
+		testType.sinon.visiter(this);
+	
 
 	}
 
