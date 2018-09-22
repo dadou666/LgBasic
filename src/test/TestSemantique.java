@@ -504,8 +504,8 @@ class TestSemantique {
 		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof MultipleDefinitionFonction);
 		MultipleDefinitionFonction erreur = (MultipleDefinitionFonction) verif.erreurs.get(0);
-		assertTrue(erreur.fonctions.contains("m2$m/1"));
-		assertTrue(erreur.fonctions.contains("m3$m/1"));
+		assertTrue(erreur.noms().contains("m2$m/1"));
+		assertTrue(erreur.noms().contains("m3$m/1"));
 		assertTrue(erreur.nomFonction.equals("m1$u/1"));
 		assertTrue(erreur.fonctions.size() == 2);
 	}
@@ -628,21 +628,6 @@ class TestSemantique {
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.isEmpty());
-
-	}
-
-	@Test
-	void testParametreFonctionInvalide() {
-		Parseur parser = new Parseur();
-		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:s | m2$f(s)");
-		sources.put("m2", "type a {} fonction f a:s | s");
-		Univers univers = parser.lireSourceCode(sources);
-		Verificateur verif = new Verificateur();
-		verif.executerPourTypes(univers);
-		verif.executerPourFonctions(univers);
-		assertTrue(verif.erreurs.size() == 1);
-		assertTrue(verif.erreurs.get(0) instanceof TypeParametreFonctionInvalide);
 
 	}
 
@@ -779,12 +764,13 @@ class TestSemantique {
 		TypeInvalideDansLiteral erreur = (TypeInvalideDansLiteral) verif.erreurs.get(0);
 		assertTrue(erreur.idx == 2);
 	}
-	
+
 	@Test
 	void testLiteralAvec2Objet() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u symbol:v | [a u b u v] ");
+		sources.put("m1",
+				" type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u symbol:v | [a u b u v] ");
 
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
@@ -795,8 +781,9 @@ class TestSemantique {
 		VerificationFonction vf = verif.fonctions.get("m1$f/2");
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression != null);
-	
+
 	}
+
 	@Test
 	void testLiteralAvec2ObjetEtUneVariableLibre() {
 		Parseur parser = new Parseur();
@@ -812,8 +799,9 @@ class TestSemantique {
 		VerificationFonction vf = verif.fonctions.get("m1$f/1");
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression != null);
-	
+
 	}
+
 	@Test
 	void testLiteralAvecErreurValidation() {
 		Parseur parser = new Parseur();
@@ -829,10 +817,11 @@ class TestSemantique {
 		VerificationFonction vf = verif.fonctions.get("m1$f/1");
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression == null);
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof TypeReserveInvalideDansLiteral);
-	
+
 	}
+
 	@Test
 	void testLiteralAvecErreurCreationTypeReserve() {
 		Parseur parser = new Parseur();
@@ -849,40 +838,78 @@ class TestSemantique {
 		assertTrue(vf.fonction.expression != null);
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression == null);
-		assertTrue(verif.erreurs.size()==1);
-		assertTrue(verif.erreurs.get(0) instanceof CreationTypeReserve);		
-	
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0) instanceof CreationTypeReserve);
+
 	}
+
 	@Test
 	void testInferenceType() {
-		String source ="type zero {}\r\n" + 
-		"type n:zero { zero:n}\r\n" + 
-		"fonction + zero:a zero:b | si a est n alors n { n= a.n} sinon b  ";
+		String source = "type zero {}\r\n" + "type n:zero { zero:n}\r\n"
+				+ "fonction + zero:a zero:b | si a est n alors n { n= a.n} sinon b  ";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
-		//verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
 
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.isEmpty());
 	}
+
 	@Test
 	void testFonctionAPI() {
-		String source ="type b {} fonction t b:a -> a  fonction u b:a | t(a) ";
+		String source = "type b {} fonction t b:a -> a  fonction u b:a | t(a) ";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
-		//verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
 
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.isEmpty());
 	}
+
+	@Test
+	void testMultipleFonctionValide() {
+		String source = "type b {}  type a:b {} type c:b {}  fonction u b:a | f(a {}) ";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+		sources.put("m2", "fonction  f a:a | a ");
+		sources.put("m3", "fonction  f b:a | a ");
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(!verif.erreurs.isEmpty());
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0) instanceof MultipleDefinitionFonction);
+	}
 	
-	
+	@Test
+	void testMultipleFonctionInexistante() {
+		String source = "type b {}  type a:b {} type c:b {}  fonction u symbol:a | f(a) ";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+		sources.put("m2", "fonction  f a:a | a ");
+		sources.put("m3", "fonction  f b:a | a ");
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(!verif.erreurs.isEmpty());
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0) instanceof FonctionInexistante);
+	}
+
 }

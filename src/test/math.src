@@ -1,5 +1,4 @@
 type zero {}
 type n:zero { zero:n}
 fonction + zero:a zero:b | si a est n alors n { n= a.n+b} sinon b  
-fonction u zero:a -> zero
-fonction f symbol:s | s
+

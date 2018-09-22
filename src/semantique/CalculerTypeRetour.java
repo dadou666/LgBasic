@@ -28,7 +28,13 @@ public class CalculerTypeRetour implements VisiteurExpression {
 
 	@Override
 	public void visiter(Appel appel) {
-		VerificationFonction vf = verificateur.recuperer(appel);
+		if (appel.erreur) {
+			return;
+		}
+		if (appel.vf == null) {
+			this.verificateur.completer(appel);
+		}
+		VerificationFonction vf =appel.vf;
 		if (vf == null) {
 			return;
 		}

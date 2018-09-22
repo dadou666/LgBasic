@@ -37,7 +37,7 @@ public class Verificateur implements VisiteurExpression {
 
 	public Verificateur() {
 		modules.add("base");
-		this.validations.put("base$symbol",(String s)-> true);
+		this.validations.put("base$symbol", (String s) -> true);
 
 	}
 
@@ -96,48 +96,39 @@ public class Verificateur implements VisiteurExpression {
 		return true;
 	}
 
-	public VerificationFonction recuperer(Appel appel) {
+	public List<VerificationFonction> recuperer(Appel appel) {
+		ArrayList<VerificationFonction> rs = new ArrayList<>();
 		if (appel.erreur) {
-			return null;
+			return rs;
 		}
+
 		if (appel.nom.moduleInit) {
 			VerificationFonction vf = fonctions.get(appel.nomRef());
 			if (vf != null) {
-				return vf;
+				rs.add(vf);
+				return rs;
 
 			}
-			List<String> noms = new ArrayList<>();
-			String tmp = null;
+		
 			for (String module : modules) {
 				String nomRefTmp = module + "$" + appel.nomRefPartiel();
 
 				vf = fonctions.get(nomRefTmp);
 				if (vf != null) {
-					tmp = module;
-					noms.add(nomRefTmp);
+					vf.module = module;
+					vf.nomFonction = nomRefTmp;
+					rs.add(vf);
 				}
 			}
-			if (noms.isEmpty()) {
+			if (rs.isEmpty()) {
 				FonctionInexistante fonctionInexistante = new FonctionInexistante();
 				fonctionInexistante.nom = appel.nomRef();
 				fonctionInexistante.nomRef = nomRef;
 				appel.erreur = true;
 				erreurs.add(fonctionInexistante);
-				return null;
+				return rs;
 			}
-			if (noms.size() == 1) {
-				appel.nom.moduleInit = false;
-
-				appel.nom.module = tmp;
-				return vf;
-			}
-			MultipleDefinitionFonction md = new MultipleDefinitionFonction();
-			md.nomFonction = nomRef;
-			md.appel = appel;
-			md.fonctions = noms;
-			appel.erreur = true;
-			erreurs.add(md);
-			return null;
+			return rs;
 
 		}
 
@@ -148,9 +139,10 @@ public class Verificateur implements VisiteurExpression {
 			fonctionInexistante.nomRef = nomRef;
 			appel.erreur = true;
 			erreurs.add(fonctionInexistante);
-			return null;
+			return rs;
 		}
-		return vf;
+		rs.add(vf);
+		return rs;
 	}
 
 	public void executerPourFonctions(Univers univers) {
@@ -205,7 +197,7 @@ public class Verificateur implements VisiteurExpression {
 			}
 			this.nomRef = vf.getKey();
 			if (vf.getValue().fonction.expression == null) {
-				
+
 				vf.getValue().typeRetour = vf.getValue().fonction.typeRetour.nomRef();
 			} else {
 				vf.getValue().fonction.expression.visiter(this);
@@ -247,7 +239,8 @@ public class Verificateur implements VisiteurExpression {
 
 			if (type.superType != null) {
 
-				if (trouverType(type.superType, false, e.getKey()) && validations.get(type.superType.nomRef()) != null) {
+				if (trouverType(type.superType, false, e.getKey())
+						&& validations.get(type.superType.nomRef()) != null) {
 					NomTypeReserve erreur = new NomTypeReserve();
 					erreur.nom = type.superType.nomRef();
 					erreurs.add(erreur);
@@ -282,7 +275,7 @@ public class Verificateur implements VisiteurExpression {
 					String nomRefTmp = superType.nomRef();
 					TypeDef sousTypeDef = types.get(nomRefTmp);
 					for (Var var : sousTypeDef.vars) {
-						if (validations.get(var.type.nomRef())==null) {
+						if (validations.get(var.type.nomRef()) == null) {
 							composant.add(var.type.nomRef());
 						}
 					}
@@ -460,7 +453,7 @@ public class Verificateur implements VisiteurExpression {
 		if (type1.equals(type2)) {
 			return true;
 		}
-		if (validations.get(type1) !=null) {
+		if (validations.get(type1) != null) {
 			return false;
 		}
 		TypeDef td = this.types.get(type1);
@@ -470,18 +463,15 @@ public class Verificateur implements VisiteurExpression {
 		return this.herite(td.superType.nomRef(), type2);
 	}
 
-	@Override
-	public void visiter(Appel appel) {
-		VerificationFonction fd = this.recuperer(appel);
-		if (fd == null) {
+	public void completer(Appel appel) {
+		
+		List<VerificationFonction> ls = this.recuperer(appel);
+		if (ls.isEmpty()) {
 			return;
-
 		}
-		int idx = 0;
-
+		appel.erreur = true;
+		List<String> appelTypes = new ArrayList<>();
 		for (Expression e : appel.params) {
-			Var var = fd.fonction.params.get(idx);
-			idx++;
 			CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
 			calculerTypeRetour.variables = this.variables;
 			calculerTypeRetour.verificateur = this;
@@ -489,19 +479,63 @@ public class Verificateur implements VisiteurExpression {
 			e.visiter(this);
 			if (nbErreur == this.erreurs.size()) {
 				e.visiter(calculerTypeRetour);
-				if (calculerTypeRetour.type != null) {
-					if (!this.herite(calculerTypeRetour.type, var.type.nomRef())) {
-						TypeParametreFonctionInvalide erreur = new TypeParametreFonctionInvalide();
-						erreur.nomFonction = this.nomRef;
-						erreur.appel = appel;
-						erreur.idx = idx;
-						erreurs.add(erreur);
-					}
-				}
 
+				appelTypes.add(calculerTypeRetour.type);
+
+			} else {
+
+				return;
 			}
 
 		}
+		List<VerificationFonction> lsValide = new ArrayList<>();
+		for (VerificationFonction fd : ls) {
+			int idx = 0;
+			boolean erreur = false;
+			for (Var var : fd.fonction.params) {
+				if (!this.herite(appelTypes.get(idx), var.type.nomRef())) {
+					erreur = true;
+					break;
+				}
+
+			}
+			if (!erreur) {
+				lsValide.add(fd);
+			}
+
+		}
+		if (lsValide.isEmpty()) {
+			FonctionInexistante fonctionInexistante = new FonctionInexistante();
+			fonctionInexistante.nom = appel.nomRef();
+			fonctionInexistante.nomRef = nomRef;
+			appel.erreur = true;
+			erreurs.add(fonctionInexistante);
+			return;
+
+		}
+		if (lsValide.size() > 1) {
+			MultipleDefinitionFonction md = new MultipleDefinitionFonction();
+			md.nomFonction = nomRef;
+			md.appel = appel;
+			md.fonctions = lsValide;
+			md.types = appelTypes;
+			appel.erreur = true;
+			erreurs.add(md);
+		}
+		appel.nom.module = lsValide.get(0).module;
+		appel.erreur = false;
+		appel.vf = lsValide.get(0);
+	}
+
+	@Override
+	public void visiter(Appel appel) {
+		if (appel.vf != null) {
+			return;
+		}
+		if (appel.erreur) {
+			return;
+		}
+		this.completer(appel);
 
 	}
 
@@ -510,7 +544,7 @@ public class Verificateur implements VisiteurExpression {
 		if (!this.trouverType(testType.typeRef, true, nomRef)) {
 			return;
 		}
-		if (validations.get(testType.typeRef.nomRef())!= null) {
+		if (validations.get(testType.typeRef.nomRef()) != null) {
 			OperationInvalideSurTypeReserve erreur = new OperationInvalideSurTypeReserve();
 			erreur.nomFonction = nomRef;
 			erreur.expression = testType;

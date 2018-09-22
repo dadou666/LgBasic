@@ -1,3 +1,5 @@
 type a {  }
 type c { b:a symbol:m}
 type f { a:v }
+fonction inc zero:a | a+ zero {}
+fonction avancer symbol:a   | a + 1
