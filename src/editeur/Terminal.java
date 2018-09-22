@@ -78,8 +78,8 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 		output = new JTextPane();
 		streamOutput = new TextAreaOutputStream(output);
-		// System.setOut(new PrintStream(streamOutput));
-	//	System.setErr(new PrintStream(streamOutput));
+		 System.setOut(new PrintStream(streamOutput));
+		System.setErr(new PrintStream(streamOutput));
 		JScrollPane outputScrollPane = new JScrollPane(output);
 		input = new JTextPane();
 
@@ -132,8 +132,8 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		sources = new HashMap<String, String>();
 		Vector<String> vector = new Vector<String>();
 		for (String s : ls) {
-			if (s.endsWith(".mdl")) {
-				int i = s.indexOf(".mdl");
+			if (s.endsWith(".src")) {
+				int i = s.indexOf(".src");
 				String nom = s.substring(0, i);
 				vector.add(nom);
 				sources.put(nom, new String(Files.readAllBytes(Paths.get(chemin, s))));
@@ -186,7 +186,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		Parseur parseur = new Parseur();
 		String sel = list.getSelectedValue();
 		if (univers == null) {
-	
+
 			univers = parseur.lireSourceCode(sources);
 		} else {
 			Module module = parseur.lireModule(sources.get(sel));
@@ -210,6 +210,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		if (erreurs.isEmpty()) {
 
 			ColorierSource colorierSource = new ColorierSource();
+			colorierSource.sets.addAll(verif.validations.keySet());
 			Module module = univers.modules.get(sel);
 			colorierSource.tp = this.input;
 			colorierSource.visiter(module);
@@ -232,7 +233,9 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		// TODO Auto-generated method stub
 		erreur = false;
 		String sel = list.getSelectedValue();
-
+		if (sel == null) {
+			return;
+		}
 		if (selection) {
 			return;
 		}
@@ -241,7 +244,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		try {
 			src = document.getText(0, document.getLength());
 			this.sources.put(sel, src);
-			Files.write(Paths.get(chemin, sel + ".mdl"), src.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+			Files.write(Paths.get(chemin, sel + ".src"), src.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
 		} catch (BadLocationException | IOException ex) {
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
@@ -252,7 +255,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			compiler();
 		} catch (Throwable e2) {
 			erreur = true;
-			e2.printStackTrace();
+			// e2.printStackTrace();
 		}
 
 		this.streamOutput.flush();
@@ -276,7 +279,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 				}
 			}
 			try {
-				Files.write(Paths.get(chemin, nom + ".mdl"), this.input.getText().getBytes(),
+				Files.write(Paths.get(chemin, nom + ".src"), this.input.getText().getBytes(),
 						StandardOpenOption.CREATE_NEW);
 				this.chargerSources();
 			} catch (IOException e) {
@@ -289,23 +292,25 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			this.compiler();
 		} catch (Throwable e) {
 			erreur = true;
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 
 	}
+
 	public void clearColor(Color color) {
 
 		this.setColor(Color.black, 0, input.getStyledDocument().getLength());
 
 	}
+
 	public void setColor(Color c, int idx, int l) {
-		
+
 		JTextPane tp = this.input;
 
-
-		tp.getStyledDocument().setCharacterAttributes(idx , l, this.attributeSet(c), true);
+		tp.getStyledDocument().setCharacterAttributes(idx, l, this.attributeSet(c), true);
 
 	}
+
 	@Override
 	public void valueChanged(ListSelectionEvent arg0) {
 		String sel = list.getSelectedValue();
@@ -325,7 +330,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			selection = false;
 		} catch (Throwable e) {
 			erreur = true;
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 
 	}

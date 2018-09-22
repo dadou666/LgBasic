@@ -37,6 +37,11 @@ public class CalculerTypeRetour implements VisiteurExpression {
 		} else {
 			if (!vf.calculerTypeEnCours) {
 				vf.calculerTypeEnCours = true;
+				if (vf.typeRetour != null) {
+					vf.typeRetour = vf.fonction.typeRetour.nomRef();
+					this.type = vf.typeRetour;
+					return;
+				}
 				CalculerTypeRetour calculer = new CalculerTypeRetour();
 				calculer.verificateur = this.verificateur;
 				calculer.nomRef = appel.nom.nomRef();
@@ -131,7 +136,7 @@ public class CalculerTypeRetour implements VisiteurExpression {
 	public void visiter(VarRef varRef) {
 		this.type = this.variables.get(varRef.nom);
 		if (this.type == null) {
-			for(String typeReserve:this.verificateur.typeReserve) {
+			for(String typeReserve:this.verificateur.validations.keySet()) {
 				TypeReserveValidation validation = this.verificateur.validations.get(typeReserve);
 				if (validation !=null && validation.valider(varRef.nom)) {
 					this.type = typeReserve;

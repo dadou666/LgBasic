@@ -841,16 +841,16 @@ class TestSemantique {
 
 		Univers univers = parser.lireSourceCode(sources);
 		Verificateur verif = new Verificateur();
-		//verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+		verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
 
 		verif.executerPourTypes(univers);
 		verif.executerPourFonctions(univers);
 		VerificationFonction vf = verif.fonctions.get("m1$f/1");
+		assertTrue(vf.fonction.expression != null);
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression == null);
 		assertTrue(verif.erreurs.size()==1);
-		assertTrue(verif.erreurs.get(0) instanceof CreationTypeReserve);
-		
+		assertTrue(verif.erreurs.get(0) instanceof CreationTypeReserve);		
 	
 	}
 	@Test
@@ -869,4 +869,20 @@ class TestSemantique {
 		verif.executerPourFonctions(univers);
 		assertTrue(verif.erreurs.isEmpty());
 	}
+	@Test
+	void testFonctionAPI() {
+		String source ="type b {} fonction t b:a -> a  fonction u b:a | t(a) ";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		//verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.isEmpty());
+	}
+	
+	
 }

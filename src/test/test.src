@@ -1,0 +1,3 @@
+type a {  }
+type c { b:a symbol:m}
+type f { a:v }

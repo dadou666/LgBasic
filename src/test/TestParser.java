@@ -29,6 +29,8 @@ class TestParser {
 				.lireModule("type zero {}\r\n" + "type n:zero { zero:n} fonction + zero:a zero:b | a.n+b ");
 		assertFalse(parseur.error);
 	}
+	
+
 
 	@Test
 	void testTypeVide() {
@@ -282,7 +284,16 @@ class TestParser {
 		assertTrue(varRef.nom.equals("q"));
 
 	}
-
+	@Test
+	void testFonctionAPI() {
+		Parseur parseur = new Parseur();
+		Module module = parseur.lireModule("fonction f toto$o:x -> m");
+		assertTrue(module != null);
+		assertTrue(module.fonctions.size() == 1);
+		assertTrue(module.fonctions.get(0).nom.equals("f"));
+		assertTrue(module.fonctions.get(0).expression == null);
+		assertTrue(module.fonctions.get(0).typeRetour != null);
+	}
 	@Test
 	void testFonctionAvecObjet() {
 		Parseur parseur = new Parseur();

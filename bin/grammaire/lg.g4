@@ -1,7 +1,7 @@
 grammar lg;
 module : ( element   )*;
 
-element : type | fonction ;
+element : type |  fonction ;
 type  : estAbstrait  'type'   ID  ( superType | )  '{' champs  '}' ;
 estAbstrait :'abstrait'  | ;
 superType :      (':' (ID | id_externe ) )  ;
@@ -24,7 +24,7 @@ testEgalite : code '==' code;
 testDifference : code '<>' code;
 si :  'si' (testType | testEgalite |testDifference) 'alors' code 'sinon' ( si |code );
 negation : '!' | ;  
-fonction : 'fonction'   (ID|operateur)  champs '|' tmpCode;
+fonction : 'fonction'   (ID|operateur)  champs  ( ('|' tmpCode)  | ( '->' typeRef )) ;
 
 tmpCode :     literal|appel |si  |code |  '(' tmpCode ')'  ;
 ref: (ID| id_externe);

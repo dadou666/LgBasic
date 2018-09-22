@@ -2,7 +2,9 @@ package editeur;
 
 import java.awt.Color;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JTextPane;
 import javax.swing.text.AttributeSet;
@@ -17,6 +19,7 @@ import model.Literal;
 import model.Module;
 import model.Objet;
 import model.ObjetParam;
+import model.Ref;
 import model.RefLiteral;
 import model.TestType;
 import model.TypeDef;
@@ -28,6 +31,7 @@ import model.VisiteurModule;
 public class ColorierSource implements VisiteurModule {
 	Color declarationFonction = Color.red;
 	Color declarationType = Color.blue;
+	Color referenceTypeReserve = Color.darkGray;
 	Color declarationFonctionParametre = Color.green;
 	Color referenceFonctionParametre = Color.ORANGE;
 	Color referenceType = Color.PINK;
@@ -37,10 +41,17 @@ public class ColorierSource implements VisiteurModule {
 	Color symbol = Color.BLACK;
 	JTextPane tp;
 	Map<Color, AttributeSet> asets = new HashMap<>();
+	Set<String> sets = new HashSet<String>();
+	public Color typeColor(Ref ref) {
+		if (sets.contains(ref.nomRef())) {
+			return this.referenceTypeReserve;
+		}
+		return this.referenceType;
+	}
 
 	@Override
 	public void visiter(Objet objet) {
-		this.setColor(referenceType, objet.type.debut, objet.type.fin);
+		this.setColor(typeColor(objet.type), objet.type.debut, objet.type.fin);
 		for (ObjetParam pm : objet.params) {
 			this.setColor(referenceAttribut, pm.debut, pm.fin);
 			pm.expression.visiter(this);
@@ -59,7 +70,7 @@ public class ColorierSource implements VisiteurModule {
 
 	@Override
 	public void visiter(TestType testType) {
-		this.setColor(referenceType, testType.typeRef.debut, testType.typeRef.fin);
+		this.setColor(typeColor(testType.typeRef), testType.typeRef.debut, testType.typeRef.fin);
 		testType.alors.visiter(this);
 		testType.sinon.visiter(this);
 		testType.cible.visiter(this);
@@ -91,7 +102,7 @@ public class ColorierSource implements VisiteurModule {
 				this.setColor(this.referenceFonctionParametre, ref.debut, ref.fin);
 			}
 			if (ref.type == RefLiteral.Type.Type) {
-				this.setColor(this.referenceType, ref.debut, ref.fin);
+				this.setColor(typeColor(ref), ref.debut, ref.fin);
 			}
 			if (ref.type == RefLiteral.Type.Symbol) {
 				this.setColor(this.symbol, ref.debut, ref.fin);
@@ -128,9 +139,13 @@ public class ColorierSource implements VisiteurModule {
 		this.setColor(this.declarationFonction, fd.debut, fd.fin);
 		for (Var var : fd.params) {
 			this.setColor(this.declarationFonctionParametre, var.debut, var.fin);
-			this.setColor(this.referenceType, var.type.debut, var.type.fin);
+			this.setColor(this.typeColor(var.type), var.type.debut, var.type.fin);
 		}
-		fd.expression.visiter(this);
+		if (fd.expression != null) {
+			fd.expression.visiter(this);
+		} else {
+			this.setColor(this.typeColor(fd.typeRetour), fd.typeRetour.debut, fd.typeRetour.fin);
+		}
 
 	}
 
@@ -138,10 +153,10 @@ public class ColorierSource implements VisiteurModule {
 	public void visiter(TypeDef td) {
 		this.setColor(this.declarationType, td.debut, td.fin);
 		if (td.superType != null) {
-			this.setColor(this.referenceType, td.superType.debut, td.superType.fin);
+			this.setColor(typeColor(td.superType), td.superType.debut, td.superType.fin);
 		}
 		for (Var v : td.vars) {
-			this.setColor(this.referenceType, v.type.debut, v.type.fin);
+			this.setColor(typeColor(v.type), v.type.debut, v.type.fin);
 			this.setColor(this.declarationAttribut, v.debut, v.fin);
 		}
 
