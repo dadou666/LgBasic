@@ -126,7 +126,7 @@ public class ColorierSource implements VisiteurModule {
 			attributes.addAttribute(StyleConstants.CharacterConstants.Bold, Boolean.TRUE);
 			attributes.addAttribute(StyleConstants.CharacterConstants.Italic, Boolean.FALSE);
 			attributes.addAttribute(StyleConstants.CharacterConstants.Foreground, c);
-			StyleConstants.setFontSize(attributes, 14);
+			StyleConstants.setFontSize(attributes, 20);
 			as = attributes;
 			asets.put(c, as);
 		}

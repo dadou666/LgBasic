@@ -16,15 +16,20 @@ public class Module {
 		init.module = nom;
 		for (FonctionDef fd : fonctions) {
 			for (Var var : fd.params) {
-				if (var.type.module == null ) {
+				if (var.type.module == null) {
 					var.type.module = nom;
 					var.type.moduleInit = true;
 				}
 			}
 			if (fd.expression != null) {
-				
-			
-			fd.expression.visiter(init); }
+
+				fd.expression.visiter(init);
+			} else {
+				if (fd.typeRetour.module == null) {
+					fd.typeRetour.moduleInit = true;
+					fd.typeRetour.module = nom;
+				}
+			}
 		}
 		for (TypeDef td : types) {
 			if (td.superType != null && td.superType.module == null) {

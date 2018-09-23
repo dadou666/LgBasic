@@ -24,6 +24,7 @@ public class InitModuleRef implements VisiteurExpression{
 		}
 		for(ObjetParam op:objet.params) {
 			if (op.expression == null) {
+				
 				return;
 			}
 			op.expression.visiter(this);

@@ -221,7 +221,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		}
 
 		Verificateur verif = new Verificateur();
-		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
+		verif.validations.put("base$symbol", (String s) -> Character.isLetter(s.charAt(0)));
 		verif.validations.put("base$int", (String s) -> estInt(s));
 		verif.validations.put("base$float", (String s) -> estFloat(s));
 		verif.executerPourTypes(univers);

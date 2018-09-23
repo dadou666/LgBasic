@@ -186,6 +186,11 @@ public class Verificateur implements VisiteurExpression {
 					erreur = true;
 				}
 			}
+			if (vf.getValue().fonction.typeRetour != null) {
+				if (!this.trouverType(vf.getValue().fonction.typeRetour, true, vf.getKey())) {
+					erreur = true;
+				}
+			}
 		}
 		if (erreur) {
 			return;
@@ -480,7 +485,9 @@ public class Verificateur implements VisiteurExpression {
 	}
 
 	public void completer(Appel appel) {
-		
+		if (appel.nom.equals("+")) {
+			System.out.println("debug");
+		}
 		List<VerificationFonction> ls = this.recuperer(appel);
 		if (ls.isEmpty()) {
 			return;
@@ -513,6 +520,7 @@ public class Verificateur implements VisiteurExpression {
 					erreur = true;
 					break;
 				}
+				idx++;
 
 			}
 			if (!erreur) {

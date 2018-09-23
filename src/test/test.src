@@ -2,7 +2,8 @@ type a {  }
 type c { b:a symbol:m}
 type f { a:v }
 fonction inc zero:a | a+ zero {}
-fonction avancer symbol:a   | a + 1
-type u { int:x int:z }
+fonction avancer symbol:a  zero:c | a +  ber
+type u { int:x int:z float:m}
 fonction m int:x | x
-fonction u int:x | u { x=x z=5p5 }
+fonction u int:x | u { x=x z=55 m=45p78 }
+fonction / int:x int:y -> int

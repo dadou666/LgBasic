@@ -988,6 +988,26 @@ class TestSemantique {
 		//assertTrue(verif.erreurs.size() == 1);
 
 	}
+	
+	@Test
+	public void testFonctionSymbol() {
+		String source = "  fonction  u int:a | a+45";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+		sources.put("m2", " fonction + symbol:a symbol:b -> symbol");
+		sources.put("m3", "type c {} fonction + c:a c:b -> symbol");
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> Character.isLetter(s.charAt(0)));
+		verif.validations.put("base$int", (String s) -> estInt(s));
+		verif.validations.put("base$float", (String s) -> estFloat(s));
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertFalse(verif.erreurs.isEmpty());
+		//assertTrue(verif.erreurs.size() == 1);
+
+	}
 	@Test
 	public void testObjetIncomplet() {
 		String source = "type b {float:a int:b} fonction m b:a | b { a= 5p45 }";
