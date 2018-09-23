@@ -413,6 +413,7 @@ public class Verificateur implements VisiteurExpression {
 				tmp.add(op.nom);
 			}
 		}
+		 Set<String> set = new HashSet<String>();
 		List<String> champs = this.verificationTypes.get(objet.type.nomRef()).champs;
 		for (ObjetParam op : objet.params) {
 			if (!champs.contains(op.nom)) {
@@ -423,13 +424,28 @@ public class Verificateur implements VisiteurExpression {
 
 			}
 			op.expression.visiter(this);
+			set.add(op.nom);
+			
 
 		}
 		if (!erreurs.isEmpty()) {
 			return;
 		}
-
+		Set<String> absents = new HashSet<>();
+		for(String champ:champs) {
+			if (!set.contains(champ)) {
+				absents.add(champ);
+			}
+		}
+		if (!absents.isEmpty()) {
+			ObjetIncomplet erreur = new ObjetIncomplet();
+			erreur.absents = absents;
+			erreur.objet = objet;
+			this.erreurs.add(erreur);
+		}
+      
 		for (ObjetParam op : objet.params) {
+			
 			CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
 			calculerTypeRetour.variables = this.variables;
 			calculerTypeRetour.verificateur = this;

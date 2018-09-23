@@ -31,6 +31,7 @@ import semantique.MultipleDefinitionFonction;
 import semantique.MultipleDefinitionType;
 import semantique.NomTypeReserve;
 import semantique.NombreParametreInvalide;
+import semantique.ObjetIncomplet;
 import semantique.OperationInvalideSurTypeReserve;
 import semantique.TypeExpressionInvalideDansObjet;
 import semantique.TypeIndetermine;
@@ -910,6 +911,105 @@ class TestSemantique {
 		assertTrue(!verif.erreurs.isEmpty());
 		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof FonctionInexistante);
+	}
+	
+	
+	public boolean estInt(String s) {
+		try {
+			Integer.parseInt(s);
+			return true;
+		} catch(Throwable t) {
+			return false;
+		}
+		
+		
+	}
+	public boolean estFloat(String s) {
+		try {
+			Float.parseFloat(s.replace('p', '.'));
+			return true;
+		} catch(Throwable t) {
+			return false;
+		}
+		
+		
+	}
+	@Test
+	public void testTypeReserveIntEtFloat() {
+		String source = "type b {int:a } fonction m b:a | b { a= er }";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
+		verif.validations.put("base$int", (String s) -> estInt(s));
+		verif.validations.put("base$float", (String s) -> estFloat(s));
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertFalse(verif.erreurs.isEmpty());
+		assertTrue(verif.erreurs.size() == 1);
+		System.out.println(verif.erreurs.get(0));
+	}
+	@Test
+	public void testTypeReserveInt() {
+		String source = "type b {int:a } fonction m b:a | b { a= 5 }";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
+		verif.validations.put("base$int", (String s) -> estInt(s));
+		verif.validations.put("base$float", (String s) -> estFloat(s));
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.isEmpty());
+		//assertTrue(verif.erreurs.size() == 1);
+
+	}
+	@Test
+	public void testTypeReserveFloatEtInt() {
+		String source = "type b {float:a int:b} fonction m b:a | b { a= 5p45 b=5}";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
+		verif.validations.put("base$int", (String s) -> estInt(s));
+		verif.validations.put("base$float", (String s) -> estFloat(s));
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertTrue(verif.erreurs.isEmpty());
+		//assertTrue(verif.erreurs.size() == 1);
+
+	}
+	@Test
+	public void testObjetIncomplet() {
+		String source = "type b {float:a int:b} fonction m b:a | b { a= 5p45 }";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur();
+		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
+		verif.validations.put("base$int", (String s) -> estInt(s));
+		verif.validations.put("base$float", (String s) -> estFloat(s));
+		verif.executerPourTypes(univers);
+		verif.executerPourFonctions(univers);
+		assertFalse(verif.erreurs.isEmpty());
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0) instanceof ObjetIncomplet);
+		ObjetIncomplet erreur = (ObjetIncomplet) verif.erreurs.get(0);
+		assertTrue(erreur.absents.contains("b"));
+		assertTrue(erreur.absents.size()==1);
+		
+
 	}
 
 }
