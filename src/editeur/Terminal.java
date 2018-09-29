@@ -208,7 +208,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 			univers = parseur.lireSourceCode(sources);
 		} else {
-			Module module = parseur.lireModule(sources.get(sel));
+			Module module = parseur.lireModule(null, sources.get(sel));
 			univers.modules.put(sel, module);
 			if (parseur.error) {
 				return;

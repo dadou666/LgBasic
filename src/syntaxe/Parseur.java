@@ -35,6 +35,7 @@ import grammaire.lgParser.TypeContext;
 import grammaire.lgParser.TypeRefContext;
 import model.Acces;
 import model.Appel;
+import model.Def;
 import model.Expression;
 import model.FonctionDef;
 import model.Literal;
@@ -84,10 +85,10 @@ public class Parseur implements ANTLRErrorListener {
 
 	public Univers lireSourceCode(Map<String, String> sources) {
 		error = false;
-		Univers u = new Univers();
+		Univers u = new Univers(null);
 		for (Map.Entry<String, String> e : sources.entrySet()) {
 
-			Module module = this.lireModule(e.getValue());
+			Module module = this.lireModule(e.getKey(), e.getValue());
 			if (module != null) {
 				u.modules.put(e.getKey(), module);
 				if (!error) {
@@ -105,7 +106,7 @@ public class Parseur implements ANTLRErrorListener {
 	 * }
 	 */
 
-	public Module lireModule(String src) {
+	public Module lireModule(String module, String src) {
 		error = false;
 		lgLexer lgLexer = new lgLexer(org.antlr.v4.runtime.CharStreams.fromString(src));
 		CommonTokenStream tokens = new CommonTokenStream(lgLexer);
@@ -114,8 +115,14 @@ public class Parseur implements ANTLRErrorListener {
 		if (error) {
 			return null;
 		}
-		return this.transformer(parser.module());
-
+		Module r= this.transformer(parser.module());
+		for(Def def:r.fonctions) {
+			def.module =module;
+		}
+		for(Def def:r.types) {
+			def.module =module;
+		}
+		return r;
 	}
 
 	public Module transformer(ModuleContext context) {

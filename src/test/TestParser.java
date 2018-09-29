@@ -18,7 +18,7 @@ class TestParser {
 	@Test
 	void testFonction() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("type zero {}\r\n"
+		Module module = parseur.lireModule(null, "type zero {}\r\n"
 				+ "type n:zero { zero:n} fonction + zero:a zero:b | si a est n alors n { n=  a.n+b  } sinon b  ");
 		assertFalse(parseur.error);
 	}
@@ -26,7 +26,7 @@ class TestParser {
 	void testFonction2() {
 		Parseur parseur = new Parseur();
 		Module module = parseur
-				.lireModule("type zero {}\r\n" + "type n:zero { zero:n} fonction + zero:a zero:b | a.n+b ");
+				.lireModule(null, "type zero {}\r\n" + "type n:zero { zero:n} fonction + zero:a zero:b | a.n+b ");
 		assertFalse(parseur.error);
 	}
 	
@@ -35,7 +35,7 @@ class TestParser {
 	@Test
 	void testTypeVide() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("type a { } ");
+		Module module = parseur.lireModule(null, "type a { } ");
 		assertTrue(module != null);
 		assertTrue(module.types.size() == 1);
 		assertTrue(module.types.get(0).nom.equals("a"));
@@ -47,7 +47,7 @@ class TestParser {
 	@Test
 	void testTypeAbstrait() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("abstrait type a { } ");
+		Module module = parseur.lireModule(null, "abstrait type a { } ");
 		assertTrue(module != null);
 		assertTrue(module.types.size() == 1);
 		assertTrue(module.types.get(0).nom.equals("a"));
@@ -59,7 +59,7 @@ class TestParser {
 	@Test
 	void testTypeAvecNonChiffre() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("type 45 { } ");
+		Module module = parseur.lireModule(null, "type 45 { } ");
 		assertTrue(module != null);
 		assertTrue(module.types.size() == 1);
 		assertTrue(module.types.get(0).nom.equals("45"));
@@ -70,7 +70,7 @@ class TestParser {
 	@Test
 	void testTypeUnChamp() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("type a {u:a } ");
+		Module module = parseur.lireModule(null, "type a {u:a } ");
 		assertTrue(module != null);
 		assertTrue(module.types.size() == 1);
 		assertTrue(module.types.get(0).nom.equals("a"));
@@ -84,7 +84,7 @@ class TestParser {
 	@Test
 	void testTypeUnChampDansAutreModule() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("type a {toto$u:a } ");
+		Module module = parseur.lireModule(null, "type a {toto$u:a } ");
 		assertTrue(module != null);
 		assertTrue(module.types.size() == 1);
 		assertTrue(module.types.get(0).nom.equals("a"));
@@ -98,7 +98,7 @@ class TestParser {
 	@Test
 	void testTypeDeuxChamps() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("type a {u:a m:b } ");
+		Module module = parseur.lireModule(null, "type a {u:a m:b } ");
 		assertTrue(module != null);
 		assertTrue(module.types.size() == 1);
 		assertTrue(module.types.get(0).nom.equals("a"));
@@ -116,7 +116,7 @@ class TestParser {
 	@Test
 	void testTypeDeuxChampsAvecHeritage() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("type a: h {u:a m:b } ");
+		Module module = parseur.lireModule(null, "type a: h {u:a m:b } ");
 		assertTrue(module != null);
 		assertTrue(module.types.size() == 1);
 		assertTrue(module.types.get(0).nom.equals("a"));
@@ -138,7 +138,7 @@ class TestParser {
 	@Test
 	void testFonctionIdentiteNomChiffre() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f o:5 | 5");
+		Module module = parseur.lireModule(null, "fonction f o:5 | 5");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -155,7 +155,7 @@ class TestParser {
 	@Test
 	void testFonctionIdentite() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f o:x | x");
+		Module module = parseur.lireModule(null, "fonction f o:x | x");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -172,7 +172,7 @@ class TestParser {
 	@Test
 	void testFonctionQuiRetourneLiteral() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f o:x | [ x m  tot$m ]");
+		Module module = parseur.lireModule(null, "fonction f o:x | [ x m  tot$m ]");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -190,7 +190,7 @@ class TestParser {
 	@Test
 	void testFonctionIdentiteParamAvecAutreModule() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x | x");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x | x");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -207,7 +207,7 @@ class TestParser {
 	@Test
 	void testFonctionAvecTestType() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x | si x est momo  alors q sinon m");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x | si x est momo  alors q sinon m");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -234,7 +234,7 @@ class TestParser {
 	@Test
 	void testFonctionAvecTestTypeEtNegation() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x | si x est !momo  alors q sinon m");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x | si x est !momo  alors q sinon m");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -261,7 +261,7 @@ class TestParser {
 	@Test
 	void testFonctionAvecTestTypeDansAutreModulEtNegation() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x | si x est ! lulu$momo  alors q sinon m");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x | si x est ! lulu$momo  alors q sinon m");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -287,7 +287,7 @@ class TestParser {
 	@Test
 	void testFonctionAPI() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x -> m");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x -> m");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -297,7 +297,7 @@ class TestParser {
 	@Test
 	void testFonctionAvecObjet() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x | nini { m= a {} }");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x | nini { m= a {} }");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -323,7 +323,7 @@ class TestParser {
 	@Test
 	void testFonctionAvecObjetDansTestType() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x | si x est lala alors nini { m= a {} } sinon o");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x | si x est lala alors nini { m= a {} } sinon o");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -350,7 +350,7 @@ class TestParser {
 	@Test
 	void testFonctionOperateur() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction + toto$o:x lili:m | si x est lala alors nini { m= a {} } sinon o");
+		Module module = parseur.lireModule(null, "fonction + toto$o:x lili:m | si x est lala alors nini { m= a {} } sinon o");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("+"));
@@ -381,7 +381,7 @@ class TestParser {
 	@Test
 	void testAppelFonctionOperateur() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x lili:m | x.m > m + o");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x lili:m | x.m > m + o");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -414,7 +414,7 @@ class TestParser {
 	@Test
 	void testAppelFonctionOperateurAvecParenthese() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x lili:m | a > ( m + o )");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x lili:m | a > ( m + o )");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -449,7 +449,7 @@ class TestParser {
 	@Test
 	void testAppelFonctionOperateurAvecParenthese2() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x lili:m | ( a > m ) + o ");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x lili:m | ( a > m ) + o ");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -484,7 +484,7 @@ class TestParser {
 	@Test
 	void testAcces() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f toto$o:x lili:m | a.lolo ");
+		Module module = parseur.lireModule(null, "fonction f toto$o:x lili:m | a.lolo ");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -499,7 +499,7 @@ class TestParser {
 	@Test
 	void testAccesEnCascade() {
 		Parseur parseur = new Parseur();
-		Module module = parseur.lireModule("fonction f t:x  | (a.lolo).momo ");
+		Module module = parseur.lireModule(null, "fonction f t:x  | (a.lolo).momo ");
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 		assertTrue(module.fonctions.get(0).nom.equals("f"));
@@ -517,7 +517,7 @@ class TestParser {
 	void testPositionDansSouce() {
 		Parseur parseur = new Parseur();
 		String source = "fonction f t:x  | mo(x)";
-		Module module = parseur.lireModule(source);
+		Module module = parseur.lireModule(null, source);
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 
@@ -531,7 +531,7 @@ class TestParser {
 	void testPositionOperateurDansSouce() {
 		Parseur parseur = new Parseur();
 		String source = "fonction f t:x  | x * x";
-		Module module = parseur.lireModule(source);
+		Module module = parseur.lireModule(null, source);
 		assertTrue(module != null);
 		assertTrue(module.fonctions.size() == 1);
 
