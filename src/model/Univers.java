@@ -12,8 +12,11 @@ import java.util.Set;
 
 public class Univers {
 	public Map<String, Module> modules = new HashMap<>();
+	public void visiter(VisiteurUnivers visiteur) {
+		visiteur.visiter(this);
+	}
 
-	public Map<String, String> sources(Class api) {
+	static public Map<String, String> sources(Class api, Map<Class, String> typeReserve) {
 		Class classes[] = api.getDeclaredClasses();
 
 		Map<String, Class> types = new HashMap<>();
@@ -37,10 +40,11 @@ public class Univers {
 				sb = new StringBuilder();
 				sources.put(tmp[0], sb);
 			}
-			sb.append("type ");
 			if (Modifier.isAbstract(cls.getModifiers())) {
-				sb.append(" abstrait ");
+				sb.append("abstrait ");
 			}
+			sb.append("type ");
+
 			sb.append(tmp[1]);
 			String superClassName = cls.getSuperclass().getSimpleName();
 			if (types.get(superClassName) != null) {
@@ -57,6 +61,15 @@ public class Univers {
 						sb.append(":");
 						sb.append(field.getName());
 						sb.append("\n");
+					} else {
+						String type = typeReserve.get(field.getType());
+						if (type != null) {
+							sb.append(type);
+							sb.append(":");
+							sb.append(field.getName());
+							sb.append("\n");
+						}
+
 					}
 				}
 
@@ -66,7 +79,7 @@ public class Univers {
 		}
 		for (Method m : api.getDeclaredMethods()) {
 			if (!Modifier.isStatic(m.getModifiers())) {
-				addSource(m,types,sources);
+				addSource(m, types, sources, typeReserve);
 			}
 
 		}
@@ -78,7 +91,8 @@ public class Univers {
 		return result;
 	}
 
-	public static void addSource(Method m, Map<String, Class> types, Map<String, StringBuilder> sources) {
+	public static void addSource(Method m, Map<String, Class> types, Map<String, StringBuilder> sources,
+			Map<Class, String> typeReserve) {
 		String name = m.getName();
 		String tmp[] = name.split("\\$");
 
@@ -113,32 +127,37 @@ public class Univers {
 
 		int idxParam = 0;
 		for (Class cls : m.getParameterTypes()) {
-			if (types.get(cls.getSimpleName()) == null) {
-				return;
+			String type = cls.getSimpleName();
+			if (types.get(type) == null) {
+				type = typeReserve.get(cls);
+				if (type == null) {
+					return;
+				}
+
 			}
-			sb.append(cls.getSimpleName());
+			sb.append(type);
 			sb.append(":");
 			sb.append("p");
 			sb.append(idxParam);
 			idxParam++;
 
 		}
-		if (types.get(m.getReturnType().getSimpleName()) == null) {
-			return;
+		String type = m.getReturnType().getSimpleName();
+		if (types.get(type) == null) {
+			type = typeReserve.get(m.getReturnType());
+			if (type == null) {
+				return;
+			}
 		}
 		sb.append("->");
-		sb.append(m.getReturnType().getSimpleName());
+		sb.append(type);
 		sb.append("\n");
-		StringBuilder source = sources.get(tmp[1]);
+		StringBuilder source = sources.get(tmp[0]);
 		if (source == null) {
 			source = new StringBuilder();
-			sources.put(tmp[1],source);
+			sources.put(tmp[0], source);
 		}
 		source.append(sb.toString());
-	}
-
-	public Univers(Class api) {
-
 	}
 
 }

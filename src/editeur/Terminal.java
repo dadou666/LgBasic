@@ -220,12 +220,12 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			return;
 		}
 
-		Verificateur verif = new Verificateur();
+		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> Character.isLetter(s.charAt(0)));
 		verif.validations.put("base$int", (String s) -> estInt(s));
 		verif.validations.put("base$float", (String s) -> estFloat(s));
-		verif.executerPourTypes(univers);
-		verif.executerPourFonctions(univers);
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
 		Vector<Erreur> erreurs = new Vector();
 		erreurs.addAll(verif.erreurs);
 		this.listErreurSemantique.setListData(erreurs);

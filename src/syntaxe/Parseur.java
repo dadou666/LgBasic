@@ -85,7 +85,7 @@ public class Parseur implements ANTLRErrorListener {
 
 	public Univers lireSourceCode(Map<String, String> sources) {
 		error = false;
-		Univers u = new Univers(null);
+		Univers u = new Univers();
 		for (Map.Entry<String, String> e : sources.entrySet()) {
 
 			Module module = this.lireModule(e.getKey(), e.getValue());

@@ -34,10 +34,12 @@ public class Verificateur implements VisiteurExpression {
 	public List<String> modules = new ArrayList<>();
 	public Map<String, TypeReserveValidation> validations = new HashMap<>();
 	public Map<String, String> variables = new HashMap<>();
+	public Univers univers;
 
-	public Verificateur() {
+	public Verificateur(Univers univers) {
 		modules.add("base");
 		this.validations.put("base$symbol", (String s) -> true);
+		this.univers = univers;
 
 	}
 
@@ -145,7 +147,7 @@ public class Verificateur implements VisiteurExpression {
 		return rs;
 	}
 
-	public void executerPourFonctions(Univers univers) {
+	public void executerPourFonctions() {
 		boolean erreur = false;
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
 			for (FonctionDef fonction : module.getValue().fonctions) {
@@ -217,7 +219,7 @@ public class Verificateur implements VisiteurExpression {
 		}
 	}
 
-	public void executerPourTypes(Univers univers) {
+	public void executerPourTypes() {
 		this.modules.addAll(univers.modules.keySet());
 
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
