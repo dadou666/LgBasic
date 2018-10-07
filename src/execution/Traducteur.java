@@ -14,10 +14,12 @@ import javassist.Modifier;
 import javassist.NotFoundException;
 import model.Acces;
 import model.Appel;
+import model.Expression;
 import model.FonctionDef;
 import model.Literal;
 import model.Module;
 import model.Objet;
+import model.ObjetParam;
 import model.Ref;
 import model.TestType;
 import model.TypeDef;
@@ -40,8 +42,11 @@ public class Traducteur implements VisiteurExpression {
 	public FonctionDef fonctionDef;
 	public Map<String,String> indexVars;
 	public Map<String,String> nomFonctions = new HashMap<>();
+	public Map<Expression,String> tmpVars = new HashMap<>();
+	public int idxTmpVar;
+	public String nom;
 
-	public Traducteur(Verificateur verificateur) {
+	public Traducteur(String nom,Verificateur verificateur) {
 		nomFonctions.put("+", "add");
 		nomFonctions.put("->","fleche");
 		nomFonctions.put("=>","flecheEgale");
@@ -54,15 +59,16 @@ public class Traducteur implements VisiteurExpression {
 		nomFonctions.put("|","ou");
 		nomFonctions.put("==","doubleEgale");
 		nomFonctions.put("=","egale");
+		this.nom=nom;
 	
 		this.verificateur = verificateur;
 
 	}
 
-	public Class traduire(String name) throws NotFoundException, CannotCompileException {
+	public Class traduire() throws NotFoundException, CannotCompileException {
 		ClassPool classPool = this.classPool();
 
-		CtClass resultClass = classPool.makeClass(name);
+		CtClass resultClass = classPool.makeClass(nom);
 		if (api != null) {
 			CtClass ctClass = classPool.get(api.getName());
 			resultClass.setSuperclass(ctClass);
@@ -115,6 +121,8 @@ public class Traducteur implements VisiteurExpression {
 					idx++;
 					
 				}
+				idxTmpVar=idx;
+				tmpVars = new HashMap<>();
 				fonctionDef.expression.visiter(this);
 				method.setBody(source.toString());
 			}
@@ -168,12 +176,79 @@ public class Traducteur implements VisiteurExpression {
 	@Override
 	public void visiter(Objet objet) {
 		// TODO Auto-generated method stub
+		String var = "_$"+this.idxTmpVar;
+		this.tmpVars.put(objet, var);
+		this.idxTmpVar++;
+		boolean estAPI = this.verificateur.univers.modules.get(objet.type.module).estAPI;
+		String type= null;
+		if (estAPI) {
+			type = api.getName()+"."+objet.type.nomRef();
+		} else {
+			type = nom+"."+objet.type.nomRef();
+		}
+		
+		this.source.append(type);
+		this.source.append(" ");
+		this.source.append(var);
+		this.source.append("=");
+		this.source.append("new ");
+		this.source.append(type);
+		this.source.append("();\n");
+		for(ObjetParam op:objet.params ) {
+			op.expression.visiter(this);
+			this.source.append(var);
+			this.source.append(".");
+			this.source.append(op.nom);
+			this.source.append("=");
+			this.source.append(this.tmpVars.get(op.expression));
+		}
 
 	}
 
 	@Override
 	public void visiter(Appel appel) {
-		// TODO Auto-generated method stub
+		String var = "_$"+this.idxTmpVar;
+		this.tmpVars.put(appel, var);
+		this.idxTmpVar++;
+		boolean estAPI = this.verificateur.univers.modules.get(appel.nom.module).estAPI;
+		String fonction= null;
+		if (estAPI) {
+			fonction = api.getName()+"."+appel.nom.module+"$"+this.nomFonction(appel.nom.nom);
+		} else {
+			fonction = nom+"."+appel.nom.module+"$"+this.nomFonction(appel.nom.nom);
+		}
+		for(Expression e:appel.params) {
+			e.visiter(this);
+		}
+		VerificationFonction vf = this.verificateur.fonctions.get(appel.nom.nomRef());
+		String typeRetour = vf.typeRetour;
+		if (typesReserve.get(typeRetour) != null) {
+			
+			typeRetour = typesReserve.get(typeRetour).getName();
+			
+		}
+		this.source.append(typeRetour);
+		this.source.append(" ");
+		
+		this.source.append(var);
+		this.source.append("=");
+		this.source.append(fonction);
+		this.source.append("(");
+		boolean first = true;
+		for(Expression e:appel.params) {
+			if (!first) {
+			this.source.append(",");
+			}
+			if (first) {
+				first = !first;
+			}
+			e.visiter(this);
+		}
+		this.source.append(");\n");
+		
+		
+		
+		
 
 	}
 
