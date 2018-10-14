@@ -651,6 +651,9 @@ public class Verificateur implements VisiteurExpression {
 		}
 		TypeDef type1 = this.types.get(nomType1);
 		TypeDef type2 = this.types.get(nomType2);
+		if (type1 == null || type2==null) {
+			return null;
+		}
 		if (type1.superType != null) {
 			String r = superTypeCommun(type1.superType.nomRef(), nomType2);
 			if (r != null) {

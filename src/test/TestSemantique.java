@@ -1031,5 +1031,23 @@ class TestSemantique {
 		
 
 	}
+	@Test
+	public void testTypeSurTypeReserve() {
+		String source = "type u {} fonction m u:u symbol:a int:b | si u est u alors a sinon b";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources);
+		Verificateur verif = new Verificateur(univers);
+		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
+		verif.validations.put("base$int", (String s) -> estInt(s));
+		verif.validations.put("base$float", (String s) -> estFloat(s));
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.get(0) instanceof TypeIndetermine);
+		
+	}
 
 }
