@@ -1,0 +1,28 @@
+type zero {}
+type n:zero { zero:n}
+type listeVide { }
+type liste:listeVide { zero:v listeVide:r }
+type typeDefVide  {}
+type typeDef : typeDefVide  { zero:super listeVide:def typeDefVide:reste }
+abstrait type expr {}
+type listeExprVide {}
+type listeExpr:listeExprVide {  expr:a listeExprVide:reste}
+type appel : expr { zero:f listeExpr:args }
+type var:expr { zero:var}
+type objet : expr { zero:f listeExpr:args }
+type acces:expr { expr:e zero:idx }
+type test : expr { expr:test zero:tp expr:then expr:else }
+type fonctionDefVide {}
+type fonctionDef:fonctionDefVide {
+	liste:args
+	expr:corps
+	fonctionDefVide:reste
+}
+type programme {
+	typeDef:types
+	fonctionDef:fonctions
+}
+
+
+
+

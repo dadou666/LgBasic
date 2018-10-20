@@ -50,8 +50,9 @@ public class Traducteur implements VisiteurExpression {
 	public Map<Expression, String> tmpVars = new HashMap<>();
 	public int idxTmpVar;
 	public String nom;
+	public Map<String,Class> mapClass = new HashMap<>();
 
-	public Object construire(String source) throws ClassNotFoundException, NoSuchFieldException, SecurityException,
+	public Object construire(String source) throws  NoSuchFieldException, SecurityException,
 			IllegalArgumentException, IllegalAccessException, InstantiationException, ClasseAbsente {
 		Stack<String> list = new Stack<>();
 		String[] array = source.split("[ \t\n]");
@@ -65,12 +66,26 @@ public class Traducteur implements VisiteurExpression {
 		return construire(list);
 
 	}
-
+	public String simplifier(String nom) {
+		String tmp[] = nom.split("\\$");
+		TypeDef td=null;
+		for(String module:verificateur.modules) {
+			if (td == null) {
+				td = this.verificateur.types.get(module+"$"+tmp[1]);
+				
+			} else {
+				return nom;
+			}
+		}
+		return tmp[1];
+		
+	}
 	public void source(Object o, StringBuilder sb)
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		String type = o.getClass().getSimpleName();
 		TypeDef td = this.verificateur.types.get(type);
-		sb.append(type);
+		sb.append(simplifier(type));
+		sb.append(" ");
 		this.source(o, td, sb);
 
 	}
@@ -95,26 +110,29 @@ public class Traducteur implements VisiteurExpression {
 
 	}
 
-	public Object construire(Stack<String> stack) throws ClasseAbsente, ClassNotFoundException, NoSuchFieldException,
+	public Object construire(Stack<String> stack) throws ClasseAbsente,  NoSuchFieldException,
 			SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException {
 		String type = stack.pop();
 		Ref ref = new Ref();
+		ref.moduleInit = true;
 		String tmp[] = type.split("\\$");
 		String nomObjet;
 		if (tmp.length == 2) {
 			ref.nom = tmp[1];
 			ref.module = tmp[0];
-			nomObjet = this.nomObjet(ref);
+			nomObjet =type;
 
 		} else {
 			ref.nom = type;
 			if (!verificateur.trouverType(ref, false, type)) {
 				throw new ClasseAbsente(type);
 			}
-			nomObjet = this.nomObjet(ref);
+			nomObjet = ref.nomRef();
 		}
-		Class cls = Class.forName(nomObjet);
-
+		Class cls =mapClass.get(nomObjet);
+		if (cls == null) {
+			throw new ClasseAbsente(type);
+		}
 		Object r = cls.newInstance();
 		this.initField(cls, ref, r, stack);
 
@@ -124,7 +142,7 @@ public class Traducteur implements VisiteurExpression {
 
 	public void initField(Class cls, Ref ref, Object o, Stack<String> stack)
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException,
-			ClassNotFoundException, InstantiationException, ClasseAbsente {
+			 InstantiationException, ClasseAbsente {
 		TypeDef td = this.verificateur.types.get(ref.nomRef());
 		if (td.superType != null) {
 			initField(cls, td.superType, o, stack);
@@ -242,8 +260,11 @@ public class Traducteur implements VisiteurExpression {
 			}
 		}
 
-		for (CtClass cc : types.values()) {
-			Class c=cc.toClass();
+		for (Map.Entry<String,CtClass> e : types.entrySet()) {
+			Class c=e.getValue().toClass();
+			mapClass.put(e.getKey(), c);
+			
+			
 			
 		}
 		Map<String, CtMethod> methodes = new HashMap<>();
