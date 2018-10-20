@@ -206,7 +206,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		String sel = list.getSelectedValue();
 		if (univers == null) {
 
-			univers = parseur.lireSourceCode(sources);
+			univers = parseur.lireSourceCode(sources, null);
 		} else {
 			Module module = parseur.lireModule(null, sources.get(sel));
 			univers.modules.put(sel, module);

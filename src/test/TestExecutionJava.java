@@ -3,15 +3,23 @@ package test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.junit.jupiter.api.Test;
 
 import execution.Traducteur;
+import javassist.CannotCompileException;
+import javassist.NotFoundException;
 import model.TypeDef;
+import model.Univers;
 import model.Var;
+import semantique.Verificateur;
+import syntaxe.Parseur;
 
 class TestExecutionJava {
 
@@ -32,7 +40,18 @@ class TestExecutionJava {
 		
 	}
 	@Test
-	void testCreerObjet() {
+	void testPeano() throws NotFoundException, CannotCompileException {
+		Map<String,String> sources =new HashMap<>();
+		sources.put("math"," type zero {}  type n:zero { zero:n } "
+				+ "  fonction + zero:a zero:b | si a est n alors n {n=a.n+b} sinon b  ");
+		Univers univers = (new Parseur()).lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+		Traducteur traducteur = new Traducteur("peano",verif);
+		Class cls = traducteur.traduire();
+		
 		
 		
 	}

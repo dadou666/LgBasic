@@ -50,7 +50,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type t {}");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		assertTrue(verif.erreurs.isEmpty());
@@ -62,7 +62,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type t { a:m }");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		assertTrue(verif.erreurs.size() == 1);
@@ -79,7 +79,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type u {} type t { u:m u:m}");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		assertTrue(verif.erreurs.size() == 1);
@@ -94,7 +94,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type u {symbol:a } type t :u  { symbol:a}");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		assertTrue(verif.erreurs.size() == 1);
@@ -109,7 +109,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type t : m { }");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		assertTrue(verif.erreurs.size() == 1);
@@ -125,7 +125,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type t  { t:a }");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		assertTrue(verif.erreurs.size() == 1);
@@ -141,7 +141,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type u { t:a } type t  { u:a }");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		assertTrue(verif.erreurs.size() == 2);
@@ -163,7 +163,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type u : m { t:a } abstrait type m { } type t  { m:a }");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		assertTrue(verif.erreurs.size() == 2);
@@ -185,7 +185,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type m :  symbol {}");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		assertTrue(verif.erreurs.size() == 1);
@@ -200,7 +200,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type m { symbol:a}");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		assertTrue(verif.erreurs.isEmpty());
@@ -212,7 +212,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "fonction a symbol:a | a   fonction a symbol:v | v");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -229,7 +229,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "fonction a u:a | a ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -247,7 +247,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type u { symbol:s } fonction a u:a | a.m ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -265,7 +265,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type u { symbol:s } fonction m symbol:s | u {s=s} fonction a symbol:s | m(s).s ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -281,7 +281,7 @@ class TestSemantique {
 				"abstrait type bool {} type true : bool  {} type false :bool {} "
 						+ " fonction not bool:b | si b est true alors false {} sinon true {} "
 						+ " fonction id bool:b | not(not(b)) ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -296,7 +296,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type u { symbol:s } fonction f u:a symbol:a | a ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -314,7 +314,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "fonction f symbol:a | momo {s=a } ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -332,7 +332,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type momo { symbol:s } fonction f symbol:a | momo {s=a s=a} ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -350,7 +350,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type momo { symbol:s } fonction f symbol:a | momo {s=a inexistant=a} ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -368,7 +368,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type momo { symbol:s } type nini { momo:m } fonction f symbol:a | nini {m=a} ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -387,7 +387,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1",
 				"type momo :toto { } type toto { symbol:s} type nini { toto:m } fonction f symbol:a | nini {m=momo{s=a}} ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -401,7 +401,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type momo :toto { } " + "type toto {} " + "type nini { e:m }" + " type e {} "
 				+ " fonction f symbol:a | nini {m=momo{}} ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -419,7 +419,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", " fonction f symbol:a | m(a) ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -436,7 +436,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type s { } " + "  fonction f s:a | si a est momo alors s {} sinon a  ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -453,7 +453,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type s { } " + "  fonction f s:a | si a est m1$momo alors s {} sinon a  ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -471,7 +471,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type s { m:x} ");
 		sources.put("m2", "type m {} ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -484,7 +484,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "fonction u symbol:s | m(s)");
 		sources.put("m2", "fonction m symbol:s | m(s) ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -498,7 +498,7 @@ class TestSemantique {
 		sources.put("m1", "fonction u symbol:s | m(s)");
 		sources.put("m2", "fonction m symbol:s | m(s) ");
 		sources.put("m3", "fonction m symbol:s | m(s) ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -517,7 +517,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type s { symbol:x} ");
 		sources.put("m2", "type symbol {} ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -537,7 +537,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "fonction f symbol:s | symbol { e=m } ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -552,7 +552,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "fonction f symbol:s | si s est symbol alors s sinon s ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -567,7 +567,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type a  {} type a  {} ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -582,7 +582,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type a:b  {} type b:c  {symbol:b}  type c { symbol:a}");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -595,7 +595,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "fonction f symbol:s | m2$f(s)");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -610,7 +610,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "fonction f symbol:s | m2$f(s)");
 		sources.put("m2", "fonction f symbol:s | s");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -624,7 +624,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type t { m2$a:x }");
 		sources.put("m2", "type a {}");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -638,7 +638,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "  type a {}  type b {}   type c {} fonction f  c:a | si a est c alors a {} sinon b {}  ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -653,7 +653,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", " fonction f  symbol:s | s.a ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -668,7 +668,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", " type m {symbol:s } fonction f  m:s | (s.s).p ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -684,7 +684,7 @@ class TestSemantique {
 		sources.put("m1",
 				"abstrait type  bool {} type true:bool { } type false:bool {}  fonction f  bool:b | si b est true alors true sinon false ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> true);
 		verif.executerPourTypes();
@@ -701,7 +701,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", " type a {symbol:a symbol:b }  fonction f symbol:u symbol:v | [a u v] ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> true);
 
@@ -729,7 +729,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", " type a {symbol:a symbol:b } type b {} fonction f symbol:u b:v | [a u v] ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> true);
 
@@ -751,7 +751,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", " type a {symbol:a b:b } type b {} fonction f symbol:u symbol:v | [a u a u b] ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> true);
 
@@ -773,7 +773,7 @@ class TestSemantique {
 		sources.put("m1",
 				" type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u symbol:v | [a u b u v] ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> true);
 
@@ -791,7 +791,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u  | [a u b u totot] ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> true);
 
@@ -809,7 +809,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u  | [a u b u totot] ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
 
@@ -829,7 +829,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u  | [a u b u totot] ");
 
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
 
@@ -851,7 +851,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
 
@@ -866,7 +866,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
 
@@ -883,7 +883,7 @@ class TestSemantique {
 		sources.put("m1", source);
 		sources.put("m2", "fonction  f a:a | a ");
 		sources.put("m3", "fonction  f b:a | a ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
 
@@ -902,7 +902,7 @@ class TestSemantique {
 		sources.put("m1", source);
 		sources.put("m2", "fonction  f a:a | a ");
 		sources.put("m3", "fonction  f b:a | a ");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
 
@@ -941,7 +941,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
 	
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
 		verif.validations.put("base$int", (String s) -> estInt(s));
@@ -959,7 +959,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
 	
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
 		verif.validations.put("base$int", (String s) -> estInt(s));
@@ -977,7 +977,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
 	
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
 		verif.validations.put("base$int", (String s) -> estInt(s));
@@ -997,7 +997,7 @@ class TestSemantique {
 		sources.put("m1", source);
 		sources.put("m2", " fonction + symbol:a symbol:b -> symbol");
 		sources.put("m3", "type c {} fonction + c:a c:b -> symbol");
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> Character.isLetter(s.charAt(0)));
 		verif.validations.put("base$int", (String s) -> estInt(s));
@@ -1015,7 +1015,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
 	
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
 		verif.validations.put("base$int", (String s) -> estInt(s));
@@ -1038,7 +1038,7 @@ class TestSemantique {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
 	
-		Univers univers = parser.lireSourceCode(sources);
+		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
 		verif.validations.put("base$int", (String s) -> estInt(s));

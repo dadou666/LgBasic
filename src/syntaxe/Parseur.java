@@ -83,7 +83,7 @@ public class Parseur implements ANTLRErrorListener {
 
 	}
 
-	public Univers lireSourceCode(Map<String, String> sources) {
+	public Univers lireSourceCode(Map<String, String> sources, List<String> moduleAPI) {
 		error = false;
 		Univers u = new Univers();
 		for (Map.Entry<String, String> e : sources.entrySet()) {
@@ -95,6 +95,10 @@ public class Parseur implements ANTLRErrorListener {
 					module.initNomModule(e.getKey());
 				}
 			}
+			if (moduleAPI != null && moduleAPI.contains(e.getKey())) {
+				module.estAPI = true;
+			}
+			
 		}
 		return u;
 

@@ -162,6 +162,7 @@ public class Verificateur implements VisiteurExpression {
 				} else {
 					VerificationFonction vf = new VerificationFonction();
 					vf.fonction = fonction;
+					vf.module = module.getKey();
 					fonctions.put(nomRefTmp, vf);
 				}
 			}

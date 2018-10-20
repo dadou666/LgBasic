@@ -49,6 +49,7 @@ class TestJavaassist {
 		CtClass ctClass = pool.makeClass("test.nini");
 		CtClass loloClass = ctClass.makeNestedClass("lolo", true);
 		CtClass momoClass = ctClass.makeNestedClass("momo", true);
+		
 		CtField fieldA=new CtField(momoClass,"a", loloClass);
 		loloClass.addField(fieldA);
 		CtField fieldB=new CtField(loloClass,"b", momoClass);
