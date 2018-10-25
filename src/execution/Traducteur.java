@@ -50,10 +50,10 @@ public class Traducteur implements VisiteurExpression {
 	public Map<Expression, String> tmpVars = new HashMap<>();
 	public int idxTmpVar;
 	public String nom;
-	public Map<String,Class> mapClass = new HashMap<>();
+	public Map<String, Class> mapClass = new HashMap<>();
 
-	public Object construire(String source) throws  NoSuchFieldException, SecurityException,
-			IllegalArgumentException, IllegalAccessException, InstantiationException, ClasseAbsente {
+	public Object construire(String source) throws NoSuchFieldException, SecurityException, IllegalArgumentException,
+			IllegalAccessException, InstantiationException, ClasseAbsente {
 		Stack<String> list = new Stack<>();
 		String[] array = source.split("[ \t\n]");
 		for (String s : array) {
@@ -66,20 +66,22 @@ public class Traducteur implements VisiteurExpression {
 		return construire(list);
 
 	}
+
 	public String simplifier(String nom) {
 		String tmp[] = nom.split("\\$");
-		TypeDef td=null;
-		for(String module:verificateur.modules) {
+		TypeDef td = null;
+		for (String module : verificateur.modules) {
 			if (td == null) {
-				td = this.verificateur.types.get(module+"$"+tmp[1]);
-				
+				td = this.verificateur.types.get(module + "$" + tmp[1]);
+
 			} else {
 				return nom;
 			}
 		}
 		return tmp[1];
-		
+
 	}
+
 	public void source(Object o, StringBuilder sb)
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		String type = o.getClass().getSimpleName();
@@ -110,8 +112,8 @@ public class Traducteur implements VisiteurExpression {
 
 	}
 
-	public Object construire(Stack<String> stack) throws ClasseAbsente,  NoSuchFieldException,
-			SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException {
+	public Object construire(Stack<String> stack) throws ClasseAbsente, NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException, InstantiationException {
 		String type = stack.pop();
 		Ref ref = new Ref();
 		ref.moduleInit = true;
@@ -120,7 +122,7 @@ public class Traducteur implements VisiteurExpression {
 		if (tmp.length == 2) {
 			ref.nom = tmp[1];
 			ref.module = tmp[0];
-			nomObjet =type;
+			nomObjet = type;
 
 		} else {
 			ref.nom = type;
@@ -129,7 +131,7 @@ public class Traducteur implements VisiteurExpression {
 			}
 			nomObjet = ref.nomRef();
 		}
-		Class cls =mapClass.get(nomObjet);
+		Class cls = mapClass.get(nomObjet);
 		if (cls == null) {
 			throw new ClasseAbsente(type);
 		}
@@ -140,9 +142,8 @@ public class Traducteur implements VisiteurExpression {
 
 	}
 
-	public void initField(Class cls, Ref ref, Object o, Stack<String> stack)
-			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException,
-			 InstantiationException, ClasseAbsente {
+	public void initField(Class cls, Ref ref, Object o, Stack<String> stack) throws NoSuchFieldException,
+			SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClasseAbsente {
 		TypeDef td = this.verificateur.types.get(ref.nomRef());
 		if (td.superType != null) {
 			initField(cls, td.superType, o, stack);
@@ -176,6 +177,7 @@ public class Traducteur implements VisiteurExpression {
 		}
 		return null;
 	}
+
 	public String var(String nom) {
 		String tmpVar = this.varCast.get(nom);
 		if (tmpVar != null) {
@@ -227,13 +229,22 @@ public class Traducteur implements VisiteurExpression {
 	public Class traduire() throws NotFoundException, CannotCompileException {
 		ClassPool classPool = this.classPool();
 
-		CtClass resultClass = classPool.makeClass(nom);
+		CtClass resultClass = null;
+
+		resultClass = classPool.makeClass(nom);
+
 		if (api != null) {
 			CtClass ctClass = classPool.get(api.getName());
 			resultClass.setSuperclass(ctClass);
 		}
 		HashMap<String, CtClass> types = new HashMap<>();
-
+		if (api != null) {
+			for (Class cls : api.getDeclaredClasses()) {
+				if (verificateur.types.get(cls.getSimpleName()) != null) {
+					mapClass.put(cls.getSimpleName(), cls);
+				}
+			}
+		}
 		if (typesReserve != null) {
 			for (Map.Entry<String, Class> e : typesReserve.entrySet()) {
 				CtClass typeReserve = classPool.get(e.getValue().getName());
@@ -244,6 +255,9 @@ public class Traducteur implements VisiteurExpression {
 
 			if (!verificateur.univers.modules.get(vt.getValue().module).estAPI) {
 				this.traduire(resultClass, vt.getKey(), vt.getValue(), types);
+			} else {
+				CtClass ctClass = classPool.get(mapClass.get(vt.getKey()).getName());
+				types.put(vt.getKey(), ctClass);
 			}
 
 		}
@@ -260,13 +274,14 @@ public class Traducteur implements VisiteurExpression {
 			}
 		}
 
-		for (Map.Entry<String,CtClass> e : types.entrySet()) {
-			Class c=e.getValue().toClass();
-			mapClass.put(e.getKey(), c);
-			
-			
-			
+		for (Map.Entry<String, CtClass> e : types.entrySet()) {
+			if (mapClass.get(e.getKey()) == null) {
+				Class c = e.getValue().toClass();
+				mapClass.put(e.getKey(), c);
+			}
+
 		}
+
 		Map<String, CtMethod> methodes = new HashMap<>();
 		for (Map.Entry<String, VerificationFonction> vf : this.verificateur.fonctions.entrySet()) {
 			String tmp[] = vf.getKey().split("\\$");
@@ -278,7 +293,7 @@ public class Traducteur implements VisiteurExpression {
 					typesParam[i] = types.get(vars.get(i).type.nomRef());
 				}
 				CtClass typeRetour = types.get(vf.getValue().typeRetour);
-				String nomFonction = vf.getValue().module+ "$" + this.nomFonction(vf.getValue().fonction.nom);
+				String nomFonction = vf.getValue().module + "$" + this.nomFonction(vf.getValue().fonction.nom);
 				CtMethod m = new CtMethod(typeRetour, nomFonction, typesParam, resultClass);
 
 				resultClass.addMethod(m);
@@ -340,6 +355,7 @@ public class Traducteur implements VisiteurExpression {
 
 	public ClassPool classPool() {
 		return ClassPool.getDefault();
+
 	}
 
 	public String nomObjet(Ref ref) {
@@ -357,7 +373,7 @@ public class Traducteur implements VisiteurExpression {
 		boolean estAPI = this.verificateur.univers.modules.get(ref.module).estAPI;
 		String type = null;
 		if (estAPI) {
-			type =  ref.module + "$" + this.nomFonction(ref.nom);
+			type = ref.module + "$" + this.nomFonction(ref.nom);
 		} else {
 			type = ref.module + "$" + this.nomFonction(ref.nom);
 		}
@@ -420,7 +436,7 @@ public class Traducteur implements VisiteurExpression {
 
 		} else {
 			typeRetour = this.nomObjet(typeRetour);
-			
+
 		}
 		this.source.append(typeRetour);
 		this.source.append(" ");

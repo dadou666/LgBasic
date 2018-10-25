@@ -12,11 +12,12 @@ import java.util.Set;
 
 public class Univers {
 	public Map<String, Module> modules = new HashMap<>();
+
 	public void visiter(VisiteurUnivers visiteur) {
 		visiteur.visiter(this);
 	}
 
-	static public Map<String, String> sources(Class api, Map<Class, String> typeReserve) {
+	static public Map<String, String> sources(Class api, Map<Class, String> typeReserve, Map<String, String> result) {
 		Class classes[] = api.getDeclaredClasses();
 
 		Map<String, Class> types = new HashMap<>();
@@ -83,7 +84,9 @@ public class Univers {
 			}
 
 		}
-		Map<String, String> result = new HashMap<>();
+		if (result == null) {
+			result = new HashMap<>();
+		}
 		for (Map.Entry<String, StringBuilder> e : sources.entrySet()) {
 			result.put(e.getKey(), e.getValue().toString());
 		}

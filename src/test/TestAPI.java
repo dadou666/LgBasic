@@ -19,7 +19,7 @@ class TestAPI {
 		Map<Class,String> typeReserve = new HashMap<>();
 		typeReserve.put(int.class, "base$int");
 		typeReserve.put(String.class, "base$string");
-		Map<String, String> sources = Univers.sources(API.class,typeReserve);
+		Map<String, String> sources = Univers.sources(API.class,typeReserve,null);
 		assertTrue(sources.size() == 3);
 		Parseur parser = new Parseur();
 		Module module = parser.lireModule("toto", sources.get("toto"));
