@@ -1,5 +1,6 @@
 package execution;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,8 +12,10 @@ import java.util.Stack;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
+import javassist.CtNewConstructor;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import model.Acces;
@@ -51,6 +54,18 @@ public class Traducteur implements VisiteurExpression {
 	public int idxTmpVar;
 	public String nom;
 	public Map<String, Class> mapClass = new HashMap<>();
+	public LgClassLoader classLoader;
+
+	public LgClassLoader classLoader() {
+		if (classLoader == null) {
+			if (api != null) {
+				classLoader = new LgClassLoader(api.getClassLoader());
+			} else {
+				classLoader = new LgClassLoader();
+			}
+		}
+		return classLoader;
+	}
 
 	public Object construire(String source) throws NoSuchFieldException, SecurityException, IllegalArgumentException,
 			IllegalAccessException, InstantiationException, ClasseAbsente {
@@ -226,7 +241,7 @@ public class Traducteur implements VisiteurExpression {
 
 	}
 
-	public Class traduire() throws NotFoundException, CannotCompileException {
+	public Class traduire() throws NotFoundException, CannotCompileException, IOException, ClassNotFoundException {
 		ClassPool classPool = this.classPool();
 
 		CtClass resultClass = null;
@@ -274,14 +289,6 @@ public class Traducteur implements VisiteurExpression {
 			}
 		}
 
-		for (Map.Entry<String, CtClass> e : types.entrySet()) {
-			if (mapClass.get(e.getKey()) == null) {
-				Class c = e.getValue().toClass();
-				mapClass.put(e.getKey(), c);
-			}
-
-		}
-
 		Map<String, CtMethod> methodes = new HashMap<>();
 		for (Map.Entry<String, VerificationFonction> vf : this.verificateur.fonctions.entrySet()) {
 			String tmp[] = vf.getKey().split("\\$");
@@ -323,8 +330,20 @@ public class Traducteur implements VisiteurExpression {
 
 		}
 		resultClass.setModifiers(resultClass.getModifiers() & ~Modifier.ABSTRACT);
+		for (Map.Entry<String, CtClass> e : types.entrySet()) {
+			if (mapClass.get(e.getKey()) == null) {
+				byte bytes[] = e.getValue().toBytecode();
 
-		return resultClass.toClass();
+				mapClass.put(e.getKey(), classLoader().define(e.getValue().getName(), bytes));
+				e.getValue().defrost();
+
+			}
+
+		}
+		byte[] bytes = resultClass.toBytecode();
+		Class cls = classLoader().define(nom, bytes);
+		resultClass.defrost();
+		return cls;
 	}
 
 	public String nomFonction(String s) {
@@ -343,6 +362,9 @@ public class Traducteur implements VisiteurExpression {
 		}
 
 		CtClass typeClass = resultClass.makeNestedClass(nom, true);
+		CtConstructor defaultConstructor = CtNewConstructor.make("public " + typeClass.getSimpleName() + "() {}",
+				typeClass);
+		typeClass.addConstructor(defaultConstructor);
 		if (typeDef.superType != null) {
 			String superTypeRef = typeDef.superType.nomRef();
 			typeClass.setSuperclass(

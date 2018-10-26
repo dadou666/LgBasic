@@ -2,6 +2,7 @@ package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -43,7 +44,7 @@ class TestExecutionJava {
 	}
 
 	@Test
-	void testPeano() throws NotFoundException, CannotCompileException, NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClasseAbsente, InvocationTargetException {
+	void testPeano() throws NotFoundException, CannotCompileException, NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClasseAbsente, InvocationTargetException, ClassNotFoundException, IOException {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("math", " type zero {}  type n:zero { zero:n } "
 				+ "  fonction + zero:a zero:b | si a est n alors n {n=a.n+b} sinon b  ");
@@ -67,7 +68,7 @@ class TestExecutionJava {
 
 	}
 	@Test
-	void testPeano2() throws NotFoundException, CannotCompileException, NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClasseAbsente, InvocationTargetException {
+	void testPeano2() throws NotFoundException, CannotCompileException, NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClasseAbsente, InvocationTargetException, ClassNotFoundException, IOException {
 		Map<String, String> sources = new HashMap<>();
 		sources.put("main",  "  fonction + zero:a zero:b | si a est n alors n {n=a.n+b} sinon b  ");
 		List<String> modules = new ArrayList<>();
@@ -78,7 +79,7 @@ class TestExecutionJava {
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
 		assertTrue(verif.erreurs.isEmpty());
-		Traducteur traducteur = new Traducteur("peano2", verif);
+		Traducteur traducteur = new Traducteur("peano", verif);
 		traducteur.api = APITestExcution.class;
 		Class cls = traducteur.traduire();
 		Class math$zero = traducteur.mapClass.get("math$zero");

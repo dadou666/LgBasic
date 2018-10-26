@@ -2,11 +2,13 @@ package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.junit.jupiter.api.Test;
 
+import execution.LgClassLoader;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -46,21 +48,40 @@ class TestJavaassist {
 	void test2() throws CannotCompileException, NotFoundException, InstantiationException, IllegalAccessException,
 			NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
 		ClassPool pool = ClassPool.getDefault();
-		CtClass ctClass = pool.makeClass("test.nini");
+		CtClass ctClass = pool.makeClass("test.nini2");
 		CtClass loloClass = ctClass.makeNestedClass("lolo", true);
 		CtClass momoClass = ctClass.makeNestedClass("momo", true);
-		
-		CtField fieldA=new CtField(momoClass,"a", loloClass);
+
+		CtField fieldA = new CtField(momoClass, "a", loloClass);
 		loloClass.addField(fieldA);
-		CtField fieldB=new CtField(loloClass,"b", momoClass);
+		CtField fieldB = new CtField(loloClass, "b", momoClass);
 		momoClass.addField(fieldB);
 		loloClass.toClass();
 		momoClass.toClass();
 		ctClass.toClass();
-		
-		
-		
-		
+
+	}
+
+	@Test
+	void test3() throws IOException, CannotCompileException, ClassNotFoundException {
+		ClassPool pool = ClassPool.getDefault();
+		CtClass ctClass = pool.makeClass("test.nini");
+		byte[] bytes = ctClass.toBytecode();
+		ctClass.defrost();
+		LgClassLoader classLoader = new LgClassLoader();
+		classLoader.define("test.nini", bytes);
+		Class cls = classLoader.loadClass("test.nini");
+		assertTrue(cls != null);
+		pool = ClassPool.getDefault();
+		ctClass = pool.makeClass("test.nini");
+		bytes = ctClass.toBytecode();
+		ctClass.defrost();
+		classLoader = new LgClassLoader();
+		classLoader.define("test.nini", bytes);
+		Class cls2 = classLoader.loadClass("test.nini");
+		assertTrue(cls2 != null);
+		assertTrue(cls != cls2);
+
 	}
 
 }
