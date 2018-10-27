@@ -950,7 +950,7 @@ class TestSemantique {
 		verif.executerPourFonctions();
 		assertFalse(verif.erreurs.isEmpty());
 		assertTrue(verif.erreurs.size() == 1);
-		System.out.println(verif.erreurs.get(0));
+	
 	}
 	@Test
 	public void testTypeReserveInt() {

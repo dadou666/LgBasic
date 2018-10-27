@@ -24,6 +24,7 @@ import model.Univers;
 import model.Var;
 import semantique.Verificateur;
 import syntaxe.Parseur;
+import test.APITestExcution2.truc$t;
 
 class TestExecutionJava {
 
@@ -61,7 +62,9 @@ class TestExecutionJava {
 		Object a = traducteur.construire("n n   zero");
 		Object b= traducteur.construire("n   zero");
 		Object r = m.invoke(cls.newInstance(),a,b);
-		assertTrue(traducteur.source(r).equals(traducteur.source(traducteur.construire("n n n zero"))));
+		String srcA = traducteur.source(r);
+		String srcB = traducteur.source(traducteur.construire("n n n zero"));
+		assertTrue(srcA.equals(srcB));
 		
 		
 		
@@ -94,6 +97,60 @@ class TestExecutionJava {
 		
 		
 
+	}
+	
+	@Test
+	void testTypeString( ) throws ClassNotFoundException, NotFoundException, CannotCompileException, IOException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+		Map<Class,String> typeReserve = new HashMap<>();
+		typeReserve.put(String.class, "base$symbol");
+		Map<String, String> sources = new HashMap<>();
+		sources.put("main",  "  fonction  f t:x | x.val  fonction id t:x | x  ");
+		Univers.sources(APITestExcution2.class,typeReserve,sources);
+		List<String> modules = new ArrayList<>();
+		modules.add("truc");
+		Univers univers = (new Parseur()).lireSourceCode(sources, modules);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		Traducteur traducteur = new Traducteur("test", verif);
+		traducteur.typesReserve.put("base$symbol", String.class);
+		traducteur.api = APITestExcution2.class;
+		Class cls  = traducteur.traduire();
+		Method m = cls.getMethod("main$f", APITestExcution2.truc$t.class);
+		APITestExcution2.truc$t t= new APITestExcution2.truc$t();
+		t.val = "hello";
+		Object r = m.invoke(cls.newInstance(), t);
+		assertTrue(r.equals(t.val));
+		 m = cls.getMethod("main$id", APITestExcution2.truc$t.class);
+		
+		assertTrue(m.invoke(cls.newInstance(), t)==t);
+		
+	}
+	
+	@Test
+	void testTypeStringCons( ) throws ClassNotFoundException, NotFoundException, CannotCompileException, IOException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+		Map<Class,String> typeReserve = new HashMap<>();
+		typeReserve.put(String.class, "base$symbol");
+		Map<String, String> sources = new HashMap<>();
+		sources.put("main",  "  fonction  cons symbol:s |  t { val=s }  ");
+		Univers.sources(APITestExcution2.class,typeReserve,sources);
+		List<String> modules = new ArrayList<>();
+		modules.add("truc");
+		Univers univers = (new Parseur()).lireSourceCode(sources, modules);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		Traducteur traducteur = new Traducteur("test", verif);
+		traducteur.typesReserve.put("base$symbol", String.class);
+		traducteur.api = APITestExcution2.class;
+		Class cls  = traducteur.traduire();
+		Method m = cls.getMethod("main$cons",String.class);
+		
+		APITestExcution2.truc$t t = (truc$t) m.invoke(cls.newInstance(), "hello");
+		assertTrue(t.val.equals("hello"));
+	
+		
+		
 	}
 
 }

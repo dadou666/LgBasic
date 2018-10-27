@@ -324,14 +324,16 @@ public class Traducteur implements VisiteurExpression {
 				}
 				idxTmpVar = idx;
 				tmpVars = new HashMap<>();
+				source.append("{");
 				fonctionDef.expression.visiter(this);
+				source.append("}");
 				method.setBody(source.toString());
 			}
 
 		}
 		resultClass.setModifiers(resultClass.getModifiers() & ~Modifier.ABSTRACT);
 		for (Map.Entry<String, CtClass> e : types.entrySet()) {
-			if (mapClass.get(e.getKey()) == null) {
+			if (mapClass.get(e.getKey()) == null && this.typesReserve.get(e.getKey()) == null) {
 				byte bytes[] = e.getValue().toBytecode();
 
 				mapClass.put(e.getKey(), classLoader().define(e.getValue().getName(), bytes));
@@ -438,6 +440,12 @@ public class Traducteur implements VisiteurExpression {
 			this.source.append(this.source(op.expression));
 
 		}
+		if (fonctionDef.expression == objet) {
+			source.append(";");
+			source.append("return ");
+			source.append(var);
+			source.append(";");
+		}
 
 	}
 
@@ -542,12 +550,24 @@ public class Traducteur implements VisiteurExpression {
 
 	@Override
 	public void visiter(Acces acces) {
+		if (fonctionDef.expression != acces) {
+			return;
+		}
+		acces.cible.visiter(this);
+		this.source.append("return ");
+		this.source.append(this.source(acces));
+		this.source.append(";");
 
 	}
 
 	@Override
 	public void visiter(VarRef varRef) {
-		// TODO Auto-generated method stub
+	  if (this.fonctionDef.expression != varRef) {
+		  return;
+	  }
+	  this.source.append("return ");
+	  this.source.append(this.traduire(varRef));
+	  this.source.append(";");
 
 	}
 
