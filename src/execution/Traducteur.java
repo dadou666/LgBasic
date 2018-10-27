@@ -438,6 +438,7 @@ public class Traducteur implements VisiteurExpression {
 			this.source.append(op.nom);
 			this.source.append("=");
 			this.source.append(this.source(op.expression));
+			this.source.append(";");
 
 		}
 		if (fonctionDef.expression == objet) {
