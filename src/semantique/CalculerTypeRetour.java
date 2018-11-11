@@ -7,7 +7,7 @@ import model.Acces;
 import model.Appel;
 import model.Literal;
 import model.Objet;
-
+import model.ParamDef;
 import model.TestType;
 import model.TypeDef;
 import model.Var;
@@ -34,7 +34,7 @@ public class CalculerTypeRetour implements VisiteurExpression {
 		if (appel.vf == null) {
 			this.verificateur.completer(appel);
 		}
-		VerificationFonction vf =appel.vf;
+		VerificationFonction vf = appel.vf;
 		if (vf == null) {
 			return;
 		}
@@ -56,8 +56,12 @@ public class CalculerTypeRetour implements VisiteurExpression {
 					calculer.variables.put(v.nom, v.type.nomRef());
 
 				}
-				vf.fonction.expression.visiter(calculer);
-				vf.typeRetour = calculer.type;
+				if (vf.fonction.expression != null) {
+					vf.fonction.expression.visiter(calculer);
+					vf.typeRetour = calculer.type;
+				} else {
+					vf.typeRetour = vf.fonction.typeRetour.nomRef();
+				}
 				this.type = vf.typeRetour;
 			}
 		}
@@ -130,11 +134,10 @@ public class CalculerTypeRetour implements VisiteurExpression {
 			typeIndetermine.e = acces.cible;
 			typeIndetermine.nomRef = nomRef;
 			this.verificateur.erreurs.add(typeIndetermine);
-			
+
 			return;
 		}
 		this.type = this.verificateur.typeVar(calculer.type, acces.nom);
-	
 
 	}
 
@@ -142,12 +145,17 @@ public class CalculerTypeRetour implements VisiteurExpression {
 	public void visiter(VarRef varRef) {
 		this.type = this.variables.get(varRef.nom);
 		if (this.type == null) {
-			for(String typeReserve:this.verificateur.validations.keySet()) {
+			ParamDef pd = this.verificateur.params.get(varRef.nom);
+			if (pd != null) {
+				this.type = pd.type.nomRef();
+				return;
+			}
+			for (String typeReserve : this.verificateur.validations.keySet()) {
 				TypeReserveValidation validation = this.verificateur.validations.get(typeReserve);
-				if (validation !=null && validation.valider(varRef.nom)) {
+				if (validation != null && validation.valider(varRef.nom)) {
 					this.type = typeReserve;
 					return;
-					
+
 				}
 			}
 		}

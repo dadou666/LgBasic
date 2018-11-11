@@ -23,6 +23,10 @@ class TestAPI {
 		assertTrue(sources.size() == 3);
 		Parseur parser = new Parseur();
 		Module module = parser.lireModule("toto", sources.get("toto"));
+		assertTrue(module.params.size()==1);
+		assertTrue(module.params.get(0).nom.equals("a"));
+		assertTrue(module.params.get(0).type.nomRef().equals("toto$m"));
+		assertTrue(!parser.error);
 		assertTrue(module.types.size() >= 1);
 		assertTrue(module.fonctions.size() >= 2);
 	

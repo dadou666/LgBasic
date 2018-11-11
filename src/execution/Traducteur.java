@@ -26,6 +26,7 @@ import model.Literal;
 import model.Module;
 import model.Objet;
 import model.ObjetParam;
+import model.ParamDef;
 import model.Ref;
 import model.TestType;
 import model.TypeDef;
@@ -141,7 +142,7 @@ public class Traducteur implements VisiteurExpression {
 
 		} else {
 			ref.nom = type;
-			if (!verificateur.trouverType(ref, false, type)) {
+			if (!verificateur.trouverType(ref, TypeDef.class, type)) {
 				throw new ClasseAbsente(type);
 			}
 			nomObjet = ref.nomRef();
@@ -183,6 +184,10 @@ public class Traducteur implements VisiteurExpression {
 				}
 
 			}
+			if (this.verificateur.params.get(vr.nom) != null) {
+				return vr.nom;
+				
+			}
 			String tmpVar = this.varCast.get(vr.nom);
 			if (tmpVar != null) {
 				return tmpVar;
@@ -190,6 +195,7 @@ public class Traducteur implements VisiteurExpression {
 			return this.indexVars.get(vr.nom);
 
 		}
+	
 		return null;
 	}
 
@@ -288,6 +294,13 @@ public class Traducteur implements VisiteurExpression {
 				}
 			}
 		}
+		for (ParamDef pd : this.verificateur.params.values()) {
+			if (!verificateur.univers.modules.get(pd.module).estAPI) {
+			CtField field = new CtField(types.get(pd.type.nomRef()), pd.nom, resultClass);
+			field.setModifiers(Modifier.PUBLIC);
+			resultClass.addField(field); }
+
+		}
 
 		Map<String, CtMethod> methodes = new HashMap<>();
 		for (Map.Entry<String, VerificationFonction> vf : this.verificateur.fonctions.entrySet()) {
@@ -326,6 +339,11 @@ public class Traducteur implements VisiteurExpression {
 				tmpVars = new HashMap<>();
 				source.append("{");
 				fonctionDef.expression.visiter(this);
+				if (fonctionDef.expression instanceof Appel) {
+					source.append("return ");
+					source.append(this.tmpVars.get(fonctionDef.expression));
+					source.append(";");
+				}
 				source.append("}");
 				method.setBody(source.toString());
 			}
@@ -563,12 +581,12 @@ public class Traducteur implements VisiteurExpression {
 
 	@Override
 	public void visiter(VarRef varRef) {
-	  if (this.fonctionDef.expression != varRef) {
-		  return;
-	  }
-	  this.source.append("return ");
-	  this.source.append(this.traduire(varRef));
-	  this.source.append(";");
+		if (this.fonctionDef.expression != varRef) {
+			return;
+		}
+		this.source.append("return ");
+		this.source.append(this.traduire(varRef));
+		this.source.append(";");
 
 	}
 

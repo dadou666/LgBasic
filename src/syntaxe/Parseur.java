@@ -28,6 +28,7 @@ import grammaire.lgParser.ModuleContext;
 import grammaire.lgParser.ObjetContext;
 import grammaire.lgParser.OperateurContext;
 import grammaire.lgParser.OperationOuAccesContext;
+import grammaire.lgParser.ParamContext;
 import grammaire.lgParser.RefContext;
 import grammaire.lgParser.SiContext;
 import grammaire.lgParser.TmpCodeContext;
@@ -42,6 +43,7 @@ import model.Literal;
 import model.Module;
 import model.Objet;
 import model.ObjetParam;
+import model.ParamDef;
 import model.Ref;
 import model.RefLiteral;
 import model.Test;
@@ -126,6 +128,9 @@ public class Parseur implements ANTLRErrorListener {
 		for(Def def:r.types) {
 			def.module =module;
 		}
+		for(Def def:r.params) {
+			def.module =module;
+		}
 		return r;
 	}
 
@@ -140,10 +145,32 @@ public class Parseur implements ANTLRErrorListener {
 				FonctionDef fd = this.transformer(ec.fonction());
 				module.fonctions.add(fd);
 			}
+			if (ec.param() != null ) {
+				ParamDef pd = this.transformer(ec.param());
+				module.params.add(pd);
+			}
 
 		}
 		return module;
 
+	}
+	public ParamDef transformer(ParamContext param) {
+		ParamDef r = new ParamDef();
+		if (param.id_externe() != null) {
+			r.type =this.transformer(param.id_externe());
+		}
+		int idxNom =0;
+		TerminalNode tn;
+		if (param.ID().size() == 2) {
+			idxNom = 1;
+			 tn =param.ID(0);
+			r.type=new Ref(tn.getText(), tn.getSymbol().getStartIndex(), tn.getSymbol().getStopIndex());
+		}
+		tn= param.ID(idxNom);
+		r.nom = tn.getText();
+		r.debut = tn.getSymbol().getStartIndex();
+		r.fin = tn.getSymbol().getStopIndex();
+		return r;
 	}
 
 	public TypeDef transformer(TypeContext tc) {

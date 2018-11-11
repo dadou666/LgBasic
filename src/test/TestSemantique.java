@@ -14,6 +14,7 @@ import model.Literal;
 import model.Module;
 import model.Objet;
 import model.ObjetParam;
+import model.TypeDef;
 import model.Univers;
 import model.Var;
 import model.VarRef;
@@ -21,6 +22,7 @@ import semantique.AccesChampInexistant;
 import semantique.CreationTypeReserve;
 import semantique.DoublonChampType;
 import semantique.DoublonNomFonction;
+import semantique.DoublonNomParam;
 import semantique.DoublonNomType;
 import semantique.DoublonObjetParam;
 import semantique.DoublonParamFonction;
@@ -525,7 +527,7 @@ class TestSemantique {
 		assertTrue(verif.erreurs.get(0) instanceof MultipleDefinitionType);
 		MultipleDefinitionType erreur = (MultipleDefinitionType) verif.erreurs.get(0);
 		assertTrue(erreur.nom.equals("m1$s"));
-		assertTrue(!erreur.estFonction);
+		assertTrue(erreur.classDef == TypeDef.class);
 		assertTrue(erreur.types.contains("base$symbol"));
 		assertTrue(erreur.types.contains("m2$symbol"));
 		assertTrue(erreur.types.size() == 2);
@@ -1047,6 +1049,107 @@ class TestSemantique {
 		verif.executerPourFonctions();
 		assertTrue(verif.erreurs.size()==1);
 		assertTrue(verif.erreurs.get(0) instanceof TypeIndetermine);
+		
+	}
+	
+	@Test 
+	public void testParam() {
+		String source ="type t { } fonction f t:a | a param t:u  fonction main | f(u)";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+		
+	}
+	
+	@Test 
+	public void testParam2() {
+		String source ="type t { } fonction f t:a | a param m:u  fonction main | f(u)";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0).getClass() == TypeInexistant.class);
+		
+
+		
+	}
+	
+	@Test 
+	public void testParam3() {
+		String source ="type t { } fonction f m:a | a param t:u  type m {} fonction main | f(u)";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue( verif.erreurs.get(0).getClass() == FonctionInexistante.class);
+		
+	}
+	
+	@Test 
+	public void testParam4() {
+		String source1 ="type t { } param t:a";
+		String source2 =" type m {} param m:a";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source1);
+		sources.put("m2", source2);
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+
+		assertTrue(verif.erreurs.size()==1);
+		assertTrue( verif.erreurs.get(0).getClass() == DoublonNomParam.class);
+		
+	}
+	@Test
+	public void testFonctionRec() {
+		
+		String source ="type zero {} type n:zero { zero:n } fonction m zero:a | si a est n alors m(a.n) sinon a";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+		
+		
+	}
+	
+	@Test 
+	public void testParam5() {
+		String source ="type zero { } type n:zero {zero:n } param zero:in fonction f | n { n=in }";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
 		
 	}
 

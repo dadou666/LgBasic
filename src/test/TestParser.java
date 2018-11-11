@@ -29,9 +29,30 @@ class TestParser {
 				.lireModule(null, "type zero {}\r\n" + "type n:zero { zero:n} fonction + zero:a zero:b | a.n+b ");
 		assertFalse(parseur.error);
 	}
-	
+	@Test
+	void testFonction3() {
+		Parseur parseur = new Parseur();
+		Module module = parseur
+				.lireModule(null, "type zero {}\r\n" + "type n:zero { zero:n} fonction m | zero { u = g() } ");
+		assertFalse(parseur.error);
+	}
+	@Test
+	void testParam() {
+		Parseur parseur = new Parseur();
+		Module module = parseur
+				.lireModule(null, "param u:e type zero {}\r\n" + "type n:zero { zero:n} fonction m | zero { u = g() } ");
+		assertFalse(parseur.error);
+		assertTrue(module.params.size()==1);
+	}
 
-
+	@Test
+	void testParam2() {
+		Parseur parseur = new Parseur();
+		Module module = parseur
+				.lireModule(null, "type zero {}\r\n" + "param u:e type n:zero { zero:n} fonction m | zero { u = g() } ");
+		assertFalse(parseur.error);
+		assertTrue(module.params.size()==1);
+	}
 	@Test
 	void testTypeVide() {
 		Parseur parseur = new Parseur();

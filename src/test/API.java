@@ -1,6 +1,7 @@
 package test;
 
 public class API {
+	public toto$m a;
 	static public class tot {}
 	
 	public int f() {
@@ -38,5 +39,8 @@ public class API {
 	
 	public int toto$m(String s) {
 		return 0;
+	}
+	public int toto$add(int a ,int b) {
+		return a+b;
 	}
 }

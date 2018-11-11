@@ -1,9 +1,6 @@
-/editeur/
-/execution/
-/grammaire/
-/ihm/
-/model/
+/monde/
 /semantique/
 /syntaxe/
 /test/
-/monde/
+/execution/
+/model/

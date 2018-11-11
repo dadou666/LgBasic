@@ -10,10 +10,13 @@ public class Module {
 	public boolean estAPI;
 	public List<FonctionDef> fonctions = new ArrayList<FonctionDef>();
 	public List<TypeDef> types = new ArrayList<TypeDef>();
-
+	public List<ParamDef> params = new ArrayList<ParamDef>();
 	public void initNomModule(String nom) {
 		InitModuleRef init = new InitModuleRef();
 		init.module = nom;
+		for(ParamDef pd:params) {
+			pd.type.moduleInit = true;
+		}
 		for (FonctionDef fd : fonctions) {
 			for (Var var : fd.params) {
 				if (var.type.module == null) {

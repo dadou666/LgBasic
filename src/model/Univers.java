@@ -12,6 +12,21 @@ import java.util.Set;
 
 public class Univers {
 	public Map<String, Module> modules = new HashMap<>();
+	public static Map<String, String> conversionsOp;
+
+	public static Map<String, String> conversionsOp() {
+		if (conversionsOp == null) {
+			conversionsOp = new HashMap<String, String>();
+			conversionsOp.put("add", "+");
+			conversionsOp.put("sub", "-");
+			conversionsOp.put("mul", "*");
+			conversionsOp.put("sup", ">");
+			conversionsOp.put("inf", "/");
+			conversionsOp.put("egale", "=");
+
+		}
+		return conversionsOp;
+	}
 
 	public void visiter(VisiteurUnivers visiteur) {
 		visiteur.visiter(this);
@@ -32,6 +47,31 @@ public class Univers {
 
 			}
 
+		}
+		for(Field f:api.getDeclaredFields()) {
+			if (f.getName().indexOf('$') == -1 && Modifier.isPublic(f.getModifiers()) && !Modifier.isStatic(f.getModifiers())) {
+				String simpleName =f.getType().getSimpleName();
+				Class cls = types.get(simpleName);
+				if (cls == null) {
+					simpleName = typeReserve.get(f.getType());
+				}
+				if (simpleName != null) {
+					String tmp[] = simpleName.split("\\$");
+					StringBuilder sb = sources.get(tmp[0]);
+					if (sb == null) {
+						sb = new StringBuilder();
+						sources.put(tmp[0], sb);
+					}
+					sb.append("param ");
+					sb.append(simpleName);
+					sb.append(":");
+					sb.append(" ");
+					sb.append(f.getName());
+					sb.append("\n");
+					
+				}
+			}
+			
 		}
 		for (Class cls : types.values()) {
 			String nom = cls.getSimpleName();
@@ -111,18 +151,9 @@ public class Univers {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("fonction ");
-		if (tmp[1].equals("add")) {
-			sb.append("+");
-		} else if (tmp[1].equals("sub")) {
-			sb.append("-");
-		} else if (tmp[1].equals("mul")) {
-			sb.append("*");
-		} else if (tmp[1].equals("sup")) {
-			sb.append(">");
-		} else if (tmp[1].equals("inf")) {
-			sb.append("/");
-		} else if (tmp[1].equals("egale")) {
-			sb.append("=");
+		String nomFonction = conversionsOp().get(tmp[1]);
+		if (nomFonction != null) {
+			sb.append(nomFonction);
 		} else {
 			sb.append(tmp[1]);
 		}
@@ -142,6 +173,7 @@ public class Univers {
 			sb.append(":");
 			sb.append("p");
 			sb.append(idxParam);
+			sb.append(" ");
 			idxParam++;
 
 		}

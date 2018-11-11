@@ -34,6 +34,9 @@ public interface lgListener extends ParseTreeListener {
 	void enterRef(lgParser.RefContext ctx);
 	void exitRef(lgParser.RefContext ctx);
 
+	void enterParam(lgParser.ParamContext ctx);
+	void exitParam(lgParser.ParamContext ctx);
+
 	void enterSi(lgParser.SiContext ctx);
 	void exitSi(lgParser.SiContext ctx);
 
