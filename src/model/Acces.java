@@ -16,5 +16,10 @@ public class Acces extends Expression implements AccesChamp{
 		// TODO Auto-generated method stub
 		return nom;
 	}
+	@Override
+	public <T> T transformer(TransformationExpression<T> transformateur) {
+
+		return transformateur.transformer(this);
+	}
 
 }

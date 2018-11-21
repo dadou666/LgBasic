@@ -26,4 +26,10 @@ public class Appel extends Expression {
 
 	}
 
+	@Override
+	public <T> T transformer(TransformationExpression<T> transformateur) {
+	
+		return transformateur.transformer(this);
+	}
+
 }

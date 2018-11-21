@@ -57,6 +57,7 @@ public class ColorierSource implements VisiteurModule {
 			pm.expression.visiter(this);
 		}
 
+
 	}
 
 	@Override

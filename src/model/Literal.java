@@ -17,4 +17,10 @@ public class Literal extends Expression {
 		
 	}
 
+	@Override
+	public <T> T transformer(TransformationExpression<T> transformateur) {
+		// TODO Auto-generated method stub
+		return transformateur.transformer(this);
+	}
+
 }

@@ -1,6 +1,10 @@
+/grammaire/
+/ihm/
+/model/
 /monde/
 /semantique/
 /syntaxe/
 /test/
+/quantification/
+/editeur/
 /execution/
-/model/
