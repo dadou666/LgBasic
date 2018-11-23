@@ -13,7 +13,7 @@ class TestDecomposition {
 
 	@Test
 	void test1() {
-		List<String> vars = new ArrayList<String>();
+		List<String> vars = new ArrayList<>();
 		vars.add("x");
 		List<String> r = Element.listeDecomposition(vars);
 		assertTrue(r.size() == 1);
@@ -22,7 +22,7 @@ class TestDecomposition {
 	}
 	@Test
 	void test2() {
-		List<String> vars = new ArrayList<String>();
+		List<String> vars = new ArrayList<>();
 		vars.add("x");
 		vars.add("y");
 		List<String> r = Element.listeDecomposition(vars);
@@ -35,7 +35,7 @@ class TestDecomposition {
 	}
 	@Test
 	void test3() {
-		List<String> vars = new ArrayList<String>();
+		List<String> vars = new ArrayList<>();
 		vars.add("x");
 		vars.add("y");
 		vars.add("z");

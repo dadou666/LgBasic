@@ -11,7 +11,7 @@ import model.Var;
 public class Element {
 	public List<Var> params = new ArrayList<Var>();
 	public Expression expression;
-	public Map<String, List<Element>> enfants = new HashMap<>();
+	public  List<Decomposition> enfants = new ArrayList<>();
 
 	static public List<String> listeDecomposition(List<String> vars) {
 		List<String> result = new ArrayList<String>();
@@ -23,7 +23,7 @@ public class Element {
 
 	}
 
-	static public void listeDecomposition(List<String> vars, String base, int idx, int nbVar, List<String> results) {
+	public	static  void listeDecomposition(List<String> vars, String base, int idx, int nbVar, List<String> results) {
 		if (nbVar == 0) {
 			results.add(base);
 			return;
