@@ -60,7 +60,7 @@ public class Simplificateur implements TransformationExpression<Expression> {
 
 	@Override
 	public Expression transformer(Appel appel) {
-		FonctionDef fd = this.verificateur.fonctions.get(appel.nom.nomRef()).fonction;
+		FonctionDef fd = this.verificateur.fonctions.get(appel.nomRef()).fonction;
 		Simplificateur simplificateur = new Simplificateur();
 		simplificateur.verificateur = verificateur;
 		for (int idx = 0; idx < appel.params.size(); idx++) {
