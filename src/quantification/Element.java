@@ -7,39 +7,34 @@ import java.util.Map;
 
 import model.Expression;
 import model.Var;
+import semantique.Verificateur;
 
 public class Element {
-	public List<Var> params = new ArrayList<Var>();
+	public Map<String, String> params = new HashMap<>();
 	public Expression expression;
-	public  List<Decomposition> enfants = new ArrayList<>();
+	public List<Decomposition> enfants;
 
-	static public List<String> listeDecomposition(List<String> vars) {
-		List<String> result = new ArrayList<String>();
-		for (int nbVar = 1; nbVar <= vars.size(); nbVar++) {
-			listeDecomposition(vars, null, 0, nbVar, result);
-		}
-
-		return result;
+	public Element(Map<String,String> params, Expression expression) {
+		this.params =params;
+		this.expression = expression;
 
 	}
 
-	public	static  void listeDecomposition(List<String> vars, String base, int idx, int nbVar, List<String> results) {
-		if (nbVar == 0) {
-			results.add(base);
-			return;
-		}
-		if (idx == vars.size()) {
-			return;
+	public void decomposer(Demonstration dem) {
+		List<String> noms = new ArrayList<String>();
+		for (String var : params.keySet()) {
+			noms.add(var);
+
 		}
 
-		String nvBase = null;
-		if (base == null) {
-			nvBase = vars.get(idx);
-		} else {
-			nvBase = base + "," + vars.get(idx);
+		List<String> decompositions = Demonstration.listeDecomposition(noms);
+		enfants = new ArrayList<>();
+		for (String decomposition : decompositions) {
+			Decomposition d = new Decomposition(decomposition.split(","), this, dem);
+
+			enfants.add(d);
+
 		}
-		listeDecomposition(vars, nvBase, idx + 1, nbVar - 1, results);
-		listeDecomposition(vars, base, idx + 1, nbVar, results);
 
 	}
 

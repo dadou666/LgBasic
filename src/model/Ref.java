@@ -10,9 +10,13 @@ public class Ref {
 	public Ref() {
 
 	}
+	public Ref(String module,String nom) {
+		this.nom =  nom;
+		this.module =module;
 
+	}
 	public Ref(String nom,int debut,int fin) {
-	
+
 		this.nom = nom;
 		this.debut = debut;
 		this.fin=fin;

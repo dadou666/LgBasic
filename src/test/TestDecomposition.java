@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import quantification.Demonstration;
 import quantification.Element;
 
 class TestDecomposition {
@@ -15,7 +16,7 @@ class TestDecomposition {
 	void test1() {
 		List<String> vars = new ArrayList<>();
 		vars.add("x");
-		List<String> r = Element.listeDecomposition(vars);
+		List<String> r = Demonstration.listeDecomposition(vars);
 		assertTrue(r.size() == 1);
 		assertTrue(r.get(0).equals("x"));
 		
@@ -25,7 +26,7 @@ class TestDecomposition {
 		List<String> vars = new ArrayList<>();
 		vars.add("x");
 		vars.add("y");
-		List<String> r = Element.listeDecomposition(vars);
+		List<String> r = Demonstration.listeDecomposition(vars);
 		assertTrue(r.size() == 3);
 		assertTrue(r.get(0).equals("x"));
 		assertTrue(r.get(1).equals("y"));
@@ -39,7 +40,7 @@ class TestDecomposition {
 		vars.add("x");
 		vars.add("y");
 		vars.add("z");
-		List<String> r = Element.listeDecomposition(vars);
+		List<String> r = Demonstration.listeDecomposition(vars);
 		assertTrue(r.size() == 7);
 		assertTrue(r.get(0).equals("x"));
 		assertTrue(r.get(1).equals("y"));

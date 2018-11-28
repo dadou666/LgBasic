@@ -44,7 +44,35 @@ public class Verificateur implements VisiteurExpression {
 		this.univers = univers;
 
 	}
+	public String simplifierType(String nom) {
+		String tmp[] = nom.split("\\$");
+		TypeDef td = null;
+		for (String module : modules) {
+			if (td == null) {
+				td = types.get(module + "$" + tmp[1]);
 
+			} else {
+				return nom;
+			}
+		}
+		return tmp[1];
+
+	}
+	
+	public String simplifierFonction(String nom) {
+		String tmp[] = nom.split("\\$");
+		VerificationFonction vf = null;
+		for (String module : modules) {
+			if (vf == null) {
+				vf = fonctions.get(module + "$" + tmp[1]);
+
+			} else {
+				return nom;
+			}
+		}
+		return tmp[1];
+
+	}
 	public boolean trouverType(Ref ref,Class<? extends Def> classDef, String nom) {
 		if (ref.moduleInit) {
 			if (this.types.get(ref.nomRef()) != null) {
@@ -378,6 +406,16 @@ public class Verificateur implements VisiteurExpression {
 		}
 		if (td.superType != null) {
 			this.listeVar(td.superType.nomRef(), r);
+		}
+
+	}
+	public void listeVarAvecType(String nomRef, HashMap<String,String> r) {
+		TypeDef td = this.types.get(nomRef);
+		for (Var var : td.vars) {
+			r.put(var.nom,var.type.nomRef());
+		}
+		if (td.superType != null) {
+			this.listeVarAvecType(td.superType.nomRef(), r);
 		}
 
 	}
