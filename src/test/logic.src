@@ -1,0 +1,4 @@
+abstrait type bool {}
+type true:bool { }
+type false:bool {}
+

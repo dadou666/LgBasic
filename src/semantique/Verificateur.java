@@ -261,6 +261,21 @@ public class Verificateur implements VisiteurExpression {
 				vf.getValue().typeRetour = vf.getValue().fonction.typeRetour.nomRef();
 			} else {
 				vf.getValue().fonction.expression.visiter(this);
+	
+			}
+
+		}
+		for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
+			this.variables = new HashMap<String, String>();
+			for (Var var : vf.getValue().fonction.params) {
+				this.variables.put(var.nom, var.type.nomRef());
+			}
+			this.nomRef = vf.getKey();
+			if (vf.getValue().fonction.expression == null) {
+
+				vf.getValue().typeRetour = vf.getValue().fonction.typeRetour.nomRef();
+			} else {
+			//	vf.getValue().fonction.expression.visiter(this);
 				CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
 				calculerTypeRetour.variables.putAll(variables);
 				calculerTypeRetour.verificateur = this;
@@ -548,7 +563,7 @@ public class Verificateur implements VisiteurExpression {
 		return this.herite(td.superType.nomRef(), type2);
 	}
 
-	public void completer(Appel appel) {
+	public void completer(Appel appel, Map<String, String> variables) {
 		if (appel.nom.equals("+")) {
 			System.out.println("debug");
 		}
@@ -560,10 +575,13 @@ public class Verificateur implements VisiteurExpression {
 		List<String> appelTypes = new ArrayList<>();
 		for (Expression e : appel.params) {
 			CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
-			calculerTypeRetour.variables = this.variables;
+			calculerTypeRetour.variables = variables;
 			calculerTypeRetour.verificateur = this;
 			int nbErreur = this.erreurs.size();
+			Map<String,String> oldVariables = this.variables;
+			this.variables = variables;
 			e.visiter(this);
+			this.variables = oldVariables;
 			if (nbErreur == this.erreurs.size()) {
 				e.visiter(calculerTypeRetour);
 
@@ -623,7 +641,7 @@ public class Verificateur implements VisiteurExpression {
 		if (appel.erreur) {
 			return;
 		}
-		this.completer(appel);
+		this.completer(appel, variables);
 
 	}
 

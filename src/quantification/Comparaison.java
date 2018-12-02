@@ -19,6 +19,23 @@ import model.VarRef;
 public class Comparaison {
 	public Map<String, String> map1 = new HashMap<>();
 	public Map<String, String> map2 = new HashMap<>();
+	public boolean comparerElement(Element e1,Element e2) {
+		map1 = new HashMap<>();
+		map2 = new HashMap<>();
+				
+		if (!this.comparerExpression(e1.expression, e2.expression)) {
+			return false;
+		}
+		for(Map.Entry<String, String> e:map1.entrySet()) {
+			String type2 = e2.params.get(e.getValue());
+			String type1 = e1.params.get(e.getKey());
+				
+			if (!type2.equals(type1)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public boolean comparerExpression(Expression e1, Expression e2) {
 		if (e1 instanceof Acces) {

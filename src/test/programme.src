@@ -1,5 +1,4 @@
-type zero {}
-type n:zero { zero:n}
+
 type listeVide { }
 type liste:listeVide { zero:v listeVide:r }
 type typeDefVide  {}

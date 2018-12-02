@@ -32,7 +32,7 @@ public class CalculerTypeRetour implements VisiteurExpression {
 			return;
 		}
 		if (appel.vf == null) {
-			this.verificateur.completer(appel);
+			this.verificateur.completer(appel, variables);
 		}
 		VerificationFonction vf = appel.vf;
 		if (vf == null) {
@@ -102,12 +102,12 @@ public class CalculerTypeRetour implements VisiteurExpression {
 
 		}
 		if (calculerAlors.type == null) {
-			this.type = calculerAlors.type;
+			this.type = calculerSinon.type;
 			return;
 		}
 
 		if (calculerSinon.type == null) {
-			this.type = calculerSinon.type;
+			this.type = calculerAlors.type;
 			return;
 		}
 		this.type = this.verificateur.superTypeCommun(calculerAlors.type, calculerSinon.type);

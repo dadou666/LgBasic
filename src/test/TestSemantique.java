@@ -43,6 +43,7 @@ import semantique.TypeParametreFonctionInvalide;
 import semantique.TypeReserveInvalideDansLiteral;
 import semantique.Verificateur;
 import semantique.VerificationFonction;
+import syntaxe.Afficheur;
 import syntaxe.Parseur;
 
 class TestSemantique {
@@ -1149,6 +1150,74 @@ class TestSemantique {
 		verif.executerPourTypes();
 		verif.executerPourParams();
 		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+		
+	}
+	
+	@Test 
+	public void testOperateurEgalite() {
+		String source ="type zero { } type n:zero {zero:n }  abstrait type  bool {} type true:bool {} type false:bool {} "
+				+ "fonction = zero:a zero:b | si a est n alors ( si b est n alors a.n=b.n sinon false {} ) sinon ( si b est n alors false {} sinon true {} ) "
+				+ "fonction + zero:a zero:b | si a est n alors n { n= a.n+b} sinon b "
+				+ "fonction commutation zero:a zero:b |  (a+b) = (b+a)  " ;
+		
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+		Afficheur afficheur= new Afficheur();
+		System.out.println( verif.fonctions.get("m1$commutation/2").fonction.expression.transformer(afficheur));
+		assertTrue(verif.erreurs.isEmpty());
+		
+	}
+	
+	@Test 
+	public void testOperateurEgalite2() {
+		String source ="type zero { } type n:zero {zero:n } abstrait type  bool {} type true:bool {} type false:bool {} "
+				+ "fonction = zero:a zero:b | si a est n alors ( si b est n alors a.n=b.n sinon false {} ) sinon ( si b est n alors false {} sinon true {} ) "
+			;
+		
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+	
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+		assertTrue( verif.fonctions.get("m1$=/2").typeRetour!=null);
+
+	
+		
+	}
+	
+	@Test 
+	public void testOperateurEgalite3() {
+		String source ="type zero { } type n:zero {zero:n }  "
+				+ "fonction = zero:a zero:b | si a est n alors ( si b est n alors a.n=b.n sinon false {} ) sinon ( si b est n alors false {} sinon true {} ) "
+				+ "fonction + zero:a zero:b | si a est n alors n { n= a.n+b} sinon b "
+				+ "fonction commutation zero:a zero:b |  (a+b) = (b+a)  " ;
+		String source2 = " abstrait type  bool {} type true:bool {} type false:bool {}";
+		
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+		sources.put("m2", source2);
+		
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+	
+
 		assertTrue(verif.erreurs.isEmpty());
 		
 	}
