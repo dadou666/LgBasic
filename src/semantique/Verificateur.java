@@ -58,7 +58,22 @@ public class Verificateur implements VisiteurExpression {
 		return tmp[1];
 
 	}
-	
+	 public List<String>  listeSousTypes(String t) {
+		TypeDef td= types.get(t);
+		List<String> sousTypes = new ArrayList<>();
+		for(Map.Entry<String, TypeDef> e:types.entrySet()) {
+			td = e.getValue();
+			if (td.superType != null) {
+				if (td.superType.nomRef().equals(t)) {
+					sousTypes.add(e.getKey());
+				}
+			}
+		}
+		return sousTypes;
+		
+		
+		
+	}
 	public String simplifierFonction(String nom) {
 		String tmp[] = nom.split("\\$");
 		VerificationFonction vf = null;
