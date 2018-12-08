@@ -44,6 +44,7 @@ public class Instanciation extends Transformation {
 		simplificateur.variables.put(var, objet);
 		enfant.expression = element.expression.transformer(simplificateur);
 		element.enfants.add(enfant);
+		enfant.transformation = this;
 		
 		
 	}

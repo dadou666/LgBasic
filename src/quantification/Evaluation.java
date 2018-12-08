@@ -20,6 +20,7 @@ public class Evaluation extends Transformation {
 		}
 		enfant.expression = element.expression.transformer(simplificateur);
 		element.enfants.add(enfant);
+		enfant.transformation = this;
 		
 	}
 

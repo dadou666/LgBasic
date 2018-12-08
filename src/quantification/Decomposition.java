@@ -32,6 +32,7 @@ public class Decomposition extends Transformation {
 				}
 			}
 			enfant.expression = element.expression;
+			enfant.transformation = this;
 		}
 		
 		

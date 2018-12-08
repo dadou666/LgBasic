@@ -16,6 +16,7 @@ public class Element {
 	public Element parent;
 	public Expression expression;
 	public List<Element> enfants;
+	public Transformation transformation;
 	public boolean estFinal = false;
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -65,9 +66,10 @@ public class Element {
 			for(Transformation t:r) {
 				t.ajouterElements(dem.verificateur, this);
 			}
-			for(Element enfant:enfants) {
-				enfant.parent = this;
-			}
+		
+		}
+		for(Element enfant:enfants) {
+			enfant.parent = this;
 		}
 
 	}
