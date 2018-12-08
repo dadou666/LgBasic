@@ -44,7 +44,7 @@ public class Transformeur implements TransformationExpression<List<Transformatio
 		if (!td.estAbstrait) {
 			Instanciation i = new Instanciation();
 			i.var = varRef.nom;
-			i.typeDef = td;
+			i.type = type;
 			r.add(i);
 
 		}

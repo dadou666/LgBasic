@@ -1,5 +1,8 @@
 package syntaxe;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import model.Acces;
 import model.Appel;
 import model.Expression;
@@ -13,6 +16,27 @@ import semantique.Verificateur;
 
 public class Afficheur implements TransformationExpression<String> {
 	public Verificateur verif;
+	static List<String> operateurs;
+
+	public static List<String> operateurs() {
+		if (operateurs == null) {
+			operateurs = new ArrayList<>();
+			operateurs.add("+");
+			operateurs.add("->");
+			operateurs.add("-");
+			operateurs.add("*");
+			operateurs.add("/");
+			operateurs.add(">");
+			operateurs.add("<");
+			operateurs.add("&");
+			operateurs.add("|");
+			operateurs.add("==");
+			operateurs.add("=");
+
+		}
+		return operateurs;
+
+	}
 
 	@Override
 	public String transformer(Acces acces) {
@@ -48,6 +72,15 @@ public class Afficheur implements TransformationExpression<String> {
 	@Override
 	public String transformer(Appel appel) {
 		StringBuilder sb = new StringBuilder();
+		if (operateurs().contains(appel.nom.nom)) {
+			sb.append("(");
+			sb.append(appel.params.get(0));
+			sb.append(appel.nom.nom);
+			sb.append(appel.params.get(1));
+			sb.append(")");
+			return sb.toString();
+			
+		}
 		if (verif == null) {
 			sb.append(appel.nom.nomRef());
 		} else {

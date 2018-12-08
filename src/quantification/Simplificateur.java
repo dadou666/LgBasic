@@ -55,7 +55,11 @@ public class Simplificateur implements TransformationExpression<Expression> {
 	public Expression transformer(VarRef varRef) {
 		// TODO Auto-generated method stub
 
-		return this.variables.get(varRef.nom);
+		Expression r= this.variables.get(varRef.nom);
+		if (r == null) {
+			return varRef;
+		}
+		return r;
 	}
 
 	@Override

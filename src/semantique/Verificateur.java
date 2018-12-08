@@ -439,7 +439,7 @@ public class Verificateur implements VisiteurExpression {
 		}
 
 	}
-	public void listeVarAvecType(String nomRef, HashMap<String,String> r) {
+	public void listeVarAvecType(String nomRef, Map<String,String> r) {
 		TypeDef td = this.types.get(nomRef);
 		for (Var var : td.vars) {
 			r.put(var.nom,var.type.nomRef());
