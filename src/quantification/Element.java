@@ -40,24 +40,30 @@ public class Element {
 	}
 
 	public void calculerEvaluations(Demonstration dem) {
-		ListerEvaluation t = new ListerEvaluation();
-		List<Evaluation> evaluations = expression.transformer(t);
-		for (Evaluation e : evaluations) {
-			this.enfants.add(e);
+		ListerNomFonction t = new ListerNomFonction();
+		expression.visiter(t);
+		for (String e : t.r) {
+			Evaluation eval = new Evaluation();
+			eval.nomFonction = e;
+			this.enfants.add(eval);
 		}
 	}
 
 	public void calculerInstanciations(Demonstration dem) {
+		ListerVariablePourInstanciation listerVariablePourInstanciation = new ListerVariablePourInstanciation();
+		expression.visiter(listerVariablePourInstanciation);
 		for (Map.Entry<String, String> e : this.params.entrySet()) {
 			String var = e.getKey();
-			String type = e.getValue();
-			TypeDef td = dem.verificateur.types.get(type);
-			if (!td.estAbstrait) {
-				Instanciation i = new Instanciation();
-				i.var = var;
-				i.type = type;
-				enfants.add(i);
+			if (listerVariablePourInstanciation.r.contains(var)) {
+				String type = e.getValue();
+				TypeDef td = dem.verificateur.types.get(type);
+				if (!td.estAbstrait) {
+					Instanciation i = new Instanciation();
+					i.var = var;
+					i.type = type;
+					enfants.add(i);
 
+				}
 			}
 		}
 
@@ -99,7 +105,7 @@ public class Element {
 
 		}
 		if (enfants == null) {
-	
+
 			enfants = new ArrayList<>();
 			this.calculerDecompositions(dem);
 			this.calculerEvaluations(dem);

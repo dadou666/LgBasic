@@ -19,7 +19,7 @@ import semantique.Verificateur;
 public class Simplificateur implements TransformationExpression<Expression> {
 	public Map<String, Expression> variables = new HashMap<>();
 	public Verificateur verificateur;
-	public Appel appel;
+	public String nomFonction;
 
 	@Override
 	public Expression transformer(Acces acces) {
@@ -64,7 +64,7 @@ public class Simplificateur implements TransformationExpression<Expression> {
 
 	@Override
 	public Expression transformer(Appel appel) {
-		if (this.appel ==appel) {
+		if (this.nomFonction.equals(appel.nom.nomRef())) {
 		FonctionDef fd = this.verificateur.fonctions.get(appel.nomRef()).fonction;
 		Simplificateur simplificateur = new Simplificateur();
 		simplificateur.verificateur = verificateur;
