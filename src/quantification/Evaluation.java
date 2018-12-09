@@ -19,8 +19,9 @@ public class Evaluation extends Transformation {
 			enfant.params.put(e.getKey(), e.getValue());
 		}
 		enfant.expression = element.expression.transformer(simplificateur);
-		element.enfants.add(enfant);
-		enfant.transformation = this;
+		
+		this.elements.add(enfant);
+		enfant.parent = element;
 		
 	}
 

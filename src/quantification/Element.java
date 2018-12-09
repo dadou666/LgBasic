@@ -8,6 +8,7 @@ import java.util.Map;
 import javassist.convert.Transformer;
 import model.Expression;
 import model.Objet;
+import model.TypeDef;
 import model.Var;
 import semantique.Verificateur;
 
@@ -15,17 +16,18 @@ public class Element {
 	public Map<String, String> params = new HashMap<>();
 	public Element parent;
 	public Expression expression;
-	public List<Element> enfants;
-	public Transformation transformation;
+	public List<Transformation> enfants;
+
 	public boolean estFinal = false;
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		boolean estPremier = true;
-		for(Map.Entry<String, String> e:params.entrySet()) {
+		for (Map.Entry<String, String> e : params.entrySet()) {
 			if (!estPremier) {
 				sb.append(" ");
 			}
-			
+
 			sb.append(e.getValue());
 			sb.append(":");
 			sb.append(e.getKey());
@@ -34,23 +36,59 @@ public class Element {
 		sb.append("|");
 		sb.append(expression);
 		return sb.toString();
-		
-	}
-
-	public List<Transformation> transformations(Demonstration dem) {
-		Transformeur t = new Transformeur();
-		return expression.transformer(t);
 
 	}
 
-	public void calculerEnfants(Demonstration dem) {
+	public void calculerEvaluations(Demonstration dem) {
+		ListerEvaluation t = new ListerEvaluation();
+		List<Evaluation> evaluations = expression.transformer(t);
+		for (Evaluation e : evaluations) {
+			this.enfants.add(e);
+		}
+	}
+
+	public void calculerInstanciations(Demonstration dem) {
+		for (Map.Entry<String, String> e : this.params.entrySet()) {
+			String var = e.getKey();
+			String type = e.getValue();
+			TypeDef td = dem.verificateur.types.get(type);
+			if (!td.estAbstrait) {
+				Instanciation i = new Instanciation();
+				i.var = var;
+				i.type = type;
+				enfants.add(i);
+
+			}
+		}
+
+	}
+
+	public void calculerDecompositions(Demonstration dem) {
+
+		for (Map.Entry<String, String> e : this.params.entrySet()) {
+			String var = e.getKey();
+			String type = e.getValue();
+
+			List<String> sousTypes = dem.verificateur.listeSousTypes(type);
+			if (!sousTypes.isEmpty()) {
+				Decomposition d = new Decomposition();
+				d.var = var;
+				d.sousTypes = sousTypes;
+				enfants.add(d);
+
+			}
+		}
+
+	}
+
+	public void calculerTransformations(Demonstration dem) {
 		if (!estFinal) {
 			if (expression instanceof Objet) {
 				estFinal = true;
 				return;
 			}
-			Element tmp  = parent;
-			while(tmp != null) {
+			Element tmp = parent;
+			while (tmp != null) {
 				Comparaison comparaison = new Comparaison();
 				if (comparaison.comparerExpression(tmp.expression, expression)) {
 					estFinal = true;
@@ -58,18 +96,14 @@ public class Element {
 				}
 				tmp = tmp.parent;
 			}
-			
+
 		}
 		if (enfants == null) {
-			List<Transformation> r = this.transformations(dem);
+	
 			enfants = new ArrayList<>();
-			for(Transformation t:r) {
-				t.ajouterElements(dem.verificateur, this);
-			}
-		
-		}
-		for(Element enfant:enfants) {
-			enfant.parent = this;
+			this.calculerDecompositions(dem);
+			this.calculerEvaluations(dem);
+			this.calculerInstanciations(dem);
 		}
 
 	}
