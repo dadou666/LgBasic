@@ -13,7 +13,7 @@ import model.TestType;
 import model.VarRef;
 import model.VisiteurExpression;
 
-public class ListerVariablePourInstanciation implements VisiteurExpression {
+public class ListerVariablePourDecomposition implements VisiteurExpression {
 	Set<String> r = new HashSet<>();
 
 	@Override

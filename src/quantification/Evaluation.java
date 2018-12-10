@@ -19,7 +19,7 @@ public class Evaluation extends Transformation {
 			enfant.params.put(e.getKey(), e.getValue());
 		}
 		enfant.expression = element.expression.transformer(simplificateur);
-		
+		enfant.supprimerVariableInutilise();
 		this.elements.add(enfant);
 		enfant.parent = element;
 		

@@ -49,40 +49,40 @@ public class Element {
 		}
 	}
 
-	public void calculerInstanciations(Demonstration dem) {
-		ListerVariablePourInstanciation listerVariablePourInstanciation = new ListerVariablePourInstanciation();
-		expression.visiter(listerVariablePourInstanciation);
-		for (Map.Entry<String, String> e : this.params.entrySet()) {
-			String var = e.getKey();
-			if (listerVariablePourInstanciation.r.contains(var)) {
-				String type = e.getValue();
-				TypeDef td = dem.verificateur.types.get(type);
-				if (!td.estAbstrait) {
-					Instanciation i = new Instanciation();
-					i.var = var;
-					i.type = type;
-					enfants.add(i);
 
-				}
-			}
-		}
-
-	}
 
 	public void calculerDecompositions(Demonstration dem) {
-
+		ListerVariablePourDecomposition listerVariablePourDecomposition = new ListerVariablePourDecomposition();
+		
+		expression.visiter(listerVariablePourDecomposition);
 		for (Map.Entry<String, String> e : this.params.entrySet()) {
 			String var = e.getKey();
 			String type = e.getValue();
+			if (listerVariablePourDecomposition.r.contains(var)) {
+				List<String> sousTypes = dem.verificateur.listeSousTypes(type);
+				Decomposition d = null;
+				if (!sousTypes.isEmpty()) {
+					d = new Decomposition();
+					d.var = var;
+					d.sousTypes = sousTypes;
 
-			List<String> sousTypes = dem.verificateur.listeSousTypes(type);
-			if (!sousTypes.isEmpty()) {
-				Decomposition d = new Decomposition();
-				d.var = var;
-				d.sousTypes = sousTypes;
-				enfants.add(d);
+				}
+
+				TypeDef td = dem.verificateur.types.get(type);
+				if (!td.estAbstrait) {
+					if (d == null) {
+						d = new Decomposition();
+					}
+					d.var = var;
+					d.type = type;
+
+				}
+				if (d != null) {
+					enfants.add(d);
+				}
 
 			}
+
 		}
 
 	}
@@ -109,9 +109,21 @@ public class Element {
 			enfants = new ArrayList<>();
 			this.calculerDecompositions(dem);
 			this.calculerEvaluations(dem);
-			this.calculerInstanciations(dem);
+
 		}
 
+	}
+	public void supprimerVariableInutilise() {
+		ListerVariable listerVariable = new ListerVariable();
+		expression.visiter(listerVariable);
+		HashMap<String,String> newMap = new HashMap<String,String>();
+		
+		for(String var:listerVariable.r) {
+			newMap.put(var, this.params.get(var));
+			
+		}
+		this.params =newMap;
+		
 	}
 
 }
