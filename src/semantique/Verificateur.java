@@ -1,5 +1,6 @@
 package semantique;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,8 @@ import model.Univers;
 import model.Var;
 import model.VarRef;
 import model.VisiteurExpression;
+import quantification.Generalisation;
+import quantification.Element;
 
 public class Verificateur implements VisiteurExpression {
 	public Map<String, TypeDef> types = new HashMap<>();
@@ -37,10 +40,60 @@ public class Verificateur implements VisiteurExpression {
 	public Map<String, TypeReserveValidation> validations = new HashMap<>();
 	public Map<String, String> variables = new HashMap<>();
 	public Univers univers;
-
+	public boolean estInt(String s) {
+		try {
+			Integer.parseInt(s);
+			return true;
+		} catch(Throwable t) {
+			return false;
+		}
+		
+		
+	}
+	public boolean estFloat(String s) {
+		try {
+			Float.parseFloat(s.replace('p', '.'));
+			return true;
+		} catch(Throwable t) {
+			return false;
+		}
+		
+		
+	}
+	public Verificateur(String nomRepertoire) throws IOException {
+		this(Univers.creerUnivers(nomRepertoire, null));
+		this.executer();
+	}
+	public Generalisation creerGeneralisation(String fonction,String type) {
+		VerificationFonction vf =this.fonctions.get(fonction);
+		if (vf == null) {
+			return null;
+		}
+		
+		TypeDef typeDef = this.types.get(type);
+		if (type == null) {
+			return null;
+		}
+		Element r = new Element();
+		r.expression =vf.fonction.expression;
+		for(Var var:vf.fonction.params) {
+			r.params.put(var.nom, var.type.nomRef());
+			
+		}
+		
+		Generalisation dem = new Generalisation();
+		dem.element = r;
+		dem.type =  new Ref(type);
+		dem.verificateur = this;
+		return dem;
+		
+	}
 	public Verificateur(Univers univers) {
 		modules.add("base");
-		this.validations.put("base$symbol", (String s) -> true);
+
+		validations.put("base$symbol", (String s) -> Character.isLetter(s.charAt(0)));
+		validations.put("base$int", (String s) -> estInt(s));
+		validations.put("base$float", (String s) -> estFloat(s));
 		this.univers = univers;
 
 	}
@@ -300,6 +353,11 @@ public class Verificateur implements VisiteurExpression {
 			}
 
 		}
+	}
+	public void executer() {
+		executerPourTypes();
+		executerPourParams();
+		executerPourFonctions();
 	}
 
 	public void executerPourTypes() {

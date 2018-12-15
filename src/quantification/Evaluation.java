@@ -18,6 +18,8 @@ public class Evaluation extends Transformation {
 		for(Map.Entry<String, String> e:element.params.entrySet()) {
 			enfant.params.put(e.getKey(), e.getValue());
 		}
+		simplificateur.nomFonction = nomFonction;
+		simplificateur.verificateur =verif;
 		enfant.expression = element.expression.transformer(simplificateur);
 		enfant.supprimerVariableInutilise();
 		this.elements.add(enfant);

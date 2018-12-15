@@ -1,14 +1,21 @@
 package model;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
+
+import syntaxe.Parseur;
 
 public class Univers {
 	public Map<String, Module> modules = new HashMap<>();
@@ -26,6 +33,29 @@ public class Univers {
 
 		}
 		return conversionsOp;
+	}
+
+	static public Univers creerUnivers(String chemin, List<String> moduleAPI) throws IOException {
+		String ls[] = new File(chemin).list();
+		Map<String, String> sources = new HashMap<String, String>();
+		Vector<String> vector = new Vector<String>();
+		for (String s : ls) {
+			if (s.endsWith(".src")) {
+				int i = s.indexOf(".src");
+				String nom = s.substring(0, i);
+				vector.add(nom);
+				sources.put(nom, new String(Files.readAllBytes(Paths.get(chemin, s))));
+
+			}
+		}
+		Parseur parseur = new Parseur();
+
+		Univers univers = parseur.lireSourceCode(sources, moduleAPI);
+		if (parseur.error) {
+			return null;
+		}
+		return univers;
+
 	}
 
 	public void visiter(VisiteurUnivers visiteur) {
@@ -48,9 +78,10 @@ public class Univers {
 			}
 
 		}
-		for(Field f:api.getDeclaredFields()) {
-			if (f.getName().indexOf('$') == -1 && Modifier.isPublic(f.getModifiers()) && !Modifier.isStatic(f.getModifiers())) {
-				String simpleName =f.getType().getSimpleName();
+		for (Field f : api.getDeclaredFields()) {
+			if (f.getName().indexOf('$') == -1 && Modifier.isPublic(f.getModifiers())
+					&& !Modifier.isStatic(f.getModifiers())) {
+				String simpleName = f.getType().getSimpleName();
 				Class cls = types.get(simpleName);
 				if (cls == null) {
 					simpleName = typeReserve.get(f.getType());
@@ -68,10 +99,10 @@ public class Univers {
 					sb.append(" ");
 					sb.append(f.getName());
 					sb.append("\n");
-					
+
 				}
 			}
-			
+
 		}
 		for (Class cls : types.values()) {
 			String nom = cls.getSimpleName();

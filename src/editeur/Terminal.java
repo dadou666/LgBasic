@@ -178,26 +178,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 	boolean colorer = false;
 	boolean erreur = false;
-	public boolean estInt(String s) {
-		try {
-			Integer.parseInt(s);
-			return true;
-		} catch(Throwable t) {
-			return false;
-		}
-		
-		
-	}
-	public boolean estFloat(String s) {
-		try {
-			Float.parseFloat(s.replace('p', '.'));
-			return true;
-		} catch(Throwable t) {
-			return false;
-		}
-		
-		
-	}
+
 	public void compiler() throws IOException {
 		if (erreur) {
 			return;
@@ -221,12 +202,9 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		}
 
 		Verificateur verif = new Verificateur(univers);
-		verif.validations.put("base$symbol", (String s) -> Character.isLetter(s.charAt(0)));
-		verif.validations.put("base$int", (String s) -> estInt(s));
-		verif.validations.put("base$float", (String s) -> estFloat(s));
-		verif.executerPourTypes();
-		verif.executerPourFonctions();
-		Vector<Erreur> erreurs = new Vector();
+
+		verif.executer();
+		Vector<Erreur> erreurs = new Vector<Erreur>();
 		erreurs.addAll(verif.erreurs);
 		this.listErreurSemantique.setListData(erreurs);
 		if (erreurs.isEmpty()) {

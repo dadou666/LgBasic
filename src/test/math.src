@@ -1,7 +1,6 @@
 fonction + zero:a zero:b | si a est n alors n { n= a.n+b} sinon b  
 fonction = zero:a zero:b | si a est n alors ( si b est n alors a.n=b.n sinon false {} ) sinon ( si b est n alors false {} sinon true {} )
-fonction commutation zero:a zero:b |  (a+b) = (b+a)
-
+fonction gen zero:a zero:b |  (a+b) = (b+a)
 type zero {}
 type n:zero { zero:n}
 

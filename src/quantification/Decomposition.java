@@ -63,6 +63,7 @@ public class Decomposition extends Transformation {
 			}
 			Simplificateur simplificateur = new Simplificateur();
 			simplificateur.variables.put(var, objet);
+			simplificateur.verificateur = verif;
 			enfant.expression = element.expression.transformer(simplificateur);
 			enfant.supprimerVariableInutilise();
 			elements.add(enfant);

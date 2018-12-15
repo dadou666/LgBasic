@@ -39,7 +39,7 @@ public class Element {
 
 	}
 
-	public void calculerEvaluations(Demonstration dem) {
+	public void calculerEvaluations(Generalisation dem) {
 		ListerNomFonction t = new ListerNomFonction();
 		expression.visiter(t);
 		for (String e : t.r) {
@@ -51,7 +51,7 @@ public class Element {
 
 
 
-	public void calculerDecompositions(Demonstration dem) {
+	public void calculerDecompositions(Generalisation dem) {
 		ListerVariablePourDecomposition listerVariablePourDecomposition = new ListerVariablePourDecomposition();
 		
 		expression.visiter(listerVariablePourDecomposition);
@@ -87,7 +87,7 @@ public class Element {
 
 	}
 
-	public void calculerTransformations(Demonstration dem) {
+	public void calculerTransformations(Generalisation dem) {
 		if (!estFinal) {
 			if (expression instanceof Objet) {
 				estFinal = true;

@@ -29,13 +29,15 @@ public class Simplificateur implements TransformationExpression<Expression> {
 			for (ObjetParam op : objet.params) {
 				if (op.nom.equals(acces.nom)) {
 					
-					return op.expression;
+					return op.expression.transformer(this);
 				}
 			}
 
 		}
-
-		return acces;
+		Acces r = new Acces();
+		r.cible = acces.cible.transformer(this);
+		r.nom =acces.nom;
+		return r;
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class Simplificateur implements TransformationExpression<Expression> {
 
 	@Override
 	public Expression transformer(Appel appel) {
-		if (this.nomFonction.equals(appel.nom.nomRef())) {
+		if (this.nomFonction != null && this.nomFonction.equals(appel.nomRef())) {
 		FonctionDef fd = this.verificateur.fonctions.get(appel.nomRef()).fonction;
 		Simplificateur simplificateur = new Simplificateur();
 		simplificateur.verificateur = verificateur;
@@ -77,7 +79,8 @@ public class Simplificateur implements TransformationExpression<Expression> {
 		}
 	
 
-			return fd.expression.transformer(simplificateur);
+			Expression r= fd.expression.transformer(simplificateur);
+			return r;
 		}
 		Appel result  = new Appel();
 		result.nom = appel.nom;
@@ -101,7 +104,13 @@ public class Simplificateur implements TransformationExpression<Expression> {
 			return testType.sinon.transformer(this);
 			
 		}
-		return testType;
+		TestType r= new TestType();
+		r.cible = testType.cible.transformer(this);
+		r.typeRef = testType.typeRef;
+		r.alors = testType.alors.transformer(this);
+		r.sinon = testType.sinon.transformer(this);
+		return r;
+		
 	}
 
 	@Override
