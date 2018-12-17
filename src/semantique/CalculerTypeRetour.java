@@ -5,6 +5,7 @@ import java.util.Map;
 
 import model.Acces;
 import model.Appel;
+import model.FonctionDef;
 import model.Literal;
 import model.Objet;
 import model.ParamDef;
@@ -22,6 +23,8 @@ public class CalculerTypeRetour implements VisiteurExpression {
 
 	@Override
 	public void visiter(Objet objet) {
+		verificateur.trouverType(objet.type, FonctionDef.class, nomRef);
+		
 		this.type = objet.type.nomRef();
 
 	}
@@ -70,6 +73,7 @@ public class CalculerTypeRetour implements VisiteurExpression {
 
 	@Override
 	public void visiter(TestType testType) {
+		this.verificateur.trouverType(testType.typeRef,FonctionDef.class, this.nomRef);
 		CalculerTypeRetour calculer = new CalculerTypeRetour();
 		calculer.verificateur = this.verificateur;
 		calculer.variables = this.variables;

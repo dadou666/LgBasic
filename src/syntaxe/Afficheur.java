@@ -102,7 +102,7 @@ public class Afficheur implements TransformationExpression<String> {
 			nomType = verif.simplifierType(nomType);
 		}
 		StringBuilder sb = new StringBuilder();
-		sb.append("si ");
+		sb.append("(si ");
 		sb.append(testType.cible.transformer(this));
 		sb.append(" est ");
 		sb.append(nomType);
@@ -110,6 +110,7 @@ public class Afficheur implements TransformationExpression<String> {
 		sb.append(testType.alors.transformer(this));
 		sb.append(" sinon ");
 		sb.append(testType.sinon.transformer(this));
+		sb.append(")");
 		return sb.toString();
 	}
 

@@ -1,0 +1,6 @@
+type feuille {}
+type arbre:feuille { feuille:g feuille:d}
+fonction = feuille:a feuille:b | true {}
+
+fonction test arbre:a arbre:b | (a.g= b.g)&(a.d=b.d)
+

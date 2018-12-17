@@ -2,6 +2,7 @@ package quantification;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import model.Acces;
 import model.Appel;
@@ -19,7 +20,7 @@ import semantique.Verificateur;
 public class Simplificateur implements TransformationExpression<Expression> {
 	public Map<String, Expression> variables = new HashMap<>();
 	public Verificateur verificateur;
-	public String nomFonction;
+	public Set<Appel> appels;
 
 	@Override
 	public Expression transformer(Acces acces) {
@@ -66,7 +67,7 @@ public class Simplificateur implements TransformationExpression<Expression> {
 
 	@Override
 	public Expression transformer(Appel appel) {
-		if (this.nomFonction != null && this.nomFonction.equals(appel.nomRef())) {
+		if (this.appels != null && appels.contains(appel)) {
 		FonctionDef fd = this.verificateur.fonctions.get(appel.nomRef()).fonction;
 		Simplificateur simplificateur = new Simplificateur();
 		simplificateur.verificateur = verificateur;

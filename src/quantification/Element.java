@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.remote.TargetedNotification;
+
 import javassist.convert.Transformer;
 import model.Expression;
 import model.Objet;
@@ -40,20 +42,21 @@ public class Element {
 	}
 
 	public void calculerEvaluations(Generalisation dem) {
-		ListerNomFonction t = new ListerNomFonction();
+		ListerAppel t = new ListerAppel();
 		expression.visiter(t);
-		for (String e : t.r) {
-			Evaluation eval = new Evaluation();
-			eval.nomFonction = e;
-			this.enfants.add(eval);
+		if (t.r.isEmpty()) {
+			return;
 		}
+		Evaluation eval = new Evaluation();
+		eval.appels = t.r;
+		this.enfants.add(eval);
 	}
 
-
+	
 
 	public void calculerDecompositions(Generalisation dem) {
 		ListerVariablePourDecomposition listerVariablePourDecomposition = new ListerVariablePourDecomposition();
-		
+
 		expression.visiter(listerVariablePourDecomposition);
 		for (Map.Entry<String, String> e : this.params.entrySet()) {
 			String var = e.getKey();
@@ -113,17 +116,18 @@ public class Element {
 		}
 
 	}
+
 	public void supprimerVariableInutilise() {
 		ListerVariable listerVariable = new ListerVariable();
 		expression.visiter(listerVariable);
-		HashMap<String,String> newMap = new HashMap<String,String>();
-		
-		for(String var:listerVariable.r) {
+		HashMap<String, String> newMap = new HashMap<String, String>();
+
+		for (String var : listerVariable.r) {
 			newMap.put(var, this.params.get(var));
-			
+
 		}
-		this.params =newMap;
-		
+		this.params = newMap;
+
 	}
 
 }

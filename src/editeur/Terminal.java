@@ -255,7 +255,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			compiler();
 		} catch (Throwable e2) {
 			erreur = true;
-			// e2.printStackTrace();
+		e2.printStackTrace();
 		}
 
 		this.streamOutput.flush();
@@ -292,7 +292,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			this.compiler();
 		} catch (Throwable e) {
 			erreur = true;
-			// e.printStackTrace();
+		e.printStackTrace();
 		}
 
 	}
@@ -330,7 +330,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			selection = false;
 		} catch (Throwable e) {
 			erreur = true;
-			// e.printStackTrace();
+	 e.printStackTrace();
 		}
 
 	}

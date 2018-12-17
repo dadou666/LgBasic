@@ -143,6 +143,7 @@ public class Verificateur implements VisiteurExpression {
 	}
 	public boolean trouverType(Ref ref,Class<? extends Def> classDef, String nom) {
 		if (ref.moduleInit) {
+			ref.moduleInit = false;
 			if (this.types.get(ref.nomRef()) != null) {
 				return true;
 			}
@@ -203,6 +204,7 @@ public class Verificateur implements VisiteurExpression {
 		}
 
 		if (appel.nom.moduleInit) {
+			appel.nom.moduleInit = false;
 			VerificationFonction vf = fonctions.get(appel.nomRef());
 			if (vf != null) {
 				rs.add(vf);
@@ -637,9 +639,7 @@ public class Verificateur implements VisiteurExpression {
 	}
 
 	public void completer(Appel appel, Map<String, String> variables) {
-		if (appel.nom.equals("+")) {
-			System.out.println("debug");
-		}
+	
 		List<VerificationFonction> ls = this.recuperer(appel);
 		if (ls.isEmpty()) {
 			return;
@@ -671,6 +671,7 @@ public class Verificateur implements VisiteurExpression {
 			int idx = 0;
 			boolean erreur = false;
 			for (Var var : fd.fonction.params) {
+				
 				if (!this.herite(appelTypes.get(idx), var.type.nomRef())) {
 					erreur = true;
 					break;

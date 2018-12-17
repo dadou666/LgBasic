@@ -14,21 +14,24 @@ public class Generalisation {
 	public Ref type;
 	public Verificateur verificateur;
 	public List<Element> enfants;
+
 	public void calculer() {
 		if (enfants == null) {
 			enfants = new ArrayList<Element>();
 			enfants.add(element);
 		}
 		List<Element> tmp = new ArrayList<>();
-		for(Element enfant:enfants) {
+		for (Element enfant : enfants) {
 			enfant.calculerTransformations(this);
-			for(Transformation t:enfant.enfants) {
-				t.ajouterElements(verificateur, enfant);
-				tmp.addAll(t.elements);
+			if (enfant.enfants != null) {
+				for (Transformation t : enfant.enfants) {
+					t.ajouterElements(verificateur, enfant);
+					tmp.addAll(t.elements);
+				}
 			}
 		}
 		this.enfants = tmp;
-		
+
 	}
 
 }

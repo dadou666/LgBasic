@@ -2,6 +2,9 @@ package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -321,7 +324,7 @@ class TestSemantique {
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.size() >= 1);
 		Erreur erreur = verif.erreurs.get(0);
 		assertTrue(erreur instanceof TypeInexistant);
 		TypeInexistant ti = (TypeInexistant) erreur;
@@ -443,7 +446,7 @@ class TestSemantique {
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.size() >= 1);
 		Erreur erreur = verif.erreurs.get(0);
 		assertTrue(erreur instanceof TypeInexistant);
 		TypeInexistant ti = (TypeInexistant) erreur;
@@ -460,7 +463,7 @@ class TestSemantique {
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.size() >= 1);
 		Erreur erreur = verif.erreurs.get(0);
 		assertTrue(erreur instanceof TypeInexistant);
 		TypeInexistant ti = (TypeInexistant) erreur;
@@ -896,7 +899,7 @@ class TestSemantique {
 		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof MultipleDefinitionFonction);
 	}
-	
+
 	@Test
 	void testMultipleFonctionInexistante() {
 		String source = "type b {}  type a:b {} type c:b {}  fonction u symbol:a | f(a) ";
@@ -915,35 +918,34 @@ class TestSemantique {
 		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof FonctionInexistante);
 	}
-	
-	
+
 	public boolean estInt(String s) {
 		try {
 			Integer.parseInt(s);
 			return true;
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			return false;
 		}
-		
-		
+
 	}
+
 	public boolean estFloat(String s) {
 		try {
 			Float.parseFloat(s.replace('p', '.'));
 			return true;
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			return false;
 		}
-		
-		
+
 	}
+
 	@Test
 	public void testTypeReserveIntEtFloat() {
 		String source = "type b {int:a } fonction m b:a | b { a= er }";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-	
+
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
@@ -953,15 +955,16 @@ class TestSemantique {
 		verif.executerPourFonctions();
 		assertFalse(verif.erreurs.isEmpty());
 		assertTrue(verif.erreurs.size() == 1);
-	
+
 	}
+
 	@Test
 	public void testTypeReserveInt() {
 		String source = "type b {int:a } fonction m b:a | b { a= 5 }";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-	
+
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
@@ -970,16 +973,17 @@ class TestSemantique {
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
 		assertTrue(verif.erreurs.isEmpty());
-		//assertTrue(verif.erreurs.size() == 1);
+		// assertTrue(verif.erreurs.size() == 1);
 
 	}
+
 	@Test
 	public void testTypeReserveFloatEtInt() {
 		String source = "type b {float:a int:b} fonction m b:a | b { a= 5p45 b=5}";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-	
+
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
@@ -988,10 +992,10 @@ class TestSemantique {
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
 		assertTrue(verif.erreurs.isEmpty());
-		//assertTrue(verif.erreurs.size() == 1);
+		// assertTrue(verif.erreurs.size() == 1);
 
 	}
-	
+
 	@Test
 	public void testFonctionSymbol() {
 		String source = "  fonction  u int:a | a+45";
@@ -1008,16 +1012,17 @@ class TestSemantique {
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
 		assertFalse(verif.erreurs.isEmpty());
-		//assertTrue(verif.erreurs.size() == 1);
+		// assertTrue(verif.erreurs.size() == 1);
 
 	}
+
 	@Test
 	public void testObjetIncomplet() {
 		String source = "type b {float:a int:b} fonction m b:a | b { a= 5p45 }";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-	
+
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
@@ -1030,17 +1035,17 @@ class TestSemantique {
 		assertTrue(verif.erreurs.get(0) instanceof ObjetIncomplet);
 		ObjetIncomplet erreur = (ObjetIncomplet) verif.erreurs.get(0);
 		assertTrue(erreur.absents.contains("b"));
-		assertTrue(erreur.absents.size()==1);
-		
+		assertTrue(erreur.absents.size() == 1);
 
 	}
+
 	@Test
 	public void testTypeSurTypeReserve() {
 		String source = "type u {} fonction m u:u symbol:a int:b | si u est u alors a sinon b";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-	
+
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
@@ -1048,66 +1053,64 @@ class TestSemantique {
 		verif.validations.put("base$float", (String s) -> estFloat(s));
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		assertTrue(verif.erreurs.size()==1);
+		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof TypeIndetermine);
-		
+
 	}
-	
-	@Test 
+
+	@Test
 	public void testParam() {
-		String source ="type t { } fonction f t:a | a param t:u  fonction main | f(u)";
+		String source = "type t { } fonction f t:a | a param t:u  fonction main | f(u)";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-	
+
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourParams();
 		verif.executerPourFonctions();
 		assertTrue(verif.erreurs.isEmpty());
-		
+
 	}
-	
-	@Test 
+
+	@Test
 	public void testParam2() {
-		String source ="type t { } fonction f t:a | a param m:u  fonction main | f(u)";
+		String source = "type t { } fonction f t:a | a param m:u  fonction main | f(u)";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-	
+
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourParams();
 		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0).getClass() == TypeInexistant.class);
-		
 
-		
 	}
-	
-	@Test 
+
+	@Test
 	public void testParam3() {
-		String source ="type t { } fonction f m:a | a param t:u  type m {} fonction main | f(u)";
+		String source = "type t { } fonction f m:a | a param t:u  type m {} fonction main | f(u)";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-	
+
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourParams();
 		verif.executerPourFonctions();
-		assertTrue(verif.erreurs.size()==1);
-		assertTrue( verif.erreurs.get(0).getClass() == FonctionInexistante.class);
-		
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0).getClass() == FonctionInexistante.class);
+
 	}
-	
-	@Test 
+
+	@Test
 	public void testParam4() {
-		String source1 ="type t { } param t:a";
-		String source2 =" type m {} param m:a";
+		String source1 = "type t { } param t:a";
+		String source2 = " type m {} param m:a";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source1);
@@ -1117,109 +1120,135 @@ class TestSemantique {
 		verif.executerPourTypes();
 		verif.executerPourParams();
 
-		assertTrue(verif.erreurs.size()==1);
-		assertTrue( verif.erreurs.get(0).getClass() == DoublonNomParam.class);
-		
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0).getClass() == DoublonNomParam.class);
+
 	}
+
 	@Test
 	public void testFonctionRec() {
-		
-		String source ="type zero {} type n:zero { zero:n } fonction m zero:a | si a est n alors m(a.n) sinon a";
-		Parseur parser = new Parseur();
-		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", source);
-	
-		Univers univers = parser.lireSourceCode(sources, null);
-		Verificateur verif = new Verificateur(univers);
-		verif.executerPourTypes();
-		verif.executerPourParams();
-		verif.executerPourFonctions();
-		
-		
-	}
-	
-	@Test 
-	public void testParam5() {
-		String source ="type zero { } type n:zero {zero:n } param zero:in fonction f | n { n=in }";
-		Parseur parser = new Parseur();
-		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", source);
-	
-		Univers univers = parser.lireSourceCode(sources, null);
-		Verificateur verif = new Verificateur(univers);
-		verif.executerPourTypes();
-		verif.executerPourParams();
-		verif.executerPourFonctions();
-		assertTrue(verif.erreurs.isEmpty());
-		
-	}
-	
-	@Test 
-	public void testOperateurEgalite() {
-		String source ="type zero { } type n:zero {zero:n }  abstrait type  bool {} type true:bool {} type false:bool {} "
-				+ "fonction = zero:a zero:b | si a est n alors ( si b est n alors a.n=b.n sinon false {} ) sinon ( si b est n alors false {} sinon true {} ) "
-				+ "fonction + zero:a zero:b | si a est n alors n { n= a.n+b} sinon b "
-				+ "fonction commutation zero:a zero:b |  (a+b) = (b+a)  " ;
-		
-		Parseur parser = new Parseur();
-		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", source);
-	
-		Univers univers = parser.lireSourceCode(sources, null);
-		Verificateur verif = new Verificateur(univers);
-		verif.executerPourTypes();
-		verif.executerPourParams();
-		verif.executerPourFonctions();
-		Afficheur afficheur= new Afficheur();
-		System.out.println( verif.fonctions.get("m1$commutation/2").fonction.expression.transformer(afficheur));
-		assertTrue(verif.erreurs.isEmpty());
-		
-	}
-	
-	@Test 
-	public void testOperateurEgalite2() {
-		String source ="type zero { } type n:zero {zero:n } abstrait type  bool {} type true:bool {} type false:bool {} "
-				+ "fonction = zero:a zero:b | si a est n alors ( si b est n alors a.n=b.n sinon false {} ) sinon ( si b est n alors false {} sinon true {} ) "
-			;
-		
-		Parseur parser = new Parseur();
-		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", source);
-	
-		Univers univers = parser.lireSourceCode(sources, null);
-		Verificateur verif = new Verificateur(univers);
-		verif.executerPourTypes();
-		verif.executerPourParams();
-		verif.executerPourFonctions();
-		assertTrue(verif.erreurs.isEmpty());
-		assertTrue( verif.fonctions.get("m1$=/2").typeRetour!=null);
 
-	
-		
+		String source = "type zero {} type n:zero { zero:n } fonction m zero:a | si a est n alors m(a.n) sinon a";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+
 	}
-	
-	@Test 
-	public void testOperateurEgalite3() {
-		String source ="type zero { } type n:zero {zero:n }  "
+
+	@Test
+	public void testParam5() {
+		String source = "type zero { } type n:zero {zero:n } param zero:in fonction f | n { n=in }";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+
+	}
+
+	@Test
+	public void testOperateurEgalite() {
+		String source = "type zero { } type n:zero {zero:n }  abstrait type  bool {} type true:bool {} type false:bool {} "
 				+ "fonction = zero:a zero:b | si a est n alors ( si b est n alors a.n=b.n sinon false {} ) sinon ( si b est n alors false {} sinon true {} ) "
 				+ "fonction + zero:a zero:b | si a est n alors n { n= a.n+b} sinon b "
-				+ "fonction commutation zero:a zero:b |  (a+b) = (b+a)  " ;
+				+ "fonction commutation zero:a zero:b |  (a+b) = (b+a)  ";
+
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+		Afficheur afficheur = new Afficheur();
+		System.out.println(verif.fonctions.get("m1$commutation/2").fonction.expression.transformer(afficheur));
+		assertTrue(verif.erreurs.isEmpty());
+
+	}
+
+	@Test
+	public void testOperateurEgalite2() {
+		String source = "type zero { } type n:zero {zero:n } abstrait type  bool {} type true:bool {} type false:bool {} "
+				+ "fonction = zero:a zero:b | si a est n alors ( si b est n alors a.n=b.n sinon false {} ) sinon ( si b est n alors false {} sinon true {} ) ";
+
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourParams();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+		assertTrue(verif.fonctions.get("m1$=/2").typeRetour != null);
+
+	}
+
+	@Test
+	public void testOperateurEgalite3() {
+		String source = "type zero { } type n:zero {zero:n }  "
+				+ "fonction = zero:a zero:b | si a est n alors ( si b est n alors a.n=b.n sinon false {} ) sinon ( si b est n alors false {} sinon true {} ) "
+				+ "fonction + zero:a zero:b | si a est n alors n { n= a.n+b} sinon b "
+				+ "fonction commutation zero:a zero:b |  (a+b) = (b+a)  ";
 		String source2 = " abstrait type  bool {} type true:bool {} type false:bool {}";
-		
+
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
 		sources.put("m2", source2);
-		
+
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
 		verif.executerPourParams();
 		verif.executerPourFonctions();
-	
 
 		assertTrue(verif.erreurs.isEmpty());
-		
+
+	}
+	
+	@Test
+	public void testBug() throws IOException {
+		String source =source(this.getClass().getResourceAsStream("/test/src/logic.src"));
+	
+		String source2 =source(this.getClass().getResourceAsStream("/test/src/arbre.src"));
+
+
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("logic", source);
+		sources.put("arbre", source2);
+
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.executer();
+
+		assertTrue(verif.erreurs.isEmpty());
+	}
+
+	public String source(InputStream is) throws IOException {
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int length;
+		while ((length = is.read(buffer)) != -1) {
+			result.write(buffer, 0, length);
+		}
+		// StandardCharsets.UTF_8.name() > JDK 7
+		return result.toString("UTF-8");
 	}
 
 }

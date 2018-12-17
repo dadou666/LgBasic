@@ -1,5 +1,7 @@
 package model;
 
+import semantique.InitModuleRef;
+
 public class Ref {
 	public int debut;
 	public int fin;
@@ -38,6 +40,9 @@ public class Ref {
 	}
 
 	public String nomRef() {
+		if (this.moduleInit) {
+			throw new Error("module non initialisé");
+		}
 		return module + "$" + nom;
 	}
 }
