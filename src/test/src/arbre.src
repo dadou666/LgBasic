@@ -1,6 +1,5 @@
 type feuille {}
 type arbre:feuille { feuille:g feuille:d}
-fonction = feuille:a feuille:b | true {}
+fonction = feuille:a feuille:b | si a est arbre alors (si b est arbre alors (a.d=b.d)& (a.g=b.g) sinon false {} ) sinon ( si b est arbre alors false {} sinon true {} ) 
 
-fonction test arbre:a arbre:b | (a.g= b.g)& true {}
-
+fonction test arbre:u arbre:v | (u.g=v.g) & (u.d=v.d) 

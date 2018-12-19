@@ -21,11 +21,18 @@ public class CalculerTypeRetour implements VisiteurExpression {
 	public Map<String, String> variables = new HashMap<>();
 	public String nomRef;
 
+	public void initType(String type) {
+		if (type == null) {
+			//throw new Error("type null");
+		}
+		this.type = type;
+	}
+
 	@Override
 	public void visiter(Objet objet) {
 		verificateur.trouverType(objet.type, FonctionDef.class, nomRef);
-		
-		this.type = objet.type.nomRef();
+
+		initType(objet.type.nomRef());
 
 	}
 
@@ -42,38 +49,42 @@ public class CalculerTypeRetour implements VisiteurExpression {
 			return;
 		}
 		if (vf.typeRetour != null) {
-			type = vf.typeRetour;
-		} else {
-			if (!vf.calculerTypeEnCours) {
-				vf.calculerTypeEnCours = true;
-				if (vf.typeRetour != null) {
-					vf.typeRetour = vf.fonction.typeRetour.nomRef();
-					this.type = vf.typeRetour;
-					return;
-				}
-				CalculerTypeRetour calculer = new CalculerTypeRetour();
-				calculer.verificateur = this.verificateur;
-				calculer.nomRef = appel.nom.nomRef();
-
-				for (Var v : vf.fonction.params) {
-					calculer.variables.put(v.nom, v.type.nomRef());
-
-				}
-				if (vf.fonction.expression != null) {
-					vf.fonction.expression.visiter(calculer);
-					vf.typeRetour = calculer.type;
-				} else {
-					vf.typeRetour = vf.fonction.typeRetour.nomRef();
-				}
-				this.type = vf.typeRetour;
-			}
+			initType(vf.typeRetour);
+			return;
 		}
+		if (vf.calculerTypeRetour == null) {
+			vf.calculerTypeRetour = this;
+			if (vf.typeRetour != null) {
+				vf.typeRetour = vf.fonction.typeRetour.nomRef();
+				initType(vf.typeRetour);
+				return;
+			}
+			CalculerTypeRetour calculer = new CalculerTypeRetour();
+			calculer.verificateur = this.verificateur;
+			calculer.nomRef = appel.nom.nomRef();
+
+			for (Var v : vf.fonction.params) {
+				calculer.variables.put(v.nom, v.type.nomRef());
+
+			}
+			if (vf.fonction.expression != null) {
+				vf.fonction.expression.visiter(calculer);
+				vf.typeRetour = calculer.type;
+			} else {
+				vf.typeRetour = vf.fonction.typeRetour.nomRef();
+			}
+			initType(vf.typeRetour);
+			vf.calculerTypeRetour = null;
+			return;
+		}
+		throw new CalculerTypeRetourEnCours();
+		// throw new Error("pas de calcul "+vf.calculerTypeRetour);
 
 	}
 
 	@Override
 	public void visiter(TestType testType) {
-		this.verificateur.trouverType(testType.typeRef,FonctionDef.class, this.nomRef);
+		this.verificateur.trouverType(testType.typeRef, FonctionDef.class, this.nomRef);
 		CalculerTypeRetour calculer = new CalculerTypeRetour();
 		calculer.verificateur = this.verificateur;
 		calculer.variables = this.variables;
@@ -90,13 +101,21 @@ public class CalculerTypeRetour implements VisiteurExpression {
 			}
 		}
 		calculerAlors.nomRef = nomRef;
-		testType.alors.visiter(calculerAlors);
+		try {
+			testType.alors.visiter(calculerAlors);
+		} catch (CalculerTypeRetourEnCours e) {
+
+		}
 
 		CalculerTypeRetour calculerSinon = new CalculerTypeRetour();
 		calculerSinon.verificateur = this.verificateur;
 		calculerSinon.variables = this.variables;
 		calculerSinon.nomRef = nomRef;
-		testType.sinon.visiter(calculerSinon);
+		try {
+			testType.sinon.visiter(calculerSinon);
+		} catch (CalculerTypeRetourEnCours e) {
+
+		}
 		if (calculerAlors.type == null && calculerSinon.type == null) {
 			TypeIndetermine erreur = new TypeIndetermine();
 			erreur.e = testType;
@@ -106,15 +125,15 @@ public class CalculerTypeRetour implements VisiteurExpression {
 
 		}
 		if (calculerAlors.type == null) {
-			this.type = calculerSinon.type;
+			initType(calculerSinon.type);
 			return;
 		}
 
 		if (calculerSinon.type == null) {
-			this.type = calculerAlors.type;
+			initType(calculerAlors.type);
 			return;
 		}
-		this.type = this.verificateur.superTypeCommun(calculerAlors.type, calculerSinon.type);
+		initType(this.verificateur.superTypeCommun(calculerAlors.type, calculerSinon.type));
 		if (this.type == null) {
 			TypeIndetermine typeIndetermine = new TypeIndetermine();
 			typeIndetermine.e = testType;
@@ -141,23 +160,23 @@ public class CalculerTypeRetour implements VisiteurExpression {
 
 			return;
 		}
-		this.type = this.verificateur.typeVar(calculer.type, acces.nom);
+		initType(this.verificateur.typeVar(calculer.type, acces.nom));
 
 	}
 
 	@Override
 	public void visiter(VarRef varRef) {
-		this.type = this.variables.get(varRef.nom);
+		initType(this.variables.get(varRef.nom));
 		if (this.type == null) {
 			ParamDef pd = this.verificateur.params.get(varRef.nom);
 			if (pd != null) {
-				this.type = pd.type.nomRef();
+				initType(pd.type.nomRef());
 				return;
 			}
 			for (String typeReserve : this.verificateur.validations.keySet()) {
 				TypeReserveValidation validation = this.verificateur.validations.get(typeReserve);
 				if (validation != null && validation.valider(varRef.nom)) {
-					this.type = typeReserve;
+					initType(typeReserve);
 					return;
 
 				}
@@ -168,7 +187,7 @@ public class CalculerTypeRetour implements VisiteurExpression {
 
 	@Override
 	public void visiter(Literal literal) {
-		this.type = literal.mots.get(0).nomRef();
+		initType(literal.mots.get(0).nomRef());
 
 	}
 

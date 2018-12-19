@@ -7,6 +7,6 @@ public class VerificationFonction {
 	public String module;
 	public FonctionDef fonction;
 	public String typeRetour;
-	public boolean calculerTypeEnCours = false;
+	public CalculerTypeRetour calculerTypeRetour = null;
 
 }

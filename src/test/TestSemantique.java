@@ -489,7 +489,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "fonction u symbol:s | m(s)");
-		sources.put("m2", "fonction m symbol:s | m(s) ");
+		sources.put("m2", "fonction m symbol:s | s ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -502,8 +502,8 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "fonction u symbol:s | m(s)");
-		sources.put("m2", "fonction m symbol:s | m(s) ");
-		sources.put("m3", "fonction m symbol:s | m(s) ");
+		sources.put("m2", "fonction m symbol:s | s ");
+		sources.put("m3", "fonction m symbol:s |s ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();

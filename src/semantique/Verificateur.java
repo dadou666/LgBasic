@@ -657,8 +657,9 @@ public class Verificateur implements VisiteurExpression {
 			this.variables = oldVariables;
 			if (nbErreur == this.erreurs.size()) {
 				e.visiter(calculerTypeRetour);
-
+		
 				appelTypes.add(calculerTypeRetour.type);
+				
 
 			} else {
 
