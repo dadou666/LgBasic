@@ -19,17 +19,20 @@ public class Generalisation {
 		if (enfants == null) {
 			enfants = new ArrayList<Element>();
 			enfants.add(element);
+		
 		}
 		List<Element> tmp = new ArrayList<>();
 		for (Element enfant : enfants) {
 			enfant.calculerTransformations(this);
-			if (enfant.enfants != null) {
-				for (Transformation t : enfant.enfants) {
-					t.ajouterElements(verificateur, enfant);
-					tmp.addAll(t.elements);
-				}
+			if (enfant.transformation != null) {
+
+				enfant.transformation.ajouterElements(verificateur, enfant);
+				enfant.transformation.ajouterElementsDansListe(tmp);
+			} else {
+				tmp.add(enfant);
 			}
 		}
+
 		this.enfants = tmp;
 
 	}

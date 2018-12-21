@@ -14,8 +14,8 @@ import model.VarRef;
 import model.VisiteurExpression;
 
 public class ListerVariablePourDecomposition implements VisiteurExpression {
-	Set<String> r = new HashSet<>();
-
+	Set<String> variablesTest = new HashSet<>();
+	Set<String> variablesAcces = new HashSet<>();
 	@Override
 	public void visiter(Objet objet) {
 		for (ObjetParam op : objet.params) {
@@ -36,7 +36,7 @@ public class ListerVariablePourDecomposition implements VisiteurExpression {
 	public void visiter(TestType testType) {
 		if (testType.cible instanceof VarRef) {
 			VarRef var = (VarRef) testType.cible;
-			r.add(var.nom);
+			variablesTest.add(var.nom);
 
 		} else
 			testType.cible.visiter(this);
@@ -49,6 +49,7 @@ public class ListerVariablePourDecomposition implements VisiteurExpression {
 	public void visiter(Acces acces) {
 		if (acces.cible instanceof VarRef) {
 			VarRef var = (VarRef) acces.cible;
+			variablesAcces.add(var.nom);
 		} else {
 			acces.cible.visiter(this);
 		}

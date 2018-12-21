@@ -6,6 +6,7 @@ import java.util.List;
 import semantique.Verificateur;
 
 abstract public class Transformation {
-	public List<Element> elements = new ArrayList<Element>();
+
 	abstract public void ajouterElements(Verificateur verif,Element element) ;
+	abstract public void ajouterElementsDansListe(List<Element> liste);
 }

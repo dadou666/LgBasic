@@ -15,12 +15,14 @@ import model.TransformationExpression;
 import model.VarRef;
 import semantique.Verificateur;
 
-public class Decomposition extends Transformation {
+public class Decomposition  {
 	public String var;
 	public List<String> sousTypes= new ArrayList<>();
 	public String type;
+	public List<Element> elements = new ArrayList<>();
 
-	@Override
+	
+
 	public void ajouterElements(Verificateur verif, Element element) {
 
 		for (String type : sousTypes) {
@@ -33,6 +35,11 @@ public class Decomposition extends Transformation {
 				}
 			}
 			enfant.expression = element.expression;
+			Simplificateur simplificateur = new Simplificateur();
+			simplificateur.typesPourVariable.putAll(enfant.params);
+			simplificateur.verificateur = verif;
+			enfant.expression = element.expression.transformer(simplificateur);
+			enfant.supprimerVariableInutilise();
 			this.elements.add(enfant);
 			enfant.parent = element;
 		}

@@ -19,10 +19,11 @@ class TestGeneralisation {
 		Generalisation gen = verificateur.creerGeneralisation("math$gen/2","logic$true");
 		assertTrue(gen != null);
 		gen.calculer();
-		assertFalse(gen.element.enfants.isEmpty());
+		assertFalse(gen.element.transformation == null);
 		assertFalse(gen.enfants.isEmpty());
 		System.out.println(" etape 1");
 		for(Element e:gen.enfants) {
+			assertTrue(e.parent != null);
 			assertTrue(e.parent == gen.element);
 			System.out.println(e);
 		}
@@ -53,7 +54,7 @@ class TestGeneralisation {
 		Generalisation gen = verificateur.creerGeneralisation("arbre$prop/1","logic$true");
 		assertTrue(gen != null);
 		gen.calculer();
-		assertFalse(gen.element.enfants.isEmpty());
+		assertFalse(gen.element.transformation == null);
 		assertFalse(gen.enfants.isEmpty());
 		System.out.println(" etape 1");
 		for(Element e:gen.enfants) {

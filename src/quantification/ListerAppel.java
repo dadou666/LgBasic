@@ -53,9 +53,9 @@ public class ListerAppel implements VisiteurExpression {
 
 	@Override
 	public void visiter(TestType testType) {
-		testType.cible.visiter(this);
-		testType.alors.visiter(this);
-		testType.sinon.visiter(this);
+		//testType.cible.visiter(this);
+		//testType.alors.visiter(this);
+		//testType.sinon.visiter(this);
 
 	}
 

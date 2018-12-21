@@ -19,6 +19,7 @@ import semantique.Verificateur;
 
 public class Simplificateur implements TransformationExpression<Expression> {
 	public Map<String, Expression> variables = new HashMap<>();
+	public Map<String, String> typesPourVariable = new HashMap<>();
 	public Verificateur verificateur;
 	public Set<Appel> appels;
 
@@ -29,7 +30,7 @@ public class Simplificateur implements TransformationExpression<Expression> {
 			Objet objet = (Objet) cible;
 			for (ObjetParam op : objet.params) {
 				if (op.nom.equals(acces.nom)) {
-					
+
 					return op.expression.transformer(this);
 				}
 			}
@@ -37,7 +38,7 @@ public class Simplificateur implements TransformationExpression<Expression> {
 		}
 		Acces r = new Acces();
 		r.cible = acces.cible.transformer(this);
-		r.nom =acces.nom;
+		r.nom = acces.nom;
 		return r;
 	}
 
@@ -58,7 +59,7 @@ public class Simplificateur implements TransformationExpression<Expression> {
 	public Expression transformer(VarRef varRef) {
 		// TODO Auto-generated method stub
 
-		Expression r= this.variables.get(varRef.nom);
+		Expression r = this.variables.get(varRef.nom);
 		if (r == null) {
 			return varRef;
 		}
@@ -68,24 +69,24 @@ public class Simplificateur implements TransformationExpression<Expression> {
 	@Override
 	public Expression transformer(Appel appel) {
 		if (this.appels != null && appels.contains(appel)) {
-		FonctionDef fd = this.verificateur.fonctions.get(appel.nomRef()).fonction;
-		Simplificateur simplificateur = new Simplificateur();
-		simplificateur.verificateur = verificateur;
-		for (int idx = 0; idx < appel.params.size(); idx++) {
-			Var var = fd.params.get(idx);
-			Expression e = appel.params.get(idx).transformer(this);
-			
-			simplificateur.variables.put(var.nom, e);
+			FonctionDef fd = this.verificateur.fonctions.get(appel.nomRef()).fonction;
+			Simplificateur simplificateur = new Simplificateur();
+			simplificateur.verificateur = verificateur;
+		
+			for (int idx = 0; idx < appel.params.size(); idx++) {
+				Var var = fd.params.get(idx);
+				Expression e = appel.params.get(idx).transformer(this);
 
-		}
-	
+				simplificateur.variables.put(var.nom, e);
 
-			Expression r= fd.expression.transformer(simplificateur);
+			}
+
+			Expression r = fd.expression.transformer(simplificateur).transformer(this);
 			return r;
 		}
-		Appel result  = new Appel();
+		Appel result = new Appel();
 		result.nom = appel.nom;
-		for(Expression e:appel.params) {
+		for (Expression e : appel.params) {
 			result.params.add(e.transformer(this));
 		}
 		return result;
@@ -97,21 +98,35 @@ public class Simplificateur implements TransformationExpression<Expression> {
 		Expression cible = testType.cible.transformer(this);
 		if (cible instanceof Objet) {
 			Objet objet = (Objet) cible;
-	
-			if ( verificateur.herite(objet.type.nomRef(), testType.typeRef.nomRef()) ) {
-				
+
+			if (verificateur.herite(objet.type.nomRef(), testType.typeRef.nomRef())) {
+
 				return testType.alors.transformer(this);
 			}
 			return testType.sinon.transformer(this);
-			
+
 		}
-		TestType r= new TestType();
+		if (cible instanceof VarRef) {
+			VarRef var = (VarRef) cible;
+			String typeVar = this.typesPourVariable.get(var.nom);
+			String typeTest = testType.typeRef.nomRef();
+			if (typeVar != null) {
+				if (verificateur.herite(typeVar, typeTest)) {
+					return testType.alors.transformer(this);
+				}
+
+				if (!verificateur.herite(typeTest, typeVar)) {
+					return testType.sinon.transformer(this);
+				}
+			}
+		}
+		TestType r = new TestType();
 		r.cible = testType.cible.transformer(this);
 		r.typeRef = testType.typeRef;
 		r.alors = testType.alors.transformer(this);
 		r.sinon = testType.sinon.transformer(this);
 		return r;
-		
+
 	}
 
 	@Override

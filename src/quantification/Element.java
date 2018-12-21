@@ -18,12 +18,15 @@ public class Element {
 	public Map<String, String> params = new HashMap<>();
 	public Element parent;
 	public Expression expression;
-	public List<Transformation> enfants;
+	public Transformation transformation;
 
 	public boolean estFinal = false;
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		if (estFinal) {
+			sb.append("final#");
+		}
 		boolean estPremier = true;
 		for (Map.Entry<String, String> e : params.entrySet()) {
 			if (!estPremier) {
@@ -37,6 +40,7 @@ public class Element {
 		}
 		sb.append("|");
 		sb.append(expression);
+		
 		return sb.toString();
 
 	}
@@ -49,44 +53,45 @@ public class Element {
 		}
 		Evaluation eval = new Evaluation();
 		eval.appels = t.r;
-		this.enfants.add(eval);
+		this.transformation = eval;
 	}
-
-	
 
 	public void calculerDecompositions(Generalisation dem) {
 		ListerVariablePourDecomposition listerVariablePourDecomposition = new ListerVariablePourDecomposition();
-
+		Decompositions decompositions = new Decompositions();
 		expression.visiter(listerVariablePourDecomposition);
 		for (Map.Entry<String, String> e : this.params.entrySet()) {
 			String var = e.getKey();
 			String type = e.getValue();
-			if (listerVariablePourDecomposition.r.contains(var)) {
+			Decomposition d = null;
+			if (listerVariablePourDecomposition.variablesTest.contains(var)) {
 				List<String> sousTypes = dem.verificateur.listeSousTypes(type);
-				Decomposition d = null;
+
 				if (!sousTypes.isEmpty()) {
 					d = new Decomposition();
 					d.var = var;
 					d.sousTypes = sousTypes;
 
 				}
+			}
 
-				TypeDef td = dem.verificateur.types.get(type);
-				if (!td.estAbstrait) {
-					if (d == null) {
-						d = new Decomposition();
-					}
-					d.var = var;
-					d.type = type;
-
+			TypeDef td = dem.verificateur.types.get(type);
+			if (!td.estAbstrait && (listerVariablePourDecomposition.variablesTest.contains(var)
+					|| listerVariablePourDecomposition.variablesAcces.contains(var))) {
+				if (d == null) {
+					d = new Decomposition();
 				}
-				if (d != null) {
-					enfants.add(d);
-				}
+				d.var = var;
+				d.type = type;
 
+			}
+			if (d != null) {
+				decompositions.decompositions.add(d);
 			}
 
 		}
+		if (!decompositions.decompositions.isEmpty()) {
+			this.transformation = decompositions; }
 
 	}
 
@@ -107,11 +112,11 @@ public class Element {
 			}
 
 		}
-		if (enfants == null) {
+		if (transformation == null) {
 
-			enfants = new ArrayList<>();
 			this.calculerDecompositions(dem);
-			this.calculerEvaluations(dem);
+			if (transformation == null)
+				this.calculerEvaluations(dem);
 
 		}
 
