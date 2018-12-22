@@ -32,7 +32,7 @@ import quantification.ExpressionType;
 
 public class Verificateur implements VisiteurExpression {
 	public Map<String, TypeDef> types = new HashMap<>();
-	public Map<String,ParamDef> params = new HashMap<>();
+	public Map<String, ParamDef> params = new HashMap<>();
 	public Map<String, VerificationType> verificationTypes = new HashMap<>();
 	public Map<String, VerificationFonction> fonctions = new HashMap<>();
 	public List<Erreur> erreurs = new ArrayList<>();
@@ -41,55 +41,58 @@ public class Verificateur implements VisiteurExpression {
 	public Map<String, TypeReserveValidation> validations = new HashMap<>();
 	public Map<String, String> variables = new HashMap<>();
 	public Univers univers;
+
 	public boolean estInt(String s) {
 		try {
 			Integer.parseInt(s);
 			return true;
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			return false;
 		}
-		
-		
+
 	}
+
 	public boolean estFloat(String s) {
 		try {
 			Float.parseFloat(s.replace('p', '.'));
 			return true;
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			return false;
 		}
-		
-		
+
 	}
+
 	public Verificateur(String nomRepertoire) throws IOException {
 		this(Univers.creerUnivers(nomRepertoire, null));
 		this.executer();
 	}
-	public Generalisation creerGeneralisation(String fonction,String type) {
-		VerificationFonction vf =this.fonctions.get(fonction);
+
+	public Generalisation creerGeneralisation(String fonction, String type) {
+		VerificationFonction vf = this.fonctions.get(fonction);
 		if (vf == null) {
 			return null;
 		}
-		
+
 		TypeDef typeDef = this.types.get(type);
 		if (type == null) {
 			return null;
 		}
 		Element r = new Element();
 		r.et = new ExpressionType();
-		r.et.expression =vf.fonction.expression;
-		for(Var var:vf.fonction.params) {
+		r.et.expression = vf.fonction.expression;
+		for (Var var : vf.fonction.params) {
 			r.et.params.put(var.nom, var.type.nomRef());
-			
+
 		}
-		
+
 		Generalisation dem = new Generalisation();
 		dem.element = r;
-		dem.type =  new Ref(type);
+		dem.type = new Ref(type);
 		dem.verificateur = this;
 		return dem;
-		
+
 	}
+
 	public Verificateur(Univers univers) {
 		modules.add("base");
 
@@ -99,6 +102,7 @@ public class Verificateur implements VisiteurExpression {
 		this.univers = univers;
 
 	}
+
 	public String simplifierType(String nom) {
 		String tmp[] = nom.split("\\$");
 		TypeDef td = null;
@@ -113,10 +117,11 @@ public class Verificateur implements VisiteurExpression {
 		return tmp[1];
 
 	}
-	 public List<String>  listeSousTypes(String t) {
-		TypeDef td= types.get(t);
+
+	public List<String> listeSousTypes(String t) {
+		TypeDef td = types.get(t);
 		List<String> sousTypes = new ArrayList<>();
-		for(Map.Entry<String, TypeDef> e:types.entrySet()) {
+		for (Map.Entry<String, TypeDef> e : types.entrySet()) {
 			td = e.getValue();
 			if (td.superType != null) {
 				if (td.superType.nomRef().equals(t)) {
@@ -125,10 +130,9 @@ public class Verificateur implements VisiteurExpression {
 			}
 		}
 		return sousTypes;
-		
-		
-		
+
 	}
+
 	public String simplifierFonction(String nom) {
 		String tmp[] = nom.split("\\$");
 		VerificationFonction vf = null;
@@ -143,9 +147,10 @@ public class Verificateur implements VisiteurExpression {
 		return tmp[1];
 
 	}
-	public boolean trouverType(Ref ref,Class<? extends Def> classDef, String nom) {
+
+	public boolean trouverType(Ref ref, Class<? extends Def> classDef, String nom) {
 		if (ref.moduleInit) {
-		
+
 			if (this.types.get(ref.nomRef()) != null) {
 				ref.moduleInit = false;
 				return true;
@@ -182,7 +187,7 @@ public class Verificateur implements VisiteurExpression {
 			}
 			MultipleDefinitionType erreur = new MultipleDefinitionType();
 			erreur.ref = ref;
-			erreur.classDef =classDef;
+			erreur.classDef = classDef;
 			erreur.nom = nom;
 			erreur.types = noms;
 			erreurs.add(erreur);
@@ -335,7 +340,7 @@ public class Verificateur implements VisiteurExpression {
 				vf.getValue().typeRetour = vf.getValue().fonction.typeRetour.nomRef();
 			} else {
 				vf.getValue().fonction.expression.visiter(this);
-	
+
 			}
 
 		}
@@ -349,7 +354,7 @@ public class Verificateur implements VisiteurExpression {
 
 				vf.getValue().typeRetour = vf.getValue().fonction.typeRetour.nomRef();
 			} else {
-			//	vf.getValue().fonction.expression.visiter(this);
+				// vf.getValue().fonction.expression.visiter(this);
 				CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
 				calculerTypeRetour.variables.putAll(variables);
 				calculerTypeRetour.verificateur = this;
@@ -360,24 +365,26 @@ public class Verificateur implements VisiteurExpression {
 
 		}
 		if (this.erreurs.isEmpty()) {
-		for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
-		
-			if (vf.getValue().fonction.expression != null) {
-				this.variables = new HashMap<String, String>();
-				for (Var var : vf.getValue().fonction.params) {
-					this.variables.put(var.nom, var.type.nomRef());
-				}
-				ResoudreModuleRef resoudre = new ResoudreModuleRef();
-				resoudre.nom =vf.getKey();
-				resoudre.variables = variables;
-				resoudre.verificateur = this;
-				this.nomRef = vf.getKey();
-				vf.getValue().fonction.expression.visiter(resoudre);
-	
-			}
+			for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
 
-		} }
+				if (vf.getValue().fonction.expression != null) {
+					this.variables = new HashMap<String, String>();
+					for (Var var : vf.getValue().fonction.params) {
+						this.variables.put(var.nom, var.type.nomRef());
+					}
+					ResoudreModuleRef resoudre = new ResoudreModuleRef();
+					resoudre.nom = vf.getKey();
+					resoudre.variables = variables;
+					resoudre.verificateur = this;
+					this.nomRef = vf.getKey();
+					vf.getValue().fonction.expression.visiter(resoudre);
+
+				}
+
+			}
+		}
 	}
+
 	public void executer() {
 		executerPourTypes();
 		executerPourParams();
@@ -521,10 +528,11 @@ public class Verificateur implements VisiteurExpression {
 		}
 
 	}
-	public void listeVarAvecType(String nomRef, Map<String,String> r) {
+
+	public void listeVarAvecType(String nomRef, Map<String, String> r) {
 		TypeDef td = this.types.get(nomRef);
 		for (Var var : td.vars) {
-			r.put(var.nom,var.type.nomRef());
+			r.put(var.nom, var.type.nomRef());
 		}
 		if (td.superType != null) {
 			this.listeVarAvecType(td.superType.nomRef(), r);
@@ -661,7 +669,7 @@ public class Verificateur implements VisiteurExpression {
 	}
 
 	public void completer(Appel appel, Map<String, String> variables) {
-	
+
 		List<VerificationFonction> ls = this.recuperer(appel);
 		if (ls.isEmpty()) {
 			return;
@@ -673,15 +681,14 @@ public class Verificateur implements VisiteurExpression {
 			calculerTypeRetour.variables = variables;
 			calculerTypeRetour.verificateur = this;
 			int nbErreur = this.erreurs.size();
-			Map<String,String> oldVariables = this.variables;
+			Map<String, String> oldVariables = this.variables;
 			this.variables = variables;
 			e.visiter(this);
 			this.variables = oldVariables;
 			if (nbErreur == this.erreurs.size()) {
 				e.visiter(calculerTypeRetour);
-		
+
 				appelTypes.add(calculerTypeRetour.type);
-				
 
 			} else {
 
@@ -694,7 +701,7 @@ public class Verificateur implements VisiteurExpression {
 			int idx = 0;
 			boolean erreur = false;
 			for (Var var : fd.fonction.params) {
-				
+
 				if (!this.herite(appelTypes.get(idx), var.type.nomRef())) {
 					erreur = true;
 					break;
@@ -813,7 +820,7 @@ public class Verificateur implements VisiteurExpression {
 
 	@Override
 	public void visiter(VarRef varRef) {
-		varRef.estLibre = this.variables.get(varRef.nom) == null && params.get(varRef.nom)==null;
+		varRef.estLibre = this.variables.get(varRef.nom) == null && params.get(varRef.nom) == null;
 
 	}
 
