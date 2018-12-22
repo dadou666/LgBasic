@@ -26,8 +26,32 @@ import javax.swing.SwingUtilities;
 class EcranDessin extends JComponent implements KeyListener {
 	public static int width = 512;
 	public static int height = 512;
-	public Map<String, Balle> balles = new HashMap<>();
+	public Config config1;
+	public Config config2;
+	public float vitesseFactor = 10;
+	public int porteFactor = 10;
+	public List<Projectile> projectiles= new ArrayList<>();
+	public List<Ressource> ressources = new ArrayList<>();
+	
+	
 	PrintWriter out;
+	public <T extends Ressource>  T donnerRessource(Class<T> cls,Soldat soldat) {
+		Ressource rs = null;
+		for(Ressource r:ressources) {
+			if (r.getClass() == cls && r.libre) {
+				if (rs == null) {
+					rs =r;
+				}else {
+					if (soldat.distance(r) <soldat.distance(rs)) {
+						rs=r;
+					}
+				
+				}
+			
+			}
+		}
+		return (T) rs;
+	}
 
 	public EcranDessin() {
 
@@ -39,10 +63,7 @@ class EcranDessin extends JComponent implements KeyListener {
 
 
 	public void paint(Graphics g) {
-		for (Map.Entry<String, Balle> e : balles.entrySet()) {
-			e.getValue().paint(g);
-
-		}
+		
 
 	}
 
@@ -59,8 +80,7 @@ class EcranDessin extends JComponent implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent arg0) {
-		out.println("KeyPressed " + arg0.getKeyChar() + "\n");
-		out.flush();
+	
 	}
 
 	@Override

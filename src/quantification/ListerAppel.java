@@ -25,6 +25,14 @@ public class ListerAppel implements VisiteurExpression {
 
 	public ExpressionType courant;
 	public Set<Appel> r = new HashSet<>();
+	public boolean validerAppel(Appel appel) {
+		for(Expression e:appel.params) {
+			if (!(e instanceof VarRef) && !(e instanceof Objet)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public boolean valider(ExpressionType et) {
 		Element tmp = element;
@@ -49,7 +57,7 @@ public class ListerAppel implements VisiteurExpression {
 
 	@Override
 	public void visiter(Appel appel) {
-		ExpressionType nv = new ExpressionType();
+		/*ExpressionType nv = new ExpressionType();
 		nv.params.putAll(element.et.params);
 		nv.expression = appel;
 		if (this.valider(nv)) {
@@ -64,6 +72,10 @@ public class ListerAppel implements VisiteurExpression {
 			}
 		} else {
 			System.out.println(" non valide " +nv);
+		}*/
+		if (this.validerAppel(appel)) {
+			r.add(appel);
+			return;
 		}
 		for (Expression e : appel.params) {
 			e.visiter(this);
