@@ -145,11 +145,13 @@ public class Verificateur implements VisiteurExpression {
 	}
 	public boolean trouverType(Ref ref,Class<? extends Def> classDef, String nom) {
 		if (ref.moduleInit) {
-			ref.moduleInit = false;
+		
 			if (this.types.get(ref.nomRef()) != null) {
+				ref.moduleInit = false;
 				return true;
 			}
 			if (this.validations.get(ref.nomRef()) != null) {
+				ref.moduleInit = false;
 				return true;
 			}
 
@@ -206,7 +208,7 @@ public class Verificateur implements VisiteurExpression {
 		}
 
 		if (appel.nom.moduleInit) {
-			appel.nom.moduleInit = false;
+
 			VerificationFonction vf = fonctions.get(appel.nomRef());
 			if (vf != null) {
 				rs.add(vf);
@@ -357,6 +359,24 @@ public class Verificateur implements VisiteurExpression {
 			}
 
 		}
+		if (this.erreurs.isEmpty()) {
+		for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
+		
+			if (vf.getValue().fonction.expression != null) {
+				this.variables = new HashMap<String, String>();
+				for (Var var : vf.getValue().fonction.params) {
+					this.variables.put(var.nom, var.type.nomRef());
+				}
+				ResoudreModuleRef resoudre = new ResoudreModuleRef();
+				resoudre.nom =vf.getKey();
+				resoudre.variables = variables;
+				resoudre.verificateur = this;
+				this.nomRef = vf.getKey();
+				vf.getValue().fonction.expression.visiter(resoudre);
+	
+			}
+
+		} }
 	}
 	public void executer() {
 		executerPourTypes();
@@ -707,6 +727,7 @@ public class Verificateur implements VisiteurExpression {
 		}
 		appel.nom.module = lsValide.get(0).module;
 		appel.erreur = false;
+		appel.nom.moduleInit = false;
 		appel.vf = lsValide.get(0);
 	}
 

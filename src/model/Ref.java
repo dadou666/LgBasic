@@ -41,7 +41,7 @@ public class Ref {
 
 	public String nomRef() {
 		if (this.moduleInit) {
-			throw new Error("module non initialisé "+this.nom);
+		//	throw new Error("module non initialisé "+this.nom);
 		}
 		return module + "$" + nom;
 	}

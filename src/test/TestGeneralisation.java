@@ -18,6 +18,8 @@ class TestGeneralisation {
 		assertTrue(verificateur.erreurs.isEmpty());
 		Generalisation gen = verificateur.creerGeneralisation("math$gen/2","logic$true");
 		assertTrue(gen != null);
+		TestModuleInit testModuleInit = new TestModuleInit();
+		gen.element.et.expression.visiter(testModuleInit);
 		gen.calculer();
 		assertFalse(gen.element.transformation == null);
 		assertFalse(gen.enfants.isEmpty());
@@ -52,7 +54,11 @@ class TestGeneralisation {
 		Verificateur verificateur = new Verificateur("F://GitHub//LgBasic//src//test");
 		assertTrue(verificateur.erreurs.isEmpty());
 		Generalisation gen = verificateur.creerGeneralisation("arbre$prop/1","logic$true");
+		
 		assertTrue(gen != null);
+		TestModuleInit testModuleInit = new TestModuleInit();
+		gen.element.et.expression.visiter(testModuleInit);
+		verificateur.fonctions.get("arbre$=/2").fonction.expression.visiter(testModuleInit);
 		gen.calculer();
 		assertFalse(gen.element.transformation == null);
 		assertFalse(gen.enfants.isEmpty());
