@@ -1,5 +1,6 @@
 package quantification;
 
+import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,17 +21,23 @@ import model.VisiteurExpression;
 import semantique.Verificateur;
 
 public class ListerAppel implements VisiteurExpression {
+	public Element element;
 
-	public boolean testerAppel(Appel appel) {
-		for (Expression e : appel.params) {
-			if (!(e instanceof Objet) && !(e instanceof VarRef)) {
+	public ExpressionType courant;
+	public Set<Appel> r = new HashSet<>();
+
+	public boolean valider(ExpressionType et) {
+		Element tmp = element;
+
+		while (tmp != null) {
+			if (tmp.transformation!=null && !tmp.transformation.valider(et)) {
 				return false;
+
 			}
+			tmp = tmp.parent;
 		}
 		return true;
 	}
-
-	public Set<Appel> r = new HashSet<>();
 
 	@Override
 	public void visiter(Objet objet) {
@@ -42,8 +49,21 @@ public class ListerAppel implements VisiteurExpression {
 
 	@Override
 	public void visiter(Appel appel) {
-		if (this.testerAppel(appel)) {
-			r.add(appel);
+		ExpressionType nv = new ExpressionType();
+		nv.params.putAll(element.et.params);
+		nv.expression = appel;
+		if (this.valider(nv)) {
+
+			if (courant == null) {
+				courant = nv;
+				r.add(appel);
+			} else {
+				if (courant.comparer(nv)) {
+					r.add(appel);
+				}
+			}
+		} else {
+			System.out.println(" non valide " +nv);
 		}
 		for (Expression e : appel.params) {
 			e.visiter(this);
@@ -53,9 +73,9 @@ public class ListerAppel implements VisiteurExpression {
 
 	@Override
 	public void visiter(TestType testType) {
-		//testType.cible.visiter(this);
-		//testType.alors.visiter(this);
-		//testType.sinon.visiter(this);
+		 testType.cible.visiter(this);
+		// testType.alors.visiter(this);
+		// testType.sinon.visiter(this);
 
 	}
 

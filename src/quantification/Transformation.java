@@ -9,4 +9,5 @@ abstract public class Transformation {
 
 	abstract public void ajouterElements(Verificateur verif,Element element) ;
 	abstract public void ajouterElementsDansListe(List<Element> liste);
+	abstract public  boolean valider(ExpressionType et);
 }

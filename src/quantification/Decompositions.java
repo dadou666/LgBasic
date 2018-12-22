@@ -24,4 +24,10 @@ public class Decompositions extends Transformation {
 		
 	}
 
+	@Override
+	public boolean valider(ExpressionType et) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 }

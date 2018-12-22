@@ -28,6 +28,7 @@ import model.VarRef;
 import model.VisiteurExpression;
 import quantification.Generalisation;
 import quantification.Element;
+import quantification.ExpressionType;
 
 public class Verificateur implements VisiteurExpression {
 	public Map<String, TypeDef> types = new HashMap<>();
@@ -75,9 +76,10 @@ public class Verificateur implements VisiteurExpression {
 			return null;
 		}
 		Element r = new Element();
-		r.expression =vf.fonction.expression;
+		r.et = new ExpressionType();
+		r.et.expression =vf.fonction.expression;
 		for(Var var:vf.fonction.params) {
-			r.params.put(var.nom, var.type.nomRef());
+			r.et.params.put(var.nom, var.type.nomRef());
 			
 		}
 		

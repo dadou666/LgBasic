@@ -15,7 +15,7 @@ import model.TransformationExpression;
 import model.VarRef;
 import semantique.Verificateur;
 
-public class Decomposition  {
+public class Decomposition extends TransformationUnitaire {
 	public String var;
 	public List<String> sousTypes= new ArrayList<>();
 	public String type;
@@ -27,19 +27,20 @@ public class Decomposition  {
 
 		for (String type : sousTypes) {
 			Element enfant = new Element();
-			for (Map.Entry<String, String> e : element.params.entrySet()) {
+			enfant.et = new ExpressionType();
+			for (Map.Entry<String, String> e : element.et.params.entrySet()) {
 				if (e.getKey().equals(var)) {
-					enfant.params.put(var, type);
+					enfant.et.params.put(var, type);
 				} else {
-					enfant.params.put(e.getKey(), e.getValue());
+					enfant.et.params.put(e.getKey(), e.getValue());
 				}
 			}
-			enfant.expression = element.expression;
+			enfant.et.expression = element.et.expression;
 			Simplificateur simplificateur = new Simplificateur();
-			simplificateur.typesPourVariable.putAll(enfant.params);
+			simplificateur.typesPourVariable.putAll(enfant.et.params);
 			simplificateur.verificateur = verif;
-			enfant.expression = element.expression.transformer(simplificateur);
-			enfant.supprimerVariableInutilise();
+			enfant.et.expression = element.et.expression.transformer(simplificateur);
+			enfant.et.supprimerVariableInutilise();
 			this.elements.add(enfant);
 			enfant.parent = element;
 		}
@@ -57,22 +58,24 @@ public class Decomposition  {
 				objet.params.add(op);
 			}
 			Element enfant = new Element();
-			for (Map.Entry<String, String> e : element.params.entrySet()) {
+			enfant.et = new ExpressionType();
+			for (Map.Entry<String, String> e : element.et.params.entrySet()) {
 				if (e.getKey().equals(var)) {
 					for (Map.Entry<String, String> e2 : map.entrySet()) {
-						enfant.params.put(var + "_" + e2.getKey(), e.getValue());
+						enfant.et.params.put(var + "_" + e2.getKey(), e.getValue());
 					}
 
 				} else {
-					enfant.params.put(e.getKey(), e.getValue());
+					enfant.et.params.put(e.getKey(), e.getValue());
 				}
 
 			}
 			Simplificateur simplificateur = new Simplificateur();
 			simplificateur.variables.put(var, objet);
 			simplificateur.verificateur = verif;
-			enfant.expression = element.expression.transformer(simplificateur);
-			enfant.supprimerVariableInutilise();
+
+			enfant.et.expression = element.et.expression.transformer(simplificateur);
+			enfant.et.supprimerVariableInutilise();
 			elements.add(enfant);
 			enfant.parent = element;
 		}

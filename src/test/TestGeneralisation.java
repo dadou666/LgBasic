@@ -79,6 +79,19 @@ class TestGeneralisation {
 			assertTrue(e.parent != null);
 			System.out.println(e);
 		}
+		gen.calculer();
+		System.out.println(" etape 5");
+		for(Element e:gen.enfants) {
+			assertTrue(e.parent != null);
+			System.out.println(e);
+		}
+		gen.calculer();
+		System.out.println(" etape 5");
+		for(Element e:gen.enfants) {
+			assertTrue(e.parent != null);
+			System.out.println(e);
+		}
+	
 	}
 
 

@@ -1,5 +1,6 @@
 package quantification;
 
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,9 +20,11 @@ import model.VarRef;
 public class Comparaison {
 	public Map<String, String> map1 = new HashMap<>();
 	public Map<String, String> map2 = new HashMap<>();
-	public boolean comparerElement(Element e1,Element e2) {
+	public boolean comparerExpressionType(ExpressionType e1,ExpressionType e2) {
+		
 		map1 = new HashMap<>();
 		map2 = new HashMap<>();
+		
 				
 		if (!this.comparerExpression(e1.expression, e2.expression)) {
 			return false;
