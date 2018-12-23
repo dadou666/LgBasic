@@ -23,7 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-class EcranDessin extends JComponent implements KeyListener {
+public class EcranDessin extends JComponent implements KeyListener {
 	public static int width = 512;
 	public static int height = 512;
 	public Config config1;
