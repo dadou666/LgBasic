@@ -10,5 +10,6 @@ abstract public class Ressource  {
 
 
 	abstract public Color color() ;
+	abstract public void executer(EcranDessin ed,Soldat soldat);
 
 }

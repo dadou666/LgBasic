@@ -1,5 +1,6 @@
 package monde;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,12 +120,18 @@ public class Config {
 		}
 		float d = soldat.distance(cible);
 		d = (float) Math.sqrt(d);
-		float porte = ecranDessin.porteFactor*soldat.portes.size();
-		if (d> porte ) {
-			soldat.deplacer(cible.position, soldat.vitesse()*ecranDessin.vitesseFactor, d-porte);
+		float p = ecranDessin.porteFactor*soldat.portes.size();
+		if (d> p ) {
+			soldat.cibleSoldat = cible;
+			soldat.deplacer(cible.position, soldat.vitesse()*ecranDessin.vitesseFactor, d-p);
+			return;
 		}
-		//reste a faire lancer le projectile
-		
+		Projectile projectile = new Projectile();
+		projectile.cible =cible;
+		projectile.puissance = soldat.puissances.size();
+		projectile.position = new Point(soldat.position.x,soldat.position.y);
+		projectile.deplacer(cible.position, soldat.vitesseTires.size()*ecranDessin.vitesseTireFactor);
+		ecranDessin.projectiles.add(projectile);
 		
 	}
 

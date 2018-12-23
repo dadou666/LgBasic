@@ -1,7 +1,5 @@
 import java.awt.Color;
 
-import monde.Ressource;
-
 public class Porte extends Ressource {
 
 	@Override

@@ -10,4 +10,11 @@ public class Vitesse extends Ressource {
 		return null;
 	}
 
+	@Override
+	public void executer(EcranDessin ed, Soldat soldat) {
+		// TODO Auto-generated method stub
+		soldat.vitesses.add(this);
+		
+	}
+
 }

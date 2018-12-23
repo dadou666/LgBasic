@@ -4,6 +4,21 @@ import java.awt.Color;
 
 public class Projectile extends Entite {
 	Soldat cible;
+	int puissance;
+	public void finDeplacer(EcranDessin ecranDessin) {
+		if (cible.collision(this)) {
+			while(puissance>=0) {
+			if (cible.vies.isEmpty()) {
+				cible.detruire();
+				return;
+			}
+			Vie vie = cible.vies.pop();
+			vie.libre =true;
+			puissance--;
+			}
+		}
+		
+	}
 	@Override
 	public Color color() {
 		// TODO Auto-generated method stub

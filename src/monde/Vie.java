@@ -10,4 +10,11 @@ public class Vie extends Ressource {
 		return Color.green;
 	}
 
+	@Override
+	public void executer(EcranDessin ed, Soldat soldat) {
+		// TODO Auto-generated method stub
+		soldat.vies.add(this);
+		
+	}
+
 }

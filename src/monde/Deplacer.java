@@ -64,7 +64,7 @@ public class Deplacer {
 
 			balle.position.setLocation(destination.x, destination.y);
 			balle.deplacer = null;
-			balle.finDeplacer();
+			balle.finDeplacer(ecran);
 			return;
 		}
 

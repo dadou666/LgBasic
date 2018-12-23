@@ -29,6 +29,7 @@ class EcranDessin extends JComponent implements KeyListener {
 	public Config config1;
 	public Config config2;
 	public float vitesseFactor = 10;
+	public float vitesseTireFactor = 10;
 	public int porteFactor = 10;
 	public List<Projectile> projectiles= new ArrayList<>();
 	public List<Ressource> ressources = new ArrayList<>();
@@ -56,6 +57,10 @@ class EcranDessin extends JComponent implements KeyListener {
 	public EcranDessin() {
 
 
+	}
+	
+	public void deplacer() {
+		
 	}
 
 	

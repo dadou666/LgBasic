@@ -22,7 +22,7 @@ abstract 	public Color color();
 	public void deplacer(Point destination, float vitesse,float distance) {
 		deplacer =new Deplacer(this, destination, vitesse,distance);
 	}
-	public void finDeplacer() {
+	public void finDeplacer(EcranDessin newParam) {
 		
 	}
 

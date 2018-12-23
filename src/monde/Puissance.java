@@ -10,4 +10,9 @@ public class Puissance extends Ressource {
 		return Color.magenta;
 	}
 
+	@Override
+	public void executer(EcranDessin ed, Soldat soldat) {
+		soldat.puissances.add(this);		
+	}
+
 }
