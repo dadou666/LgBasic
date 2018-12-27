@@ -11,8 +11,14 @@ public class Puissance extends Ressource {
 	}
 
 	@Override
-	public void executer(EcranDessin ed, Soldat soldat) {
+	public void executer(EcranJeux ed, Soldat soldat) {
 		soldat.puissances.add(this);		
+	}
+
+	@Override
+	public String name() {
+		// TODO Auto-generated method stub
+		return "Pu";
 	}
 
 }

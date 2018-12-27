@@ -1,5 +1,6 @@
 abstrait type bool {}
 type true:bool { }
 type false:bool {}
+param bool:titi
 fonction & bool:a bool:b | si a est true alors b sinon false {}
-
+fonction main | 785

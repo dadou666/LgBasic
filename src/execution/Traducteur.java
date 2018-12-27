@@ -102,6 +102,11 @@ public class Traducteur implements VisiteurExpression {
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		String type = o.getClass().getSimpleName();
 		TypeDef td = this.verificateur.types.get(type);
+		if (td == null) {
+			sb.append(" ");
+			sb.append(o);
+			return;
+		}
 		sb.append(simplifier(type));
 		sb.append(" ");
 		this.source(o, td, sb);
@@ -122,6 +127,7 @@ public class Traducteur implements VisiteurExpression {
 		}
 		for (Var var : td.vars) {
 			Field f = o.getClass().getField(var.nom);
+			
 			source(f.get(o), sb);
 
 		}
@@ -273,8 +279,8 @@ public class Traducteur implements VisiteurExpression {
 			}
 		}
 		for (Map.Entry<String, TypeDef> vt : verificateur.types.entrySet()) {
-
-			if (!verificateur.univers.modules.get(vt.getValue().module).estAPI) {
+			Module module = verificateur.univers.modules.get(vt.getValue().module);
+			if (!module.estAPI) {
 				this.traduire(resultClass, vt.getKey(), vt.getValue(), types);
 			} else {
 				CtClass ctClass = classPool.get(mapClass.get(vt.getKey()).getName());
@@ -351,19 +357,32 @@ public class Traducteur implements VisiteurExpression {
 		}
 		resultClass.setModifiers(resultClass.getModifiers() & ~Modifier.ABSTRACT);
 		for (Map.Entry<String, CtClass> e : types.entrySet()) {
-			if (mapClass.get(e.getKey()) == null && this.typesReserve.get(e.getKey()) == null) {
-				byte bytes[] = e.getValue().toBytecode();
-
-				mapClass.put(e.getKey(), classLoader().define(e.getValue().getName(), bytes));
-				e.getValue().defrost();
-
-			}
+			this.defineClass(types, e.getKey(), e.getValue());
 
 		}
 		byte[] bytes = resultClass.toBytecode();
 		Class cls = classLoader().define(nom, bytes);
 		resultClass.defrost();
 		return cls;
+	}
+	public void defineClass(Map<String,CtClass> types,String nom , CtClass ctClass) throws IOException, CannotCompileException, ClassNotFoundException {
+		TypeDef td=this.verificateur.types.get(nom);
+		if (td == null) {
+			return;
+		}
+		if (td.superType != null) {
+			String nomSuperType = td.superType.nomRef();
+			defineClass(types,td.superType.nomRef(),types.get(nomSuperType));
+		}
+		
+		if (mapClass.get(nom) == null && this.typesReserve.get(nom) == null) {
+			byte bytes[] = ctClass.toBytecode();
+
+			mapClass.put(nom, classLoader().define(ctClass.getName(), bytes));
+			ctClass.defrost();
+
+		}		
+		
 	}
 
 	public String nomFonction(String s) {

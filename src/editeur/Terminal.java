@@ -58,6 +58,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 	JTextPane input;
 
 	JTextPane output;
+	Executeur executeur;
 	// public static String chemin = "F:\\workspaces\\Lg";
 	public static String chemin = "F://GitHub//LgBasic//src//test";
 	Map<Color, AttributeSet> asets = new HashMap<>();
@@ -71,15 +72,18 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 	JList<String> list;
 	JList<Erreur> listErreurSemantique;
 	JButton nouveau;
+	JButton executer;
+	Verificateur verificateur;
 
-	public Terminal() {
+	public Terminal(Executeur executeur) {
+		this.executeur = executeur;
 
 		SwingBuilder sb = new SwingBuilder(this);
 
 		output = new JTextPane();
 		streamOutput = new TextAreaOutputStream(output);
-		 System.setOut(new PrintStream(streamOutput));
-		System.setErr(new PrintStream(streamOutput));
+		System.setOut(new PrintStream(streamOutput));
+	//	System.setErr(new PrintStream(streamOutput));
 		JScrollPane outputScrollPane = new JScrollPane(output);
 		input = new JTextPane();
 
@@ -97,7 +101,18 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		JScrollPane listScrollPane = new JScrollPane(list);
 		nouveau = new JButton("Nouveau");
 		nouveau.addActionListener(this);
-
+		executer = new JButton("Executer");
+		executer.addActionListener(this);
+		if (executeur != null) {
+			executer.setEnabled(executeur.test(this));
+		}
+		sb.beginY();
+		sb.beginX();
+		sb.setSize(300, 30);
+		sb.add(nouveau);
+		sb.setSize(300, 30);
+		sb.add(executer);
+		sb.end();
 		sb.beginX();
 		sb.beginY();
 		sb.setSize(1600, 700);
@@ -112,11 +127,11 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		sb.end();
 		sb.space(4);
 		sb.beginY();
-		sb.setSize(300, 30);
-		sb.add(nouveau);
-		sb.setSize(300, 870);
+
+		sb.setSize(300, 900);
 		sb.add(listScrollPane);
 
+		sb.end();
 		sb.end();
 		sb.end();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -170,7 +185,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				new Terminal().setVisible(true);
+				new Terminal(new SimpleExecuteur()).setVisible(true);
 			}
 		});
 
@@ -180,6 +195,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 	boolean erreur = false;
 
 	public void compiler() throws IOException {
+		this.executer.setEnabled(false);
 		if (erreur) {
 			return;
 		}
@@ -189,7 +205,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 			univers = parseur.lireSourceCode(sources, null);
 		} else {
-			Module module = parseur.lireModule(null, sources.get(sel));
+			Module module = parseur.lireModule(sel, sources.get(sel));
 			univers.modules.put(sel, module);
 			if (parseur.error) {
 				return;
@@ -197,12 +213,14 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			module.initNomModule(sel);
 
 		}
+
 		if (parseur.error) {
 			return;
 		}
 
 		Verificateur verif = new Verificateur(univers);
 
+		this.verificateur = null;
 		verif.executer();
 		Vector<Erreur> erreurs = new Vector<Erreur>();
 		erreurs.addAll(verif.erreurs);
@@ -214,6 +232,12 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			Module module = univers.modules.get(sel);
 			colorierSource.tp = this.input;
 			colorierSource.visiter(module);
+			this.verificateur = verif;
+			if (this.executeur == null) {
+				this.executer.setEnabled(true);
+			} else {
+				this.executer.setEnabled(this.executeur.test(this));
+			}
 
 		}
 	}
@@ -255,7 +279,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			compiler();
 		} catch (Throwable e2) {
 			erreur = true;
-		e2.printStackTrace();
+			e2.printStackTrace();
 		}
 
 		this.streamOutput.flush();
@@ -269,6 +293,13 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		if (arg0.getSource() == executer) {
+			if (executeur != null) {
+				executeur.executer(this);
+			}
+			return;
+
+		}
 		if (arg0.getSource() == nouveau) {
 			String nom = UI.request("nom ", this);
 			for (int idx = 0; idx < this.list.getModel().getSize(); idx++) {
@@ -292,7 +323,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			this.compiler();
 		} catch (Throwable e) {
 			erreur = true;
-		e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}
@@ -314,7 +345,11 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 	@Override
 	public void valueChanged(ListSelectionEvent arg0) {
 		String sel = list.getSelectedValue();
+		if (this.executeur != null) {
+			this.executer.setEnabled(this.executeur.test(this));
+		}
 		if (sel == null) {
+
 			return;
 		}
 		try {
@@ -330,7 +365,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			selection = false;
 		} catch (Throwable e) {
 			erreur = true;
-	 e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}

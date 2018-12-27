@@ -1,10 +1,13 @@
 type feuille {}
-type arbre:feuille { feuille:g feuille:d}
-fonction = feuille:a feuille:b | si a est arbre alors (si b est arbre alors ((a.d=b.d) & (a.g=b.g) ) sinon false {} ) sinon ( si b est arbre alors false {} sinon true {} ) 
-fonction test arbre:u arbre:v | (u.g=v.g) & (u.d=v.d) 
-fonction inv feuille:a | si a est arbre alors arbre { g = inv(a.d) d = inv(a.g) } sinon a
+type noeud:feuille { feuille:g feuille:d}
+
+fonction = feuille:a feuille:b | si a est noeud alors (si b est noeud alors ((a.d=b.d) & (a.g=b.g) ) sinon false {} ) sinon ( si b est noeud alors false {} sinon true {} ) 
+fonction test noeud:u noeud:v | (u.g=v.g) & (u.d=v.d) 
+fonction inv feuille:a | si a est noeud alors noeud { g = inv(a.d) d = inv(a.g) } sinon a
 
 fonction prop feuille:a | a = inv(inv(a))
+fonction + feuille:a feuille:b  | noeud{ g=a d=b }
+
 
 
 

@@ -19,6 +19,7 @@ import model.Literal;
 import model.Module;
 import model.Objet;
 import model.ObjetParam;
+import model.ParamDef;
 import model.Ref;
 import model.RefLiteral;
 import model.TestType;
@@ -171,6 +172,17 @@ public class ColorierSource implements VisiteurModule {
 		for (TypeDef td : module.types) {
 			td.visiter(this);
 		}
+		for(ParamDef pd: module.params) {
+			pd.visiter(this);
+		}
+	}
+
+	@Override
+	public void visiter(ParamDef pd) {
+		// TODO Auto-generated method stub
+		this.setColor(this.typeColor(pd.type), pd.type.debut, pd.type.fin);
+		this.setColor(this.declarationFonctionParametre, pd.debut, pd.fin);
+		
 	}
 
 }

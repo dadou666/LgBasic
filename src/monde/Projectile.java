@@ -4,8 +4,9 @@ import java.awt.Color;
 
 public class Projectile extends Entite {
 	Soldat cible;
+	Soldat attaquant;
 	int puissance;
-	public void finDeplacer(EcranDessin ecranDessin) {
+	public void finDeplacer(EcranJeux ecranDessin) {
 		if (cible.collision(this)) {
 			while(puissance>=0) {
 			if (cible.vies.isEmpty()) {
@@ -17,6 +18,8 @@ public class Projectile extends Entite {
 			puissance--;
 			}
 		}
+		attaquant.projectile = null;
+		
 		
 	}
 	@Override

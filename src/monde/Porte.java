@@ -10,9 +10,15 @@ public class Porte extends Ressource {
 	}
 
 	@Override
-	public void executer(EcranDessin ed, Soldat soldat) {
+	public void executer(EcranJeux ed, Soldat soldat) {
 		soldat.portes.add(this);
 		
+	}
+
+	@Override
+	public String name() {
+		// TODO Auto-generated method stub
+		return "Po";
 	}
 
 }

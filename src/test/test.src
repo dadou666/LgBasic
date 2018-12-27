@@ -1,9 +1,4 @@
-type a {  }
-type c { b:a symbol:m}
-type f { a:v }
-fonction inc zero:a | a+ zero {}
-fonction avancer symbol:a  zero:c | a +  ber
-type u { int:x int:z float:m}
-fonction m int:x | x
-fonction u int:x | u { x=x z=55 m=45p78 }
-fonction / int:x int:y -> int
+type a { int:a int:b }
+
+
+fonction main | a { a=66 b=79 }

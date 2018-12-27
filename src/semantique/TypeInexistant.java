@@ -9,6 +9,9 @@ public class TypeInexistant extends Erreur {
 	public String nomRef;
 	public Expression expression;
 	public String nom;
+	public String toString() {
+		return "Dans " +nomRef+ " le type "+nom+" inexistant "; 
+	}
 	
 
 }

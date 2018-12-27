@@ -48,7 +48,7 @@ public class Deplacer {
 
 	}
 
-	public void deplacer(EcranDessin ecran,Entite balle) {
+	public void deplacer(EcranJeux ecran,Entite balle) {
 		float dx = depart.x - balle.position.x;
 		float dy = depart.y - balle.position.y;
 

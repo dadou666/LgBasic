@@ -11,47 +11,65 @@ public class Config {
 	public int porte;
 	public int vitesse;
 	public int vitesseTire;
-	public List<Soldat> soldats;
+	public List<Soldat> soldats=new ArrayList<>();
+	public List<Soldat> nvSoldats = new ArrayList<>();
+	public List<Ressource> tmp = new ArrayList<>();
+	public void deplacer(EcranJeux ecranDessin) {
+		nvSoldats.clear();
+		for(Soldat soldat:soldats) {
+			soldat.deplacer.deplacer(ecranDessin, soldat);
+		}
+		soldats.addAll(nvSoldats);
+		
+		
+	}
 
-
-	public void gererActions(EcranDessin ecran) {
+	public void gererActions(EcranJeux ecran,Config adversaire) {
 
 		if (soldats.size() < population) {
 				this.gererAugmentationPopulation(ecran, population-soldats.size());
 				return;
 		}
+		tmp.clear();
 		for (Soldat soldat : soldats) {
-			this.gererActions(soldat, ecran);
+			this.gererActions(soldat, ecran,adversaire);
 
+		}
+		for (Ressource r :tmp) {
+			r.libre = true;
 		}
 
 	}
 
-	public void gererAugmentationPopulation(EcranDessin ecran, int n) {
-		List<Reproduction> reproductions = new ArrayList<>();
+	public void gererAugmentationPopulation(EcranJeux ecran, int n) {
+		tmp.clear();
 		for (Soldat soldat : soldats) {
 			if (soldat.cible == null) {
 				Reproduction reproduction = ecran.donnerRessource(Reproduction.class, soldat);
 				if (reproduction != null) {
 					reproduction.libre = false;
+					tmp.add(reproduction);
 					soldat.cible = reproduction;
 					soldat.deplacer(reproduction.position, soldat.vitesse()*ecran.vitesseFactor);
 					n--;
 					if (n == 0) {
-						for (Reproduction r : reproductions) {
+						for (Ressource r :tmp) {
 							r.libre = true;
 						}
 					}
 				}
 			}
 		}
-		for (Reproduction r : reproductions) {
+		for (Ressource r :tmp) {
 			r.libre = true;
 		}
 
 	}
 
-	public void gererActions(Soldat soldat, EcranDessin ecranDessin) {
+	public void gererActions(Soldat soldat, EcranJeux ecranDessin,Config adversaire) {
+		if (soldat.projectile != null) {
+			return;
+		}
 		if (soldat.deplacer != null) {
 			return;
 		}
@@ -62,6 +80,7 @@ public class Config {
 			Vie vie = ecranDessin.donnerRessource(Vie.class, soldat);
 			if (vie != null) {
 				soldat.cible = vie;
+				tmp.add(vie);
 				soldat.deplacer(vie.position, soldat.vitesse()*ecranDessin.vitesseFactor);
 				return;
 			}
@@ -70,6 +89,7 @@ public class Config {
 			Puissance puissance = ecranDessin.donnerRessource(Puissance.class, soldat);
 			if (puissance != null) {
 				soldat.cible = puissance;
+				tmp.add(puissance);
 				soldat.deplacer(puissance.position, soldat.vitesse()*ecranDessin.vitesseFactor);
 				return;
 			}
@@ -79,6 +99,7 @@ public class Config {
 			Vitesse vitesse = ecranDessin.donnerRessource(Vitesse.class, soldat);
 			if (vitesse != null) {
 				soldat.cible = vitesse;
+				tmp.add(vitesse);
 				soldat.deplacer(vitesse.position, soldat.vitesse()*ecranDessin.vitesseFactor);
 				return;
 			}
@@ -87,6 +108,7 @@ public class Config {
 			VitesseTire vitesseTire = ecranDessin.donnerRessource(VitesseTire.class, soldat);
 			if (vitesseTire != null) {
 				soldat.cible = vitesseTire;
+				tmp.add(vitesseTire);
 				soldat.deplacer(vitesseTire.position, soldat.vitesse()*ecranDessin.vitesseFactor);
 				return;
 			}
@@ -95,14 +117,16 @@ public class Config {
 			Porte porte = ecranDessin.donnerRessource(Porte.class, soldat);
 			if (porte != null) {
 				soldat.cible = porte;
+				tmp.add(porte);
 				soldat.deplacer(porte.position, soldat.vitesse()*ecranDessin.vitesseFactor);
 				return;
 			}
 		}
+		this.attaquer(soldat, adversaire, ecranDessin);
 		
 
 	}
-	public void attaquer(Soldat soldat , Config adversaire,EcranDessin ecranDessin) {
+	public void attaquer(Soldat soldat , Config adversaire,EcranJeux ecranDessin) {
 		Soldat cible=null;
 		for(Soldat s:adversaire.soldats) {
 			if (cible == null) {
@@ -131,6 +155,8 @@ public class Config {
 		projectile.puissance = soldat.puissances.size();
 		projectile.position = new Point(soldat.position.x,soldat.position.y);
 		projectile.deplacer(cible.position, soldat.vitesseTires.size()*ecranDessin.vitesseTireFactor);
+		projectile.attaquant = soldat;
+		soldat.projectile =projectile;
 		ecranDessin.projectiles.add(projectile);
 		
 	}

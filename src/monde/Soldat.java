@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Stack;
 
 public class Soldat extends Entite {
+	public Color color;
 	public Stack<Vie> vies = new Stack<>();
 	public List<Porte> portes = new ArrayList<>();
 	public List<Vitesse> vitesses = new ArrayList<>();
@@ -15,6 +16,10 @@ public class Soldat extends Entite {
 	public Reproduction reproduction;
 	public Soldat cibleSoldat;
 	public Config config;
+	public Projectile projectile;
+	public Soldat() {
+		this.rayon = 15;
+	}
 	public void detruire() {
 		reproduction.libre = true;
 		for(Porte p:portes) {
@@ -32,14 +37,16 @@ public class Soldat extends Entite {
 		}
 		config.soldats.remove(this);
 	}
-	public void finDeplacer(EcranDessin ecranDessin) {
+	public void finDeplacer(EcranJeux ecranDessin) {
 		if (cibleSoldat != null) {
-			Projectile projectile = new Projectile();
-			projectile.cible =cibleSoldat;
-			projectile.puissance = puissances.size();
-			projectile.position = new Point(position.x,position.y);
-			projectile.deplacer(cible.position, vitesseTires.size()*ecranDessin.vitesseTireFactor);
-			ecranDessin.projectiles.add(projectile);
+			Projectile p = new Projectile();
+			p.cible =cibleSoldat;
+			p.puissance = puissances.size();
+			p.position = new Point(position.x,position.y);
+			p.attaquant = this;
+			p.deplacer(cible.position, vitesseTires.size()*ecranDessin.vitesseTireFactor);
+			this.projectile = p;
+			ecranDessin.projectiles.add(p);
 			cibleSoldat = null;
 			return;
 		}
@@ -62,7 +69,7 @@ public class Soldat extends Entite {
 	@Override
 	public Color color() {
 		// TODO Auto-generated method stub
-		return Color.BLACK;
+		return color;
 	}
 
 	public int distance(Ressource r) {

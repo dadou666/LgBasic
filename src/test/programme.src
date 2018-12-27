@@ -1,16 +1,16 @@
 
 type listeVide { }
-type liste:listeVide { zero:v listeVide:r }
+type liste:listeVide { z:v listeVide:r }
 type typeDefVide  {}
-type typeDef : typeDefVide  { zero:super listeVide:def typeDefVide:reste }
+type typeDef : typeDefVide  { z:super listeVide:def typeDefVide:reste }
 abstrait type expr {}
 type listeExprVide {}
 type listeExpr:listeExprVide {  expr:a listeExprVide:reste}
-type appel : expr { zero:f listeExpr:args }
-type var:expr { zero:var}
-type objet : expr { zero:f listeExpr:args }
-type acces:expr { expr:e zero:idx }
-type test : expr { expr:test zero:tp expr:then expr:else }
+type appel : expr { z:f listeExpr:args }
+type var:expr { z:var}
+type objet : expr { z:f listeExpr:args }
+type acces:expr { expr:e z:idx }
+type test : expr { expr:test z:tp expr:then expr:else }
 type fonctionDefVide {}
 type fonctionDef:fonctionDefVide {
 	liste:args

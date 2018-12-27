@@ -11,10 +11,16 @@ public class Vie extends Ressource {
 	}
 
 	@Override
-	public void executer(EcranDessin ed, Soldat soldat) {
+	public void executer(EcranJeux ed, Soldat soldat) {
 		// TODO Auto-generated method stub
 		soldat.vies.add(this);
 		
+	}
+
+	@Override
+	public String name() {
+		// TODO Auto-generated method stub
+		return "Vi";
 	}
 
 }
