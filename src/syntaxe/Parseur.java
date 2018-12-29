@@ -265,6 +265,7 @@ public class Parseur implements ANTLRErrorListener {
 		ref.nom = tn.getText();
 		ref.debut = mn.getSymbol().getStartIndex();
 		ref.fin = mn.getSymbol().getStopIndex();
+		ref.moduleDansDefininition = true;
 		return ref;
 
 	}
@@ -281,7 +282,7 @@ public class Parseur implements ANTLRErrorListener {
 		}
 		Objet objet = new Objet();
 
-		objet.type = typeRef;
+		objet.typeOrVar = typeRef;
 		for (AttributContext attributContext : objetContext.attributs().attribut()) {
 			ObjetParam op = new ObjetParam();
 			TerminalNode tn = attributContext.ID();

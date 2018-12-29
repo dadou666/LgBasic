@@ -3,4 +3,15 @@ type true:bool { }
 type false:bool {}
 param bool:titi
 fonction & bool:a bool:b | si a est true alors b sinon false {}
-fonction main | 785
+
+type fin  {}
+type liste_int :fin {  int:val fin:next}
+fonction somme fin:l | si l est liste_int alors l.val + somme(l.next) sinon 0
+fonction main |  somme( 
+		liste_int {
+			 val=45 
+			next= liste_int { 
+				val=8 
+				next=liste_int {
+					val=11 
+					next=fin {} }} }) 

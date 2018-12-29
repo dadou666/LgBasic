@@ -16,7 +16,7 @@ public class TestModuleInit extends VisiteurExpressionImplementation {
 	@Override
 	public void visiter(Objet objet) {
 		super.visiter(objet);
-		objet.type.nomRef();
+		objet.typeOrVar.nomRef();
 
 	}
 

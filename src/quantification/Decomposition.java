@@ -50,7 +50,7 @@ public class Decomposition extends TransformationUnitaire {
 			Objet objet = new Objet();
 			String tmp[] = type.split("\\$");
 
-			objet.type = new Ref(tmp[0], tmp[1]);
+			objet.typeOrVar = new Ref(tmp[0], tmp[1]);
 			for (Map.Entry<String, String> e : map.entrySet()) {
 				ObjetParam op = new ObjetParam();
 				op.nom = e.getKey();

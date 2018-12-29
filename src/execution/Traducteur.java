@@ -144,10 +144,12 @@ public class Traducteur implements VisiteurExpression {
 		if (tmp.length == 2) {
 			ref.nom = tmp[1];
 			ref.module = tmp[0];
+			ref.moduleDansDefininition =true;
 			nomObjet = type;
 
 		} else {
 			ref.nom = type;
+			ref.moduleDansDefininition =false;
 			if (!verificateur.trouverType(ref, TypeDef.class, type)) {
 				throw new ClasseAbsente(type);
 			}
@@ -460,7 +462,7 @@ public class Traducteur implements VisiteurExpression {
 		this.tmpVars.put(objet, var);
 		this.idxTmpVar++;
 
-		String type = nomObjet(objet.type);
+		String type = nomObjet(objet.typeOrVar);
 		this.source.append(type);
 		this.source.append(" ");
 		this.source.append(var);

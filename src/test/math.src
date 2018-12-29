@@ -1,7 +1,6 @@
 fonction + z:a z:b | si a est n alors n { n= a.n+b} sinon b  
 fonction = z:a z:b | si a est n alors ( si b est n alors a.n=b.n sinon false {} ) sinon ( si b est n alors false {} sinon true {} )
 fonction gen z:a z:b |  (a+b) = (b+a)
-
 type z {}
 
 type n:z { z:n}

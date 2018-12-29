@@ -30,9 +30,9 @@ public class CalculerTypeRetour implements VisiteurExpression {
 
 	@Override
 	public void visiter(Objet objet) {
-		verificateur.trouverType(objet.type, FonctionDef.class, nomRef);
+		verificateur.trouverType(objet.typeOrVar, FonctionDef.class, nomRef);
 
-		initType(objet.type.nomRef());
+		initType(objet.typeOrVar.nomRef());
 
 	}
 

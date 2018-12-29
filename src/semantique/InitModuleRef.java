@@ -18,9 +18,9 @@ public class InitModuleRef implements VisiteurExpression{
 	@Override
 	public void visiter(Objet objet) {
 
-		if (objet.type.module == null) {
-			objet.type.module = module;
-			objet.type.moduleInit = true;
+		if (objet.typeOrVar.module == null) {
+			objet.typeOrVar.module = module;
+			objet.typeOrVar.moduleInit = true;
 		}
 		for(ObjetParam op:objet.params) {
 			if (op.expression == null) {

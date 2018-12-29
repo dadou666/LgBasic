@@ -52,7 +52,7 @@ public class ColorierSource implements VisiteurModule {
 
 	@Override
 	public void visiter(Objet objet) {
-		this.setColor(typeColor(objet.type), objet.type.debut, objet.type.fin);
+		this.setColor(typeColor(objet.typeOrVar), objet.typeOrVar.debut, objet.typeOrVar.fin);
 		for (ObjetParam pm : objet.params) {
 			this.setColor(referenceAttribut, pm.debut, pm.fin);
 			pm.expression.visiter(this);

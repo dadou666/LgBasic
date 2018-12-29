@@ -46,7 +46,7 @@ public class Simplificateur implements TransformationExpression<Expression> {
 	@Override
 	public Expression transformer(Objet objet) {
 		Objet result = new Objet();
-		result.type = objet.type;
+		result.typeOrVar = objet.typeOrVar;
 		for (ObjetParam op : objet.params) {
 			ObjetParam tmp = new ObjetParam();
 			tmp.nom = op.nom;
@@ -104,7 +104,7 @@ public class Simplificateur implements TransformationExpression<Expression> {
 		if (cible instanceof Objet) {
 			Objet objet = (Objet) cible;
 
-			if (verificateur.herite(objet.type.nomRef(), testType.typeRef.nomRef())) {
+			if (verificateur.herite(objet.typeOrVar.nomRef(), testType.typeRef.nomRef())) {
 
 				return testType.alors.transformer(this);
 			}

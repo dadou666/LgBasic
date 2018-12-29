@@ -3,6 +3,7 @@ package editeur;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 
 import execution.Traducteur;
 import javassist.CannotCompileException;
@@ -13,6 +14,7 @@ import semantique.VerificationFonction;
 import test.APITestExcution5;
 
 public class SimpleExecuteur implements Executeur {
+	
 
 	@Override
 	public void executer(Terminal terminal) {
@@ -23,6 +25,7 @@ public class SimpleExecuteur implements Executeur {
 		traducteur.typesReserve.put("base$symbol", String.class);
 		traducteur.typesReserve.put("base$int", int.class);
 		traducteur.literalTracducteurs = new HashMap<>();
+		traducteur.api = this.classAPI();
 		traducteur.literalTracducteurs.put("base$symbol", (String s) -> "\"" + s + "\"");
 		traducteur.literalTracducteurs.put("base$int", (String s) -> s);
 		Class cls;
@@ -56,6 +59,22 @@ public class SimpleExecuteur implements Executeur {
 			return fd != null;
 		}
 		return false;
+	}
+
+	@Override
+	public Class classAPI() {
+		// TODO Auto-generated method stub
+		return APIBase.class;
+		//return null;
+	}
+
+	@Override
+	public Map<Class, String> typeReserve() {
+
+		Map<Class,String> map = new HashMap<>();
+		map.put(String.class, "base$string");
+		map.put(int.class, "base$int");
+		return map;
 	}
 
 }

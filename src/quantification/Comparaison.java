@@ -93,7 +93,7 @@ public class Comparaison {
 	}
 
 	public boolean comparerObjet(Objet o1, Objet o2) {
-		if (!o1.type.nomRef().equals(o2.type.nomRef())) {
+		if (!o1.typeOrVar.nomRef().equals(o2.typeOrVar.nomRef())) {
 			return false;
 		}
 		

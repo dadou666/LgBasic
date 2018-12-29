@@ -332,12 +332,12 @@ class TestParser {
 
 		Objet objet = (Objet) module.fonctions.get(0).expression;
 		assertTrue(objet.params.size() == 1);
-		assertTrue(objet.type.nom.equals("nini"));
-		assertTrue(objet.type.module == null);
+		assertTrue(objet.typeOrVar.nom.equals("nini"));
+		assertTrue(objet.typeOrVar.module == null);
 		assertTrue(objet.params.get(0).nom.equals("m"));
 		assertTrue(objet.params.get(0).expression instanceof Objet);
 		Objet obj = (Objet) objet.params.get(0).expression;
-		assertTrue(obj.type.nom.equals("a"));
+		assertTrue(obj.typeOrVar.nom.equals("a"));
 
 	}
 
@@ -362,7 +362,7 @@ class TestParser {
 		assertTrue(testType.alors != null);
 		assertTrue(testType.alors instanceof Objet);
 		Objet objet = (Objet) testType.alors;
-		assertTrue(objet.type.nom.equals("nini"));
+		assertTrue(objet.typeOrVar.nom.equals("nini"));
 
 		VarRef varRef = (VarRef) testType.sinon;
 		assertTrue(varRef.nom.equals("o"));
@@ -393,7 +393,7 @@ class TestParser {
 		assertTrue(testType.alors != null);
 		assertTrue(testType.alors instanceof Objet);
 		Objet objet = (Objet) testType.alors;
-		assertTrue(objet.type.nom.equals("nini"));
+		assertTrue(objet.typeOrVar.nom.equals("nini"));
 
 		VarRef varRef = (VarRef) testType.sinon;
 		assertTrue(varRef.nom.equals("o"));

@@ -8,6 +8,7 @@ public class Ref {
 	public String module;
 	public String nom;
 	public boolean moduleInit = false;
+	public boolean moduleDansDefininition;
 
 	public Ref() {
 
@@ -29,6 +30,7 @@ public class Ref {
 	public Ref(String module, String nom) {
 		this.nom = nom;
 		this.module = module;
+		moduleDansDefininition = (module != null);
 
 	}
 
@@ -37,6 +39,7 @@ public class Ref {
 		this.nom = nom;
 		this.debut = debut;
 		this.fin = fin;
+		moduleDansDefininition = false;
 	}
 
 	public String nomRef() {

@@ -48,9 +48,9 @@ public class Afficheur implements TransformationExpression<String> {
 	public String transformer(Objet objet) {
 		StringBuilder sb = new StringBuilder();
 		if (verif != null) {
-			sb.append(verif.simplifierType(objet.type.nomRef()));
+			sb.append(verif.simplifierType(objet.typeOrVar.nomRef()));
 		} else {
-			sb.append(objet.type.nomRef());
+			sb.append(objet.typeOrVar.nomRef());
 		}
 		sb.append("{");
 		for (ObjetParam op : objet.params) {

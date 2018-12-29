@@ -17,11 +17,13 @@ import model.Literal;
 import model.Module;
 import model.Objet;
 import model.ObjetParam;
+import model.TestType;
 import model.TypeDef;
 import model.Univers;
 import model.Var;
 import model.VarRef;
 import semantique.AccesChampInexistant;
+import semantique.CreationTypeAbstrait;
 import semantique.CreationTypeReserve;
 import semantique.DoublonChampType;
 import semantique.DoublonNomFonction;
@@ -717,7 +719,7 @@ class TestSemantique {
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression != null);
 		Objet o = l.expression;
-		assertTrue(o.type.nomRef().equals("m1$a"));
+		assertTrue(o.typeOrVar.nomRef().equals("m1$a"));
 		assertTrue(o.params.get(0).nom.equals("a"));
 		assertTrue(o.params.get(0).expression instanceof VarRef);
 		VarRef vr = (VarRef) o.params.get(0).expression;
@@ -883,7 +885,7 @@ class TestSemantique {
 
 	@Test
 	void testMultipleFonctionValide() {
-		String source = "type b {}  type a:b {} type c:b {}  fonction u b:a | f(a {}) ";
+		String source = "type b {}  type a:b {} type c:b {}  fonction u b:x | f(a {}) ";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
@@ -898,6 +900,78 @@ class TestSemantique {
 		assertTrue(!verif.erreurs.isEmpty());
 		assertTrue(verif.erreurs.size() == 1);
 		assertTrue(verif.erreurs.get(0) instanceof MultipleDefinitionFonction);
+	}
+	
+	@Test
+	void testCreationTypeAbstrait() {
+		String source = "abstrait type b {}   fonction u b:x | b {}  ";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		assertTrue(!verif.erreurs.isEmpty());
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0) instanceof CreationTypeAbstrait);
+	}
+	
+	@Test
+	void testCreationTypeAbstraitAvecVar() {
+		String source = "abstrait type b {}   fonction u b:x | x {}  ";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		assertTrue(!verif.erreurs.isEmpty());
+		assertTrue(verif.erreurs.size() == 1);
+		assertTrue(verif.erreurs.get(0) instanceof CreationTypeAbstrait);
+	}
+	@Test
+	void testCreationAvecVar() {
+		String source = "type u {} type b {u:a u:b}   fonction u b:x | x { a= u { } }  ";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+
+	}
+	@Test
+	void testCreationAvecVarAvecTestType() {
+		String source = "type u {} abstrait type b {u:a u:b}  type a:b {} fonction u b:x | si x est a alors x { a= u { } } sinon x ";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		// verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		VerificationFonction vf = verif.fonctions.get("m1$u/1");
+		assertTrue(vf != null);
+		TestType test = (TestType) vf.fonction.expression;
+		Objet objet = (Objet) test.alors;
+		assertTrue(verif.erreurs.isEmpty());
+		assertTrue(objet.typeOrVar.nomRef().equals("m1$a"));
 	}
 
 	@Test

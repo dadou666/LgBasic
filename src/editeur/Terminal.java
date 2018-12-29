@@ -6,6 +6,7 @@ import model.Univers;
 import semantique.Erreur;
 import semantique.Verificateur;
 import syntaxe.Parseur;
+import test.APITestExcution;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -74,6 +75,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 	JButton nouveau;
 	JButton executer;
 	Verificateur verificateur;
+	List<String> modulesAPI = new ArrayList<>();
 
 	public Terminal(Executeur executeur) {
 		this.executeur = executeur;
@@ -83,7 +85,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		output = new JTextPane();
 		streamOutput = new TextAreaOutputStream(output);
 		System.setOut(new PrintStream(streamOutput));
-	//	System.setErr(new PrintStream(streamOutput));
+		 System.setErr(new PrintStream(streamOutput));
 		JScrollPane outputScrollPane = new JScrollPane(output);
 		input = new JTextPane();
 
@@ -155,6 +157,18 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 			}
 		}
+		if (this.executeur != null && this.executeur.classAPI() != null) {
+			List<String> modules = new ArrayList<>();
+			modules.addAll(sources.keySet());
+
+			sources = Univers.sources(this.executeur.classAPI(), this.executeur.typeReserve(), sources);
+			for (String module : sources.keySet()) {
+				if (!modules.contains(module)) {
+					this.modulesAPI.add(module);
+					vector.add(module);
+				}
+			}
+		}
 
 		list.setListData(vector);
 	}
@@ -201,9 +215,10 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		}
 		Parseur parseur = new Parseur();
 		String sel = list.getSelectedValue();
+
 		if (univers == null) {
 
-			univers = parseur.lireSourceCode(sources, null);
+			univers = parseur.lireSourceCode(sources, this.modulesAPI);
 		} else {
 			Module module = parseur.lireModule(sel, sources.get(sel));
 			univers.modules.put(sel, module);
@@ -362,6 +377,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			this.setColor(Color.black, 0, input.getStyledDocument().getLength());
 			this.compiler();
 			this.input.setCaretPosition(0);
+			this.input.setEnabled(!this.modulesAPI.contains(sel));
 			selection = false;
 		} catch (Throwable e) {
 			erreur = true;

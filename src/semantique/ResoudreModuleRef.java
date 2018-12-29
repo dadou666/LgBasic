@@ -18,7 +18,7 @@ public class ResoudreModuleRef extends VisiteurExpressionImplementation {
 	@Override
 	public void visiter(Objet objet) {
 		super.visiter(objet);
-		verificateur.trouverType(objet.type, FonctionDef.class, nom);
+		verificateur.trouverType(objet.typeOrVar, FonctionDef.class, nom);
 
 	}
 
