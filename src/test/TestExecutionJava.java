@@ -98,6 +98,57 @@ class TestExecutionJava {
 		assertTrue(traducteur.source(r).equals(traducteur.source(traducteur.construire("n n n zero"))));
 
 	}
+	
+	@Test
+	void testPeano3() throws NotFoundException, CannotCompileException, NoSuchMethodException, SecurityException,
+			NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException,
+			ClasseAbsente, InvocationTargetException, ClassNotFoundException, IOException {
+		Map<String, String> sources = new HashMap<>();
+		sources.put("main", "   fonction nb | [n n n zero ]");
+		List<String> modules = new ArrayList<>();
+		modules.add("math");
+		Univers.sources(APITestExcution.class, null, sources);
+		Univers univers = (new Parseur()).lireSourceCode(sources, modules);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+		Traducteur traducteur = new Traducteur("peano", verif);
+		traducteur.api = APITestExcution.class;
+		Class cls = traducteur.traduire();
+		Class math$zero = traducteur.mapClass.get("math$zero");
+		assertTrue(math$zero != null);
+		assertTrue(math$zero == APITestExcution.math$zero.class);
+		Method m = cls.getMethod("main$nb");
+		Object r = m.invoke(cls.newInstance());
+		assertTrue(traducteur.source(r).equals(traducteur.source(traducteur.construire("n n n zero"))));
+
+	}
+	@Test
+	void testPeano4() throws NotFoundException, CannotCompileException, NoSuchMethodException, SecurityException,
+			NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException,
+			ClasseAbsente, InvocationTargetException, ClassNotFoundException, IOException {
+		Map<String, String> sources = new HashMap<>();
+		sources.put("main", " fonction s n:a | a.n  fonction nb | s([n n n zero ])");
+		List<String> modules = new ArrayList<>();
+		modules.add("math");
+		Univers.sources(APITestExcution.class, null, sources);
+		Univers univers = (new Parseur()).lireSourceCode(sources, modules);
+		Verificateur verif = new Verificateur(univers);
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+		Traducteur traducteur = new Traducteur("peano", verif);
+		traducteur.api = APITestExcution.class;
+		Class cls = traducteur.traduire();
+		Class math$zero = traducteur.mapClass.get("math$zero");
+		assertTrue(math$zero != null);
+		assertTrue(math$zero == APITestExcution.math$zero.class);
+		Method m = cls.getMethod("main$nb");
+		Object r = m.invoke(cls.newInstance());
+		assertTrue(traducteur.source(r).equals(traducteur.source(traducteur.construire(" n n zero"))));
+
+	}
 
 	@Test
 	void testTypeString() throws ClassNotFoundException, NotFoundException, CannotCompileException, IOException,
@@ -235,7 +286,39 @@ class TestExecutionJava {
 		assertTrue(t.val2==45);
 
 	}
-	
+	@Test
+	void testLiteralTraducteurInt2() throws ClassNotFoundException, NotFoundException, CannotCompileException,
+			IOException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
+			InvocationTargetException, InstantiationException, NoSuchFieldException {
+		Map<Class, String> typeReserve = new HashMap<>();
+		typeReserve.put(String.class, "base$symbol");
+		typeReserve.put(int.class, "base$int");
+		Map<String, String> sources = new HashMap<>();
+		sources.put("main", "  type ls:fin { int:val fin:next } type fin { }  fonction m | [ls 5 ls 78 ls 6 fin] ");
+		Univers.sources(APITestExcution3.class, typeReserve, sources);
+		List<String> modules = new ArrayList<>();
+		modules.add("truc");
+		Univers univers = (new Parseur()).lireSourceCode(sources, modules);
+		Verificateur verif = new Verificateur(univers);
+		verif.validations.put("base$int", (String s) -> estInt(s));
+		verif.validations.put("base$symbol", (String s) -> estChaine(s));
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+		Traducteur traducteur = new Traducteur("test", verif);
+		traducteur.typesReserve.put("base$symbol", String.class);
+		traducteur.typesReserve.put("base$int", int.class);
+		traducteur.api = APITestExcution3.class;
+		traducteur.literalTracducteurs = new HashMap<>();
+		traducteur.literalTracducteurs.put("base$symbol", (String s) -> "\"" + s + "\"");
+		traducteur.literalTracducteurs.put("base$int", (String s) -> s);
+		Class cls = traducteur.traduire();
+		Method m = cls.getMethod("main$m");
+
+		Object t =  m.invoke(cls.newInstance());
+		String src = traducteur.source(t);
+
+	}
 	@Test
 	void testParam1() throws ClassNotFoundException, NotFoundException, CannotCompileException,
 			IOException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,

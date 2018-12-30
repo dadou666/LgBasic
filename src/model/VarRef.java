@@ -8,7 +8,10 @@ public class VarRef extends Expression {
 	public VarRef(String nom) {
 		this.nom=nom;
 	}
-
+	public VarRef(String nom,boolean estLibre) {
+		this.nom=nom;
+		this.estLibre =estLibre;
+	}
 	@Override
 	public void visiter(VisiteurExpression visiteur) {
 		visiteur.visiter(this);

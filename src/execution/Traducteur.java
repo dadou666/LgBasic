@@ -347,9 +347,15 @@ public class Traducteur implements VisiteurExpression {
 				tmpVars = new HashMap<>();
 				source.append("{");
 				fonctionDef.expression.visiter(this);
-				if (fonctionDef.expression instanceof Appel) {
+				if (fonctionDef.expression instanceof Appel ) {
 					source.append("return ");
 					source.append(this.tmpVars.get(fonctionDef.expression));
+					source.append(";");
+				}
+				if (fonctionDef.expression instanceof Literal ) {
+					Literal l= (Literal) fonctionDef.expression;
+					source.append("return ");
+					source.append(this.tmpVars.get(l.expression));
 					source.append(";");
 				}
 				source.append("}");
@@ -614,6 +620,8 @@ public class Traducteur implements VisiteurExpression {
 	@Override
 	public void visiter(Literal literal) {
 		literal.expression.visiter(this);
+		String var = this.tmpVars.get(literal.expression);
+		this.tmpVars.put(literal, var);
 
 	}
 

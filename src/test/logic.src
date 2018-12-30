@@ -7,7 +7,7 @@ fonction & bool:a bool:b | si a est true alors b sinon false {}
 type fin  {}
 type liste_int :fin {  int:val fin:next}
 fonction somme fin:l | si l est liste_int alors l.val + somme(l.next) sinon 0
-fonction main |  somme( 
+fonction main1 |  somme( 
 		liste_int {
 			 val=45 
 			next= liste_int { 
@@ -15,3 +15,6 @@ fonction main |  somme(
 				next=liste_int {
 					val=11 
 					next=fin {} }} }) 
+fonction main2 | somme( [liste_int 5 liste_int 11 liste_int 12 liste_int 66 fin])
+fonction main |main2()
+

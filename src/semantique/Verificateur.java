@@ -952,7 +952,7 @@ public class Verificateur implements VisiteurExpression {
 
 					}
 					if (validation.valider(opRef.nom)) {
-						op.expression = new VarRef(refs.get(idxLiteral).nom);
+						op.expression = new VarRef(refs.get(idxLiteral).nom,true);
 						opRef.type = RefLiteral.Type.Symbol;
 						idxLiteral++;
 					} else {
