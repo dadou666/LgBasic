@@ -99,6 +99,7 @@ public class ColorierSource implements VisiteurModule {
 
 	@Override
 	public void visiter(Literal literal) {
+		
 		for (RefLiteral ref : literal.mots) {
 			if (ref.type == RefLiteral.Type.Var) {
 				this.setColor(this.referenceFonctionParametre, ref.debut, ref.fin);
