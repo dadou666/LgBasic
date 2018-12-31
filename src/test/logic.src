@@ -15,6 +15,6 @@ fonction main1 |  somme(
 				next=liste_int {
 					val=11 
 					next=fin {} }} }) 
-fonction main2 | somme( [liste_int 5 liste_int 11 liste_int 12 liste_int 66 fin])
+fonction main2 | somme(nono(5))
 fonction main |main2()
-
+fonction nono  int:v | [liste_int v liste_int 10 liste_int 55 fin]

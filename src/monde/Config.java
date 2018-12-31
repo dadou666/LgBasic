@@ -1,6 +1,7 @@
 package monde;
 
 import java.awt.Point;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,33 @@ public class Config {
 	public List<Soldat> soldats=new ArrayList<>();
 	public List<Soldat> nvSoldats = new ArrayList<>();
 	public List<Ressource> tmp = new ArrayList<>();
+	public API api;
+	public Method method;
+	public API.api$soldatVides soldats() {
+		API.api$soldatVides tmp = new API.api$soldatVides ();
+		for(Soldat s:soldats) {
+			API.api$soldats soldats = new API.api$soldats();
+			soldats.suivant =tmp;
+			tmp = soldats;
+			soldats.porte = s.portes.size();
+			soldats.vie = s.vies.size();
+			soldats.vitesseTire = s.vitesseTires.size();
+			soldats.vitesseDeplacement = s.vitesses.size();
+			soldats.puissance =s.puissances.size();
+		}
+		return tmp;
+		
+		
+	}
+	public void init(API.api$objectif o) {
+		
+		this.vie = o.vie;
+		this.population =o.population;
+		this.puissance = o.puissance;
+		this.vitesse = o.vitesse;
+		this.vitesseTire = o.vitesseTire;
+		this.porte = o.porte;
+	}
 	public void deplacer(EcranJeux ecranDessin) {
 		nvSoldats.clear();
 		for(Soldat soldat:soldats) {

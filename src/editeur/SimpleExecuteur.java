@@ -51,12 +51,18 @@ public class SimpleExecuteur implements Executeur {
 	@Override
 	public boolean test(Terminal terminal) {
 		String module = terminal.list.getSelectedValue();
+		terminal.msgImpossibleExecuter.setText("");
 		if (module == null) {
+			terminal.msgImpossibleExecuter.setText("Pas de module selectionné");
 			return false;
 		}
 		if (terminal.verificateur != null) {
 			VerificationFonction fd =terminal.verificateur.fonctions.get(module+"$main/0");
-			return fd != null;
+			if  (fd != null) {
+				return true;
+			}
+			terminal.msgImpossibleExecuter.setText("Il manque dans le module une fonction main/0");
+			
 		}
 		return false;
 	}

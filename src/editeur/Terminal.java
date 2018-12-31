@@ -34,6 +34,7 @@ import java.util.Vector;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -70,11 +71,12 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 	 * @param args
 	 */
 	TextAreaOutputStream streamOutput;
-	JList<String> list;
+	public JList<String> list;
 	JList<Erreur> listErreurSemantique;
 	JButton nouveau;
 	JButton executer;
-	Verificateur verificateur;
+	public JLabel msgImpossibleExecuter;
+	public Verificateur verificateur;
 	List<String> modulesAPI = new ArrayList<>();
 
 	public Terminal(Executeur executeur) {
@@ -103,6 +105,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		JScrollPane listScrollPane = new JScrollPane(list);
 		nouveau = new JButton("Nouveau");
 		nouveau.addActionListener(this);
+		msgImpossibleExecuter = new JLabel();
 		executer = new JButton("Executer");
 		executer.addActionListener(this);
 		if (executeur != null) {
@@ -114,6 +117,8 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		sb.add(nouveau);
 		sb.setSize(300, 30);
 		sb.add(executer);
+		sb.setSize(1000, 30);
+		sb.add(msgImpossibleExecuter);
 		sb.end();
 		sb.beginX();
 		sb.beginY();
@@ -377,7 +382,7 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 			this.setColor(Color.black, 0, input.getStyledDocument().getLength());
 			this.compiler();
 			this.input.setCaretPosition(0);
-			this.input.setEnabled(!this.modulesAPI.contains(sel));
+			this.input.setEditable(!this.modulesAPI.contains(sel));
 			selection = false;
 		} catch (Throwable e) {
 			erreur = true;

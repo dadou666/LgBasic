@@ -915,11 +915,12 @@ public class Verificateur implements VisiteurExpression {
 	public int idxLiteral;
 
 	public Objet creerObjet(List<RefLiteral> refs) {
-		Ref ref = refs.get(idxLiteral);
+		RefLiteral ref = refs.get(idxLiteral);
 		idxLiteral++;
 		if (this.trouverType(ref, FonctionDef.class, this.nomRef)) {
 			Objet objet = new Objet();
 			objet.typeOrVar = ref;
+			ref.type = RefLiteral.Type.Type;
 
 			List<String> champs = this.verificationTypes.get(ref.nomRef()).champs;
 			for (String champ : champs) {

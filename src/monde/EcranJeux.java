@@ -23,6 +23,10 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import editeur.Executeur;
+import editeur.Terminal;
+import semantique.VerificationFonction;
+
 public class EcranJeux extends JComponent implements KeyListener {
 	
 	public Config config1;
@@ -179,4 +183,6 @@ public class EcranJeux extends JComponent implements KeyListener {
 		// TODO Auto-generated method stub
 
 	}
+
+	
 }

@@ -1,0 +1,4 @@
+
+fonction config1 | augmenterVie(o)
+fonction config2 |objectif {  vie=10 puissance=5 porte=10 vitesse=6 vitesseTire=15 population= 5}
+fonction augmenterVie objectif:obj | si obj.vie > 10 est vrai alors obj sinon obj { vie=obj.vie+1 }
