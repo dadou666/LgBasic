@@ -1,9 +1,14 @@
 package monde;
 
 import java.awt.Point;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import monde.API.api$action;
+import monde.API.api$ecrire;
+import monde.API.api$objectif;
 
 public class Config {
 	public int vie;
@@ -12,58 +17,88 @@ public class Config {
 	public int porte;
 	public int vitesse;
 	public int vitesseTire;
-	public List<Soldat> soldats=new ArrayList<>();
+	public List<Soldat> soldats = new ArrayList<>();
 	public List<Soldat> nvSoldats = new ArrayList<>();
 	public List<Ressource> tmp = new ArrayList<>();
 	public API api;
 	public Method method;
+
+	public void executer(EcranJeux ecranJeux,Config adversaire) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		if (method == null) {
+			return ;
+		}
+		api.enemies = adversaire.soldats();
+		api.moi = this.soldats();
+		if (api.o == null) {
+			api.o = new API.api$objectif();
+		}
+		api.o.population = population;
+		api.o.vie = vie;
+		api.o.porte = porte;
+		api.o.vitesse = vitesse;
+		api.o.vitesseTire = vitesseTire;
+		api.o.puissance = puissance;
+		api.ressources = ecranJeux.ressources();
+		API.api$action r= (api$action) method.invoke(api);
+		if (r instanceof API.api$objectif) {
+			API.api$objectif o = (api$objectif) r;
+			this.init(o);
+		}
+		if (r instanceof API.api$ecrire) {
+			API.api$ecrire ecrire =(api$ecrire) r;
+			api.objets.put(ecrire.nom, ecrire.valeur);
+		}
+		
+
+	}
+
 	public API.api$soldatVides soldats() {
-		API.api$soldatVides tmp = new API.api$soldatVides ();
-		for(Soldat s:soldats) {
+		API.api$soldatVides tmp = new API.api$soldatVides();
+		for (Soldat s : soldats) {
 			API.api$soldats soldats = new API.api$soldats();
-			soldats.suivant =tmp;
+			soldats.suivant = tmp;
 			tmp = soldats;
 			soldats.porte = s.portes.size();
 			soldats.vie = s.vies.size();
 			soldats.vitesseTire = s.vitesseTires.size();
 			soldats.vitesseDeplacement = s.vitesses.size();
-			soldats.puissance =s.puissances.size();
+			soldats.puissance = s.puissances.size();
 		}
 		return tmp;
-		
-		
+
 	}
+
 	public void init(API.api$objectif o) {
-		
+
 		this.vie = o.vie;
-		this.population =o.population;
+		this.population = o.population;
 		this.puissance = o.puissance;
 		this.vitesse = o.vitesse;
 		this.vitesseTire = o.vitesseTire;
 		this.porte = o.porte;
 	}
+
 	public void deplacer(EcranJeux ecranDessin) {
 		nvSoldats.clear();
-		for(Soldat soldat:soldats) {
+		for (Soldat soldat : soldats) {
 			soldat.deplacer.deplacer(ecranDessin, soldat);
 		}
 		soldats.addAll(nvSoldats);
-		
-		
+
 	}
 
-	public void gererActions(EcranJeux ecran,Config adversaire) {
+	public void gererActions(EcranJeux ecran, Config adversaire) {
 
 		if (soldats.size() < population) {
-				this.gererAugmentationPopulation(ecran, population-soldats.size());
-				return;
+			this.gererAugmentationPopulation(ecran, population - soldats.size());
+			return;
 		}
 		tmp.clear();
 		for (Soldat soldat : soldats) {
-			this.gererActions(soldat, ecran,adversaire);
+			this.gererActions(soldat, ecran, adversaire);
 
 		}
-		for (Ressource r :tmp) {
+		for (Ressource r : tmp) {
 			r.libre = true;
 		}
 
@@ -78,23 +113,23 @@ public class Config {
 					reproduction.libre = false;
 					tmp.add(reproduction);
 					soldat.cible = reproduction;
-					soldat.deplacer(reproduction.position, soldat.vitesse()*ecran.vitesseFactor);
+					soldat.deplacer(reproduction.position, soldat.vitesse() * ecran.vitesseFactor);
 					n--;
 					if (n == 0) {
-						for (Ressource r :tmp) {
+						for (Ressource r : tmp) {
 							r.libre = true;
 						}
 					}
 				}
 			}
 		}
-		for (Ressource r :tmp) {
+		for (Ressource r : tmp) {
 			r.libre = true;
 		}
 
 	}
 
-	public void gererActions(Soldat soldat, EcranJeux ecranDessin,Config adversaire) {
+	public void gererActions(Soldat soldat, EcranJeux ecranDessin, Config adversaire) {
 		if (soldat.projectile != null) {
 			return;
 		}
@@ -109,7 +144,7 @@ public class Config {
 			if (vie != null) {
 				soldat.cible = vie;
 				tmp.add(vie);
-				soldat.deplacer(vie.position, soldat.vitesse()*ecranDessin.vitesseFactor);
+				soldat.deplacer(vie.position, soldat.vitesse() * ecranDessin.vitesseFactor);
 				return;
 			}
 		}
@@ -118,7 +153,7 @@ public class Config {
 			if (puissance != null) {
 				soldat.cible = puissance;
 				tmp.add(puissance);
-				soldat.deplacer(puissance.position, soldat.vitesse()*ecranDessin.vitesseFactor);
+				soldat.deplacer(puissance.position, soldat.vitesse() * ecranDessin.vitesseFactor);
 				return;
 			}
 		}
@@ -128,7 +163,7 @@ public class Config {
 			if (vitesse != null) {
 				soldat.cible = vitesse;
 				tmp.add(vitesse);
-				soldat.deplacer(vitesse.position, soldat.vitesse()*ecranDessin.vitesseFactor);
+				soldat.deplacer(vitesse.position, soldat.vitesse() * ecranDessin.vitesseFactor);
 				return;
 			}
 		}
@@ -137,7 +172,7 @@ public class Config {
 			if (vitesseTire != null) {
 				soldat.cible = vitesseTire;
 				tmp.add(vitesseTire);
-				soldat.deplacer(vitesseTire.position, soldat.vitesse()*ecranDessin.vitesseFactor);
+				soldat.deplacer(vitesseTire.position, soldat.vitesse() * ecranDessin.vitesseFactor);
 				return;
 			}
 		}
@@ -146,25 +181,25 @@ public class Config {
 			if (porte != null) {
 				soldat.cible = porte;
 				tmp.add(porte);
-				soldat.deplacer(porte.position, soldat.vitesse()*ecranDessin.vitesseFactor);
+				soldat.deplacer(porte.position, soldat.vitesse() * ecranDessin.vitesseFactor);
 				return;
 			}
 		}
 		this.attaquer(soldat, adversaire, ecranDessin);
-		
 
 	}
-	public void attaquer(Soldat soldat , Config adversaire,EcranJeux ecranDessin) {
-		Soldat cible=null;
-		for(Soldat s:adversaire.soldats) {
+
+	public void attaquer(Soldat soldat, Config adversaire, EcranJeux ecranDessin) {
+		Soldat cible = null;
+		for (Soldat s : adversaire.soldats) {
 			if (cible == null) {
-				cible=s;
-			}else {
-				if (s.distance(soldat)< cible.distance(soldat)) {
-					cible=s;
-					
+				cible = s;
+			} else {
+				if (s.distance(soldat) < cible.distance(soldat)) {
+					cible = s;
+
 				}
-				
+
 			}
 		}
 		if (cible == null) {
@@ -172,21 +207,21 @@ public class Config {
 		}
 		float d = soldat.distance(cible);
 		d = (float) Math.sqrt(d);
-		float p = ecranDessin.porteFactor*soldat.portes.size();
-		if (d> p ) {
+		float p = ecranDessin.porteFactor * soldat.portes.size();
+		if (d > p) {
 			soldat.cibleSoldat = cible;
-			soldat.deplacer(cible.position, soldat.vitesse()*ecranDessin.vitesseFactor, d-p);
+			soldat.deplacer(cible.position, soldat.vitesse() * ecranDessin.vitesseFactor, d - p);
 			return;
 		}
 		Projectile projectile = new Projectile();
-		projectile.cible =cible;
+		projectile.cible = cible;
 		projectile.puissance = soldat.puissances.size();
-		projectile.position = new Point(soldat.position.x,soldat.position.y);
-		projectile.deplacer(cible.position, soldat.vitesseTires.size()*ecranDessin.vitesseTireFactor);
+		projectile.position = new Point(soldat.position.x, soldat.position.y);
+		projectile.deplacer(cible.position, soldat.vitesseTires.size() * ecranDessin.vitesseTireFactor);
 		projectile.attaquant = soldat;
-		soldat.projectile =projectile;
+		soldat.projectile = projectile;
 		ecranDessin.projectiles.add(projectile);
-		
+
 	}
 
 }

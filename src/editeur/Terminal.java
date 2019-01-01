@@ -56,7 +56,8 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.xml.sax.SAXException;
 
-public class Terminal extends JFrame implements KeyListener, ActionListener, ListSelectionListener {
+public class Terminal  implements KeyListener, ActionListener, ListSelectionListener {
+	JFrame frame;
 	JTextPane input;
 
 	JTextPane output;
@@ -79,10 +80,10 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 	public Verificateur verificateur;
 	List<String> modulesAPI = new ArrayList<>();
 
-	public Terminal(Executeur executeur) {
+	public Terminal(Executeur executeur,SwingBuilder sb) {
 		this.executeur = executeur;
 
-		SwingBuilder sb = new SwingBuilder(this);
+
 
 		output = new JTextPane();
 		streamOutput = new TextAreaOutputStream(output);
@@ -141,11 +142,11 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 		sb.end();
 		sb.end();
 		sb.end();
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
 		input.addKeyListener(this);
 		list.addListSelectionListener(this);
-		// list.addLis
-		sb.open("Langage fonctionnel");
+
+
 
 	}
 
@@ -204,7 +205,11 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				new Terminal(new SimpleExecuteur()).setVisible(true);
+				JFrame frame = new JFrame();
+				SwingBuilder sb = new SwingBuilder(frame);
+				new Terminal(new SimpleExecuteur(),sb);
+				frame.setVisible(true);
+				sb.open("Langage fonctionnel");
 			}
 		});
 
@@ -321,11 +326,11 @@ public class Terminal extends JFrame implements KeyListener, ActionListener, Lis
 
 		}
 		if (arg0.getSource() == nouveau) {
-			String nom = UI.request("nom ", this);
+			String nom = UI.request("nom ", frame);
 			for (int idx = 0; idx < this.list.getModel().getSize(); idx++) {
 				String tmp = this.list.getModel().getElementAt(idx);
 				if (tmp.equals(nom)) {
-					UI.warning("nom existant", this);
+					UI.warning("nom existant", frame);
 					return;
 				}
 			}
