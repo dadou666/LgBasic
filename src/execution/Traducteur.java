@@ -539,7 +539,7 @@ public class Traducteur implements VisiteurExpression {
 
 	@Override
 	public void visiter(TestType testType) {
-
+		
 		String tmpVar = "_$" + this.idxTmpVar;
 		this.idxTmpVar++;
 
@@ -567,7 +567,7 @@ public class Traducteur implements VisiteurExpression {
 
 		} else {
 
-			testType.visiter(this);
+			testType.cible.visiter(this);
 			this.source.append("if");
 			this.source.append("  (");
 			this.source.append(this.source(testType.cible));

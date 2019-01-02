@@ -101,7 +101,7 @@ class TestSemantique {
 	void testDoublonChampAvecHeritage() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type u {symbol:a } type t :u  { symbol:a}");
+		sources.put("m1", "type u {string:a } type t :u  { string:a}");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -192,7 +192,7 @@ class TestSemantique {
 	void testTypeReserve() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type m :  symbol {}");
+		sources.put("m1", "type m :  string {}");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -207,7 +207,7 @@ class TestSemantique {
 	void testTypeSymbol() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type m { symbol:a}");
+		sources.put("m1", "type m { string:a}");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -219,7 +219,7 @@ class TestSemantique {
 	void testNomFonctionEnDouble() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction a symbol:a | a   fonction a symbol:v | v");
+		sources.put("m1", "fonction a string:a | a   fonction a string:v | v");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -254,7 +254,7 @@ class TestSemantique {
 	void testNomChampInconnu() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type u { symbol:s } fonction a u:a | a.m ");
+		sources.put("m1", "type u { string:s } fonction a u:a | a.m ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -272,7 +272,7 @@ class TestSemantique {
 	void testTestInferenceType() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type u { symbol:s } fonction m symbol:s | u {s=s} fonction a symbol:s | m(s).s ");
+		sources.put("m1", "type u { string:s } fonction m string:s | u {s=s} fonction a string:s | m(s).s ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -303,7 +303,7 @@ class TestSemantique {
 	void testDoublonNomParametreFonction() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type u { symbol:s } fonction f u:a symbol:a | a ");
+		sources.put("m1", "type u { string:s } fonction f u:a string:a | a ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -321,7 +321,7 @@ class TestSemantique {
 	void testTypeInexistanteCreationObjet() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:a | momo {s=a } ");
+		sources.put("m1", "fonction f string:a | momo {s=a } ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -339,7 +339,7 @@ class TestSemantique {
 	void testDoublonAttributCreationObjet() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type momo { symbol:s } fonction f symbol:a | momo {s=a s=a} ");
+		sources.put("m1", "type momo { string:s } fonction f string:a | momo {s=a s=a} ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -357,7 +357,7 @@ class TestSemantique {
 	void testCreationObjetAvecAttributInexistant() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type momo { symbol:s } fonction f symbol:a | momo {s=a inexistant=a} ");
+		sources.put("m1", "type momo { string:s } fonction f string:a | momo {s=a inexistant=a} ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -375,7 +375,7 @@ class TestSemantique {
 	void testCreationObjetAvecAttributDuMauvaisType() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type momo { symbol:s } type nini { momo:m } fonction f symbol:a | nini {m=a} ");
+		sources.put("m1", "type momo { string:s } type nini { momo:m } fonction f string:a | nini {m=a} ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -394,7 +394,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1",
-				"type momo :toto { } type toto { symbol:s} type nini { toto:m } fonction f symbol:a | nini {m=momo{s=a}} ");
+				"type momo :toto { } type toto { string:s} type nini { toto:m } fonction f string:a | nini {m=momo{s=a}} ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -408,7 +408,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", "type momo :toto { } " + "type toto {} " + "type nini { e:m }" + " type e {} "
-				+ " fonction f symbol:a | nini {m=momo{}} ");
+				+ " fonction f string:a | nini {m=momo{}} ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -426,7 +426,7 @@ class TestSemantique {
 	void testFonctionInexistante() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " fonction f symbol:a | m(a) ");
+		sources.put("m1", " fonction f string:a | m(a) ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -490,8 +490,8 @@ class TestSemantique {
 	void testResolutionTypeDansFonction() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction u symbol:s | m(s)");
-		sources.put("m2", "fonction m symbol:s | s ");
+		sources.put("m1", "fonction u string:s | m(s)");
+		sources.put("m2", "fonction m string:s | s ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -503,9 +503,9 @@ class TestSemantique {
 	void testMultipleDefinitionFonction() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction u symbol:s | m(s)");
-		sources.put("m2", "fonction m symbol:s | s ");
-		sources.put("m3", "fonction m symbol:s |s ");
+		sources.put("m1", "fonction u string:s | m(s)");
+		sources.put("m2", "fonction m string:s | s ");
+		sources.put("m3", "fonction m string:s |s ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -523,8 +523,8 @@ class TestSemantique {
 	void testMultipleDefinitionTypeDansType() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type s { symbol:x} ");
-		sources.put("m2", "type symbol {} ");
+		sources.put("m1", "type s { string:x} ");
+		sources.put("m2", "type string {} ");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -534,8 +534,8 @@ class TestSemantique {
 		MultipleDefinitionType erreur = (MultipleDefinitionType) verif.erreurs.get(0);
 		assertTrue(erreur.nom.equals("m1$s"));
 		assertTrue(erreur.classDef == TypeDef.class);
-		assertTrue(erreur.types.contains("base$symbol"));
-		assertTrue(erreur.types.contains("m2$symbol"));
+		assertTrue(erreur.types.contains("base$string"));
+		assertTrue(erreur.types.contains("m2$string"));
 		assertTrue(erreur.types.size() == 2);
 	}
 
@@ -543,7 +543,7 @@ class TestSemantique {
 	void testCreationSymbol() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:s | symbol { e=m } ");
+		sources.put("m1", "fonction f string:s | string { e=m } ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -558,7 +558,7 @@ class TestSemantique {
 	void testTestSurSymbol() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:s | si s est symbol alors s sinon s ");
+		sources.put("m1", "fonction f string:s | si s est string alors s sinon s ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -588,7 +588,7 @@ class TestSemantique {
 	void testHeritageProfondeur3() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "type a:b  {} type b:c  {symbol:b}  type c { symbol:a}");
+		sources.put("m1", "type a:b  {} type b:c  {string:b}  type c { string:a}");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -602,7 +602,7 @@ class TestSemantique {
 	void testReferenceFonctionInexistante() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:s | m2$f(s)");
+		sources.put("m1", "fonction f string:s | m2$f(s)");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -616,8 +616,8 @@ class TestSemantique {
 	void testReferenceExterneFonctionExistante() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction f symbol:s | m2$f(s)");
-		sources.put("m2", "fonction f symbol:s | s");
+		sources.put("m1", "fonction f string:s | m2$f(s)");
+		sources.put("m2", "fonction f string:s | s");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
 		verif.executerPourTypes();
@@ -659,7 +659,7 @@ class TestSemantique {
 	void testAccesSurTypeReserve() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " fonction f  symbol:s | s.a ");
+		sources.put("m1", " fonction f  string:s | s.a ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -674,7 +674,7 @@ class TestSemantique {
 	void testAccesSurTypeReserveDansObjet() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " type m {symbol:s } fonction f  m:s | (s.s).p ");
+		sources.put("m1", " type m {string:s } fonction f  m:s | (s.s).p ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -707,7 +707,7 @@ class TestSemantique {
 	void testLiteral() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " type a {symbol:a symbol:b }  fonction f symbol:u symbol:v | [a u v] ");
+		sources.put("m1", " type a {string:a string:b }  fonction f string:u string:v | [a u v] ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -735,7 +735,7 @@ class TestSemantique {
 	void testLiteralAvecErreurTypeVariable() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " type a {symbol:a symbol:b } type b {} fonction f symbol:u b:v | [a u v] ");
+		sources.put("m1", " type a {string:a string:b } type b {} fonction f string:u b:v | [a u v] ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -757,7 +757,7 @@ class TestSemantique {
 	void testLiteralAvecErreurTypeObjet() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " type a {symbol:a b:b } type b {} fonction f symbol:u symbol:v | [a u a u b] ");
+		sources.put("m1", " type a {string:a b:b } type b {} fonction f string:u string:v | [a u a u b] ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -779,7 +779,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1",
-				" type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u symbol:v | [a u b u v] ");
+				" type a {string:a b:b } type b {string:a string:b} fonction f string:u string:v | [a u b u v] ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -797,7 +797,7 @@ class TestSemantique {
 	void testLiteralAvec2ObjetEtUneVariableLibre() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u  | [a u b u totot] ");
+		sources.put("m1", " type a {string:a b:b } type b {string:a string:b} fonction f string:u  | [a u b u totot] ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -815,11 +815,11 @@ class TestSemantique {
 	void testLiteralAvecErreurValidation() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u  | [a u b u totot] ");
+		sources.put("m1", " type a {string:a b:b } type b {string:a string:b} fonction f string:u  | [a u b u totot] ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
-		verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+		verif.validations.put("base$string", (String s) -> s.startsWith("_"));
 
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -835,11 +835,11 @@ class TestSemantique {
 	void testLiteralAvecErreurCreationTypeReserve() {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", " type a {symbol:a b:b } type b {symbol:a symbol:b} fonction f symbol:u  | [a u b u totot] ");
+		sources.put("m1", " type a {string:a b:b } type b {string:a string:b} fonction f string:u  | [a u b u totot] ");
 
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
-		verif.validations.put("base$symbol", (String s) -> s.startsWith("_"));
+		verif.validations.put("base$string", (String s) -> s.startsWith("_"));
 
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
@@ -976,7 +976,7 @@ class TestSemantique {
 
 	@Test
 	void testMultipleFonctionInexistante() {
-		String source = "type b {}  type a:b {} type c:b {}  fonction u symbol:a | f(a) ";
+		String source = "type b {}  type a:b {} type c:b {}  fonction u string:a | f(a) ";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
@@ -1076,7 +1076,7 @@ class TestSemantique {
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);
-		sources.put("m2", " fonction + symbol:a symbol:b -> symbol");
+		sources.put("m2", " fonction + string:a string:b -> symbol");
 		sources.put("m3", "type c {} fonction + c:a c:b -> symbol");
 		Univers univers = parser.lireSourceCode(sources, null);
 		Verificateur verif = new Verificateur(univers);
@@ -1115,7 +1115,7 @@ class TestSemantique {
 
 	@Test
 	public void testTypeSurTypeReserve() {
-		String source = "type u {} fonction m u:u symbol:a int:b | si u est u alors a sinon b";
+		String source = "type u {} fonction m u:u string:a int:b | si u est u alors a sinon b";
 		Parseur parser = new Parseur();
 		Map<String, String> sources = new HashMap<>();
 		sources.put("m1", source);

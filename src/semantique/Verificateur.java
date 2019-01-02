@@ -62,8 +62,8 @@ public class Verificateur implements VisiteurExpression {
 
 	}
 
-	public Verificateur(String nomRepertoire) throws IOException {
-		this(Univers.creerUnivers(nomRepertoire, null));
+	public Verificateur(Class clsAPI,Map<Class,String> typeReserve,String nomRepertoire) throws IOException {
+		this(Univers.creerUnivers(clsAPI,typeReserve,nomRepertoire, null));
 		this.executer();
 	}
 
@@ -96,7 +96,7 @@ public class Verificateur implements VisiteurExpression {
 	public Verificateur(Univers univers) {
 		modules.add("base");
 
-		validations.put("base$symbol", (String s) -> Character.isLetter(s.charAt(0)));
+		validations.put("base$string", (String s) -> Character.isLetter(s.charAt(0)));
 		validations.put("base$int", (String s) -> estInt(s));
 		validations.put("base$float", (String s) -> estFloat(s));
 		this.univers = univers;

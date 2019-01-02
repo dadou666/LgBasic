@@ -35,7 +35,8 @@ public class Univers {
 		return conversionsOp;
 	}
 
-	static public Univers creerUnivers(String chemin, List<String> moduleAPI) throws IOException {
+	static public Univers creerUnivers(Class classAPI, Map<Class, String> typeReserve, String chemin,
+			List<String> moduleAPI) throws IOException {
 		String ls[] = new File(chemin).list();
 		Map<String, String> sources = new HashMap<String, String>();
 		Vector<String> vector = new Vector<String>();
@@ -49,7 +50,20 @@ public class Univers {
 			}
 		}
 		Parseur parseur = new Parseur();
-
+		if (classAPI != null) {
+			List<String> modules = new ArrayList<>();
+			modules.addAll(sources.keySet());
+			if (moduleAPI == null) {
+				moduleAPI = new ArrayList<>();
+			}
+			sources = Univers.sources(classAPI, typeReserve, sources);
+			for (String module : sources.keySet()) {
+				if (!modules.contains(module)) {
+					moduleAPI.add(module);
+					vector.add(module);
+				}
+			}
+		}
 		Univers univers = parseur.lireSourceCode(sources, moduleAPI);
 		if (parseur.error) {
 			return null;

@@ -6,6 +6,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,7 +30,7 @@ import editeur.Executeur;
 import editeur.Terminal;
 import semantique.VerificationFonction;
 
-public class EcranJeux extends JComponent implements KeyListener {
+public class EcranJeux extends JComponent implements KeyListener, WindowListener {
 
 	public Config config1;
 	public Config config2;
@@ -39,6 +41,7 @@ public class EcranJeux extends JComponent implements KeyListener {
 	public List<Projectile> projectiles = new ArrayList<>();
 	public List<Projectile> projectilesTmp = new ArrayList<>();
 	public List<Ressource> ressources = new ArrayList<>();
+	public boolean stop = false;
 
 	public API.api$ressourcesVide ressources() {
 		API.api$ressourcesVide rs = new API.api$ressourcesVide();
@@ -59,6 +62,9 @@ public class EcranJeux extends JComponent implements KeyListener {
 				}
 				if (r instanceof Porte) {
 					tmp = new API.api$porte();
+				}
+				if (r instanceof Reproduction) {
+					tmp = new API.api$reproduction();
 				}
 				tmp.suivant = rs;
 				rs = tmp;
@@ -114,7 +120,7 @@ public class EcranJeux extends JComponent implements KeyListener {
 			ressource.position = p;
 
 			this.ressources.add(ressource);
-			System.out.println(" ajout " + rc);
+//			System.out.println(" ajout " + rc);
 			points.remove(p);
 
 		}
@@ -134,6 +140,44 @@ public class EcranJeux extends JComponent implements KeyListener {
 		this.config2.soldats.add(s);
 	}
 
+	public void loop()
+			throws InterruptedException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		while (!config1.soldats.isEmpty() && !config2.soldats.isEmpty() && !stop) {
+			Thread.sleep(100);
+			this.step();
+			SwingUtilities.invokeAndWait(new Runnable() {
+
+				@Override
+				public void run() {
+                    EcranJeux.this.repaint();
+					
+				}
+				
+				
+			});
+		}
+
+	}
+
+	public void lancerThread() {
+
+		Thread t = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					loop();
+				} catch (Exception e) {
+
+					e.printStackTrace();
+				}
+
+			}
+
+		});
+		t.start();
+	}
+
 	public void step() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		this.config1.deplacer(this);
 		this.config2.deplacer(this);
@@ -148,11 +192,11 @@ public class EcranJeux extends JComponent implements KeyListener {
 
 		projectiles = projectilesTmp;
 		projectilesTmp = tmp;
-		config1.gererActions(this, config2);
-		config2.gererActions(this, config1);
+
 		config1.executer(this, config2);
 		config2.executer(this, config1);
-
+		config1.gererActions(this, config2);
+		config2.gererActions(this, config1);
 	}
 
 	public void paint(Graphics g) {
@@ -168,6 +212,7 @@ public class EcranJeux extends JComponent implements KeyListener {
 			p.paint(g);
 		}
 		for (Ressource r : this.ressources) {
+			if (r.libre)
 			r.paint(g);
 		}
 
@@ -177,11 +222,14 @@ public class EcranJeux extends JComponent implements KeyListener {
 		int nx = 40;
 		int ny = 20;
 		JFrame window = new JFrame();
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setBounds(30, 30, nx * tailleCase, ny * tailleCase);
 		EcranJeux mc;
+
 		try {
 			mc = new EcranJeux(nx, ny, new Config(), new Config());
+			window.addWindowListener(mc);
+
 			window.getContentPane().add(mc);
 			window.setVisible(true);
 			window.addKeyListener(mc);
@@ -207,6 +255,48 @@ public class EcranJeux extends JComponent implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		stop = true;
+		System.out.println(" closing");
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		stop = true;
+		System.out.println(" closed");
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
 		// TODO Auto-generated method stub
 
 	}

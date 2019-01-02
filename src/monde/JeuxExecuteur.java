@@ -1,14 +1,19 @@
 package monde;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import editeur.Executeur;
 import editeur.Terminal;
 import execution.Traducteur;
+import ihm.swing.SwingBuilder;
+import javassist.CannotCompileException;
+import javassist.NotFoundException;
 import semantique.Verificateur;
 import semantique.VerificationFonction;
 
@@ -30,8 +35,39 @@ public class JeuxExecuteur implements Executeur {
 
 	@Override
 	public void executer(Terminal terminal) {
-		Config config1 = this.creerConfig(terminal, true);
-		Config config2 = this.creerConfig(terminal, false);
+		try {
+			executer(terminal.verificateur, terminal.list.getSelectedValue());
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public void executer(Verificateur v, String module) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, NotFoundException, CannotCompileException, IOException {
+		Config config1 = this.creerConfig(v, module, true);
+		Config config2 = this.creerConfig(v, module, false);
 
 		int nx = 40;
 		int ny = 20;
@@ -40,10 +76,12 @@ public class JeuxExecuteur implements Executeur {
 		window.setBounds(30, 30, nx * EcranJeux.tailleCase, ny * EcranJeux.tailleCase);
 		EcranJeux mc;
 		try {
-			mc = new EcranJeux(nx, ny, new Config(), new Config());
+			mc = new EcranJeux(nx, ny, config1, config2);
+			window.addWindowListener(mc);
 			window.getContentPane().add(mc);
 			window.setVisible(true);
 			window.addKeyListener(mc);
+			mc.lancerThread();
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,40 +89,34 @@ public class JeuxExecuteur implements Executeur {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
-	public Config creerConfig(Terminal terminal, boolean estConfig1) {
-
-		Verificateur v = terminal.verificateur;
-		String module = terminal.list.getSelectedValue();
+	public Config creerConfig(Verificateur v, String module, boolean estConfig1) throws ClassNotFoundException, NotFoundException, CannotCompileException, IOException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException {
 
 		Traducteur traducteur = new Traducteur("test" + System.currentTimeMillis(), v);
-		traducteur.typesReserve.put("base$symbol", String.class);
+		traducteur.typesReserve.put("base$string", String.class);
 		traducteur.typesReserve.put("base$int", int.class);
 		traducteur.literalTracducteurs = new HashMap<>();
 		traducteur.api = this.classAPI();
-		traducteur.literalTracducteurs.put("base$symbol", (String s) -> "\"" + s + "\"");
+		traducteur.literalTracducteurs.put("base$string", (String s) -> "\"" + s + "\"");
 		traducteur.literalTracducteurs.put("base$int", (String s) -> s);
 		Class cls;
-		try {
+		
 			cls = traducteur.traduire();
 
 			API o = (API) cls.newInstance();
 			Config config = new Config();
 			config.api = o;
 			if (estConfig1) {
-				config.method = cls.getMethod(module + "$config1/0");
+				config.method = cls.getMethod(module + "$config1");
 			} else {
-				config.method = cls.getMethod(module + "$config2/0");
+				config.method = cls.getMethod(module + "$config2");
 
 			}
 			return config;
 
-		} catch (Exception e) {
 
-		}
-		return null;
+
 	}
 
 	@Override
@@ -118,5 +150,49 @@ public class JeuxExecuteur implements Executeur {
 			return true;
 		}
 		return false;
+	}
+
+	public static void main(String[] args) {
+	//	SwingUtilities.invokeLater(new Runnable() {
+	//		public void run() {
+				JeuxExecuteur je = new JeuxExecuteur();
+				Verificateur verificateur;
+				try {
+					verificateur = new Verificateur(je.classAPI(),je.typeReserve(),"F://GitHub//LgBasic//src//monde");
+					if (verificateur.erreurs.isEmpty()) {
+					try {
+						je.executer(verificateur, "main");
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InstantiationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NoSuchMethodException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SecurityException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (CannotCompileException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+
+	//		}
+//		});
+
 	}
 }

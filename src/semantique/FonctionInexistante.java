@@ -6,6 +6,6 @@ public class FonctionInexistante extends Erreur {
 	public String nomRef;
 	public String nom;
 	public String toString() {
-		return " la fonction "+nomRef+" est inexistante"+nom;
+		return " la fonction "+nom+" est inexistante dans "+nomRef;
 	}
 }

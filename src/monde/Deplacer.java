@@ -18,7 +18,7 @@ public class Deplacer {
 		depart = new Point(balle.position);
 		distance = (float) Math.sqrt(dx * dx + dy * dy);
 		
-		if (distance > 0.0f) {
+		if (distance >= 0.0f) {
 
 			vx = vitesse * (dx / distance);
 			vy = vitesse * (dy / distance);
@@ -37,7 +37,7 @@ public class Deplacer {
 		float dy = destination.y - balle.position.y;
 		depart = new Point(balle.position);
 		distance = (float) Math.sqrt(dx * dx + dy * dy);
-		if (distance > 0.0f) {
+		if (distance >= 0.0f) {
 
 			vx = vitesse * (dx / distance);
 			vy = vitesse * (dy / distance);

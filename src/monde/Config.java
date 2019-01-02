@@ -81,7 +81,8 @@ public class Config {
 	public void deplacer(EcranJeux ecranDessin) {
 		nvSoldats.clear();
 		for (Soldat soldat : soldats) {
-			soldat.deplacer.deplacer(ecranDessin, soldat);
+			if (soldat.deplacer != null) {
+			soldat.deplacer.deplacer(ecranDessin, soldat); }
 		}
 		soldats.addAll(nvSoldats);
 
@@ -191,6 +192,9 @@ public class Config {
 
 	public void attaquer(Soldat soldat, Config adversaire, EcranJeux ecranDessin) {
 		Soldat cible = null;
+		if (soldat.cible != null) {
+			return;
+		}
 		for (Soldat s : adversaire.soldats) {
 			if (cible == null) {
 				cible = s;

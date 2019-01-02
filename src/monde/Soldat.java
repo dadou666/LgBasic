@@ -63,7 +63,7 @@ public class Soldat extends Entite {
 
 	public Ressource cible;
 	public float vitesse() {
-		return vitesses.size();
+		return vitesses.size()+1;
 	}
 
 	@Override

@@ -185,9 +185,9 @@ class TestExecutionJava {
 			NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, InstantiationException {
 		Map<Class, String> typeReserve = new HashMap<>();
-		typeReserve.put(String.class, "base$symbol");
+		typeReserve.put(String.class, "base$string");
 		Map<String, String> sources = new HashMap<>();
-		sources.put("main", "  fonction  cons symbol:s |  t { val=s }  ");
+		sources.put("main", "  fonction  cons string:s |  t { val=s }  ");
 		Univers.sources(APITestExcution2.class, typeReserve, sources);
 		List<String> modules = new ArrayList<>();
 		modules.add("truc");
@@ -196,7 +196,7 @@ class TestExecutionJava {
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
 		Traducteur traducteur = new Traducteur("test", verif);
-		traducteur.typesReserve.put("base$symbol", String.class);
+		traducteur.typesReserve.put("base$string", String.class);
 		traducteur.api = APITestExcution2.class;
 		Class cls = traducteur.traduire();
 		Method m = cls.getMethod("main$cons", String.class);
@@ -214,7 +214,7 @@ class TestExecutionJava {
 		typeReserve.put(String.class, "base$symbol");
 		typeReserve.put(int.class, "base$int");
 		Map<String, String> sources = new HashMap<>();
-		sources.put("main", "  fonction  cons symbol:s |  t { val=s val2=popo }  ");
+		sources.put("main", "  fonction  cons string:s |  t { val=s val2=popo }  ");
 		Univers.sources(APITestExcution3.class, typeReserve, sources);
 		List<String> modules = new ArrayList<>();
 		modules.add("truc");
@@ -223,11 +223,11 @@ class TestExecutionJava {
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
 		Traducteur traducteur = new Traducteur("test", verif);
-		traducteur.typesReserve.put("base$symbol", String.class);
+		traducteur.typesReserve.put("base$string", String.class);
 		traducteur.typesReserve.put("base$int", int.class);
 		traducteur.api = APITestExcution3.class;
 		traducteur.literalTracducteurs = new HashMap<>();
-		traducteur.literalTracducteurs.put("base$symbol", (String s) -> "\"" + s + "\"");
+		traducteur.literalTracducteurs.put("base$string", (String s) -> "\"" + s + "\"");
 		traducteur.literalTracducteurs.put("base$int", (String s) -> s);
 		Class cls = traducteur.traduire();
 		Method m = cls.getMethod("main$cons", String.class);

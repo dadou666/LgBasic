@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
+import editeur.SimpleExecuteur;
 import quantification.Element;
 import quantification.Generalisation;
 import semantique.Verificateur;
@@ -14,8 +15,11 @@ class TestGeneralisation {
 
 	@Test
 	void test() throws IOException {
-		Verificateur verificateur = new Verificateur("F://GitHub//LgBasic//src//test");
+		SimpleExecuteur se= new SimpleExecuteur();
+		Verificateur verificateur = new Verificateur(se.classAPI(),se.typeReserve(),"F://GitHub//LgBasic//src//test");
+		System.out.println(" erreurs="+verificateur.erreurs);
 		assertTrue(verificateur.erreurs.isEmpty());
+
 		Generalisation gen = verificateur.creerGeneralisation("math$gen/2","logic$true");
 		assertTrue(gen != null);
 		TestModuleInit testModuleInit = new TestModuleInit();
@@ -69,7 +73,8 @@ class TestGeneralisation {
 	
 	@Test
 	void test2() throws IOException {
-		Verificateur verificateur = new Verificateur("F://GitHub//LgBasic//src//test");
+		SimpleExecuteur se= new SimpleExecuteur();
+		Verificateur verificateur = new Verificateur(se.classAPI(),se.typeReserve(),"F://GitHub//LgBasic//src//test");
 		assertTrue(verificateur.erreurs.isEmpty());
 		Generalisation gen = verificateur.creerGeneralisation("arbre$prop/1","logic$true");
 		
