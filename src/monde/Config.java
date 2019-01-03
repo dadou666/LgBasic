@@ -17,15 +17,18 @@ public class Config {
 	public int porte;
 	public int vitesse;
 	public int vitesseTire;
+	public int nombreDetruit=0;
+	
 	public List<Soldat> soldats = new ArrayList<>();
 	public List<Soldat> nvSoldats = new ArrayList<>();
 	public List<Ressource> tmp = new ArrayList<>();
 	public API api;
 	public Method method;
 
-	public void executer(EcranJeux ecranJeux,Config adversaire) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public void executer(EcranJeux ecranJeux, Config adversaire)
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		if (method == null) {
-			return ;
+			return;
 		}
 		api.enemies = adversaire.soldats();
 		api.moi = this.soldats();
@@ -39,16 +42,15 @@ public class Config {
 		api.o.vitesseTire = vitesseTire;
 		api.o.puissance = puissance;
 		api.ressources = ecranJeux.ressources();
-		API.api$action r= (api$action) method.invoke(api);
+		API.api$action r = (api$action) method.invoke(api);
 		if (r instanceof API.api$objectif) {
 			API.api$objectif o = (api$objectif) r;
 			this.init(o);
 		}
 		if (r instanceof API.api$ecrire) {
-			API.api$ecrire ecrire =(api$ecrire) r;
+			API.api$ecrire ecrire = (api$ecrire) r;
 			api.objets.put(ecrire.nom, ecrire.valeur);
 		}
-		
 
 	}
 
@@ -81,8 +83,9 @@ public class Config {
 	public void deplacer(EcranJeux ecranDessin) {
 		nvSoldats.clear();
 		for (Soldat soldat : soldats) {
-			if (soldat.deplacer != null) {
-			soldat.deplacer.deplacer(ecranDessin, soldat); }
+			if (soldat.etat != null) {
+				soldat.etat.step(ecranDessin, soldat);
+			}
 		}
 		soldats.addAll(nvSoldats);
 
@@ -99,6 +102,7 @@ public class Config {
 			this.gererActions(soldat, ecran, adversaire);
 
 		}
+		// System.out.println(" ressources ="+tmp);
 		for (Ressource r : tmp) {
 			r.libre = true;
 		}
@@ -108,13 +112,14 @@ public class Config {
 	public void gererAugmentationPopulation(EcranJeux ecran, int n) {
 		tmp.clear();
 		for (Soldat soldat : soldats) {
-			if (soldat.cible == null) {
+			if (soldat.etat == null) {
 				Reproduction reproduction = ecran.donnerRessource(Reproduction.class, soldat);
 				if (reproduction != null) {
-					reproduction.libre = false;
+
 					tmp.add(reproduction);
-					soldat.cible = reproduction;
-					soldat.deplacer(reproduction.position, soldat.vitesse() * ecran.vitesseFactor);
+
+					soldat.deplacerPourRessource(reproduction.position, soldat.vitesse() * ecran.vitesseFactor,
+							reproduction);
 					n--;
 					if (n == 0) {
 						for (Ressource r : tmp) {
@@ -131,61 +136,37 @@ public class Config {
 	}
 
 	public void gererActions(Soldat soldat, EcranJeux ecranDessin, Config adversaire) {
-		if (soldat.projectile != null) {
+
+		if (soldat.etat != null) {
 			return;
 		}
-		if (soldat.deplacer != null) {
-			return;
-		}
-		if (soldat.cible != null) {
-			return;
-		}
+		Ressource r = null;
 		if (soldat.vies.size() < vie) {
-			Vie vie = ecranDessin.donnerRessource(Vie.class, soldat);
-			if (vie != null) {
-				soldat.cible = vie;
-				tmp.add(vie);
-				soldat.deplacer(vie.position, soldat.vitesse() * ecranDessin.vitesseFactor);
-				return;
-			}
+			r = ecranDessin.donnerRessource(Vie.class, soldat);
 		}
-		if (soldat.puissances.size() < puissance) {
-			Puissance puissance = ecranDessin.donnerRessource(Puissance.class, soldat);
-			if (puissance != null) {
-				soldat.cible = puissance;
-				tmp.add(puissance);
-				soldat.deplacer(puissance.position, soldat.vitesse() * ecranDessin.vitesseFactor);
-				return;
-			}
+		if (r == null && soldat.puissances.size() < puissance) {
+			r = ecranDessin.donnerRessource(Puissance.class, soldat);
+
 		}
 
-		if (soldat.vitesses.size() < vitesse) {
-			Vitesse vitesse = ecranDessin.donnerRessource(Vitesse.class, soldat);
-			if (vitesse != null) {
-				soldat.cible = vitesse;
-				tmp.add(vitesse);
-				soldat.deplacer(vitesse.position, soldat.vitesse() * ecranDessin.vitesseFactor);
-				return;
-			}
+		if (r == null && soldat.vitesses.size() < vitesse) {
+			r = ecranDessin.donnerRessource(Vitesse.class, soldat);
+
 		}
-		if (soldat.vitesseTires.size() < vitesseTire) {
-			VitesseTire vitesseTire = ecranDessin.donnerRessource(VitesseTire.class, soldat);
-			if (vitesseTire != null) {
-				soldat.cible = vitesseTire;
-				tmp.add(vitesseTire);
-				soldat.deplacer(vitesseTire.position, soldat.vitesse() * ecranDessin.vitesseFactor);
-				return;
-			}
+		if (r == null && soldat.vitesseTires.size() < vitesseTire) {
+			r = ecranDessin.donnerRessource(VitesseTire.class, soldat);
+
 		}
-		if (soldat.portes.size() < porte) {
-			Porte porte = ecranDessin.donnerRessource(Porte.class, soldat);
-			if (porte != null) {
-				soldat.cible = porte;
-				tmp.add(porte);
-				soldat.deplacer(porte.position, soldat.vitesse() * ecranDessin.vitesseFactor);
-				return;
-			}
+		if (r == null && soldat.portes.size() < porte) {
+			r = ecranDessin.donnerRessource(Porte.class, soldat);
+
 		}
+		if (r != null) {
+			soldat.deplacerPourRessource(r.position, soldat.vitesse() * ecranDessin.vitesseFactor, r);
+			tmp.add(r);
+			return;
+		}
+		
 		this.attaquer(soldat, adversaire, ecranDessin);
 
 	}
@@ -199,7 +180,8 @@ public class Config {
 			if (cible == null) {
 				cible = s;
 			} else {
-				if (s.distance(soldat) < cible.distance(soldat)) {
+				float distance = s.distance(soldat);
+				if (distance > 15 && distance < cible.distance(soldat)) {
 					cible = s;
 
 				}
@@ -207,25 +189,24 @@ public class Config {
 			}
 		}
 		if (cible == null) {
+		
 			return;
 		}
 		float d = soldat.distance(cible);
-		d = (float) Math.sqrt(d);
-		float p = ecranDessin.porteFactor * soldat.portes.size();
-		if (d > p) {
-			soldat.cibleSoldat = cible;
-			soldat.deplacer(cible.position, soldat.vitesse() * ecranDessin.vitesseFactor, d - p);
-			return;
-		}
-		Projectile projectile = new Projectile();
-		projectile.cible = cible;
-		projectile.puissance = soldat.puissances.size();
-		projectile.position = new Point(soldat.position.x, soldat.position.y);
-		projectile.deplacer(cible.position, soldat.vitesseTires.size() * ecranDessin.vitesseTireFactor);
-		projectile.attaquant = soldat;
-		soldat.projectile = projectile;
-		ecranDessin.projectiles.add(projectile);
+		if (d > 0) {
+			
+			float p = ecranDessin.porteFactor * soldat.porte();
+			if (d > p) {
 
+				float distance = d - p;
+				soldat.deplacerPourAttaque(cible.position, distance, soldat.vitesse() * ecranDessin.vitesseFactor,
+						cible);
+
+				return;
+			}
+			soldat.lancerProjectile(ecranDessin, cible);
+			System.out.println(" projectile distance =" + d);
+		}
 	}
 
 }

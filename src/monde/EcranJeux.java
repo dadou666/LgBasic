@@ -24,6 +24,7 @@ import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import editeur.Executeur;
@@ -35,13 +36,15 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 	public Config config1;
 	public Config config2;
 	public static int tailleCase = 40;
-	public float vitesseFactor = 10;
-	public float vitesseTireFactor = 10;
-	public int porteFactor = 10;
+	public float vitesseFactor = 3;
+	public float vitesseTireFactor = 3;
+	public int porteFactor = 15;
 	public List<Projectile> projectiles = new ArrayList<>();
 	public List<Projectile> projectilesTmp = new ArrayList<>();
 	public List<Ressource> ressources = new ArrayList<>();
 	public boolean stop = false;
+	public JLabel soldatDetruit1;
+	public JLabel soldatDetruit2;
 
 	public API.api$ressourcesVide ressources() {
 		API.api$ressourcesVide rs = new API.api$ressourcesVide();
@@ -80,16 +83,22 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 		Ressource rs = null;
 		for (Ressource r : ressources) {
 			if (r.getClass() == cls && r.libre) {
-				if (rs == null) {
-					rs = r;
-				} else {
-					if (soldat.distance(r) < soldat.distance(rs)) {
+				float dist = soldat.distance(r);
+				if (dist > 20) {
+					if (rs == null) {
 						rs = r;
-					}
+					} else {
+						if (dist < soldat.distance(rs)) {
+							rs = r;
+						}
 
+					}
 				}
 
 			}
+		}
+		if (rs != null) {
+			rs.libre = false;
 		}
 		return (T) rs;
 	}
@@ -120,7 +129,7 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 			ressource.position = p;
 
 			this.ressources.add(ressource);
-//			System.out.println(" ajout " + rc);
+			// System.out.println(" ajout " + rc);
 			points.remove(p);
 
 		}
@@ -149,11 +158,10 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 
 				@Override
 				public void run() {
-                    EcranJeux.this.repaint();
-					
+					EcranJeux.this.repaint();
+
 				}
-				
-				
+
 			});
 		}
 
@@ -179,12 +187,15 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 	}
 
 	public void step() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		this.soldatDetruit1.setText("" + config1.nombreDetruit);
+		this.soldatDetruit2.setText("" + config2.nombreDetruit);
+
 		this.config1.deplacer(this);
 		this.config2.deplacer(this);
 		projectilesTmp.clear();
 		for (Projectile p : projectiles) {
-			p.deplacer.deplacer(this, p);
-			if (p.deplacer != null) {
+			p.etat.step(this, p);
+			if (p.etat != null) {
 				projectilesTmp.add(p);
 			}
 		}
@@ -213,7 +224,7 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 		}
 		for (Ressource r : this.ressources) {
 			if (r.libre)
-			r.paint(g);
+				r.paint(g);
 		}
 
 	}

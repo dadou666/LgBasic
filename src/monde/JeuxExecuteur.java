@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import editeur.Executeur;
@@ -73,13 +74,31 @@ public class JeuxExecuteur implements Executeur {
 		int ny = 20;
 		JFrame window = new JFrame();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setBounds(30, 30, nx * EcranJeux.tailleCase, ny * EcranJeux.tailleCase);
+	//	window.setBounds(30, 30, nx * EcranJeux.tailleCase, ny * EcranJeux.tailleCase+30);
 		EcranJeux mc;
 		try {
 			mc = new EcranJeux(nx, ny, config1, config2);
 			window.addWindowListener(mc);
-			window.getContentPane().add(mc);
-			window.setVisible(true);
+			SwingBuilder sb = new SwingBuilder(window);
+			mc.soldatDetruit1 = new JLabel();
+			mc.soldatDetruit2 = new JLabel();
+			sb.beginY();
+			sb.setSize(100, 30);
+			sb.beginX();
+			sb.setSize(200, 30);
+			sb.add(new JLabel("nom soldat detruit rouge"));
+			sb.setSize(100, 30);
+			sb.add(mc.soldatDetruit1);
+			sb.setSize(200, 30);
+			sb.add(new JLabel("nom soldat detruit noir"));
+			sb.setSize(100, 30);
+			sb.add(mc.soldatDetruit2);
+			sb.end();
+			sb.setSize(nx * EcranJeux.tailleCase, ny * EcranJeux.tailleCase);
+			sb.add(mc);
+			sb.end();
+			
+			sb.open("War");
 			window.addKeyListener(mc);
 			mc.lancerThread();
 		} catch (InstantiationException e) {
