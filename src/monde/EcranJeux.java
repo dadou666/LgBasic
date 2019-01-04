@@ -16,6 +16,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +31,7 @@ import javax.swing.SwingUtilities;
 
 import editeur.Executeur;
 import editeur.Terminal;
+import reader.Factory;
 import semantique.VerificationFonction;
 
 public class EcranJeux extends JComponent implements KeyListener, WindowListener {
@@ -103,46 +106,32 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 		return (T) rs;
 	}
 
-	public EcranJeux(int nx, int ny, Config config1, Config config2)
+	public EcranJeux(Sauvegarde sauvegarde,Config config1, Config config2)
 			throws InstantiationException, IllegalAccessException {
-		List<Point> points = new ArrayList<Point>();
-		for (int ix = 0; ix < nx - 1; ix++) {
+		
+		RessourceSauvegardeVide tmp = sauvegarde.ressources;
+		while (tmp instanceof RessourceSauvegarde) {
+			RessourceSauvegarde rs =(RessourceSauvegarde) tmp;
+			Point p = new Point(rs.x*tailleCase+tailleCase/2,rs.y*tailleCase+tailleCase/2);
 
-			for (int iy = 0; iy < ny - 1; iy++) {
-				points.add(new Point(ix * tailleCase + tailleCase / 2, iy * tailleCase + tailleCase / 2));
-
-			}
-		}
-		List<Class<? extends Ressource>> liste = new ArrayList<>();
-		liste.add(Vie.class);
-		liste.add(Reproduction.class);
-		liste.add(Vitesse.class);
-		liste.add(VitesseTire.class);
-		liste.add(Puissance.class);
-		liste.add(Porte.class);
-		Random random = new Random();
-		int size = points.size() / 4;
-		while (points.size() > size) {
-			Point p = points.get(random.nextInt(points.size() - 1));
-			Class<? extends Ressource> rc = liste.get(random.nextInt(liste.size() - 1));
-			Ressource ressource = rc.newInstance();
+			Ressource ressource = rs.ressource;
+			ressource.libre = true;
 			ressource.position = p;
+			
 
 			this.ressources.add(ressource);
-			// System.out.println(" ajout " + rc);
-			points.remove(p);
+			tmp = rs.suivant;
 
 		}
-		Point p = points.get(random.nextInt(points.size() - 1));
-		points.remove(p);
+		Point p =  new Point(sauvegarde.x1*tailleCase+tailleCase/2,sauvegarde.y1*tailleCase+tailleCase/2);
+		
 		this.config1 = config1;
 		Soldat s = new Soldat();
 		s.position = p;
 		s.config = this.config1;
 		this.config1.soldats.add(s);
 		this.config2 = config2;
-		p = points.get(random.nextInt(points.size() - 1));
-		points.remove(p);
+		p =  new Point(sauvegarde.x2*tailleCase+tailleCase/2,sauvegarde.y2*tailleCase+tailleCase/2);
 		s = new Soldat();
 		s.position = p;
 		s.config = this.config2;
@@ -230,15 +219,18 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 	}
 
 	public static void main(String[] a) {
-		int nx = 40;
-		int ny = 20;
-		JFrame window = new JFrame();
-		// window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setBounds(30, 30, nx * tailleCase, ny * tailleCase);
-		EcranJeux mc;
+
+
 
 		try {
-			mc = new EcranJeux(nx, ny, new Config(), new Config());
+			String srcSauvegarde = new String(Files.readAllBytes(Paths.get(JeuxExecuteur.chemin, "sauvegarde.txt")));
+			Factory factory = new Factory(srcSauvegarde);
+			Sauvegarde sauvegarde = (Sauvegarde) factory.toObject();
+			JFrame window = new JFrame();
+			// window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			window.setBounds(30, 30, sauvegarde.nx * tailleCase, sauvegarde.ny * tailleCase);
+			EcranJeux mc;
+			mc = new EcranJeux(sauvegarde, new Config(), new Config());
 			window.addWindowListener(mc);
 
 			window.getContentPane().add(mc);
@@ -248,6 +240,18 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

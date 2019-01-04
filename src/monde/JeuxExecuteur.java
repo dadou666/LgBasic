@@ -2,6 +2,8 @@ package monde;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,10 +17,12 @@ import execution.Traducteur;
 import ihm.swing.SwingBuilder;
 import javassist.CannotCompileException;
 import javassist.NotFoundException;
+import reader.Factory;
 import semantique.Verificateur;
 import semantique.VerificationFonction;
 
 public class JeuxExecuteur implements Executeur {
+	public static String chemin = "";
 	@Override
 	public Class classAPI() {
 		// TODO Auto-generated method stub
@@ -70,14 +74,18 @@ public class JeuxExecuteur implements Executeur {
 		Config config1 = this.creerConfig(v, module, true);
 		Config config2 = this.creerConfig(v, module, false);
 
-		int nx = 40;
-		int ny = 20;
+
 		JFrame window = new JFrame();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	//	window.setBounds(30, 30, nx * EcranJeux.tailleCase, ny * EcranJeux.tailleCase+30);
 		EcranJeux mc;
 		try {
-			mc = new EcranJeux(nx, ny, config1, config2);
+			String srcSauvegarde = new String(Files.readAllBytes(Paths.get(JeuxExecuteur.chemin, "sauvegarde.txt")));
+			Factory factory = new Factory(srcSauvegarde);
+			Sauvegarde sauvegarde = (Sauvegarde) factory.toObject();
+			int nx = sauvegarde.nx;
+			int ny = sauvegarde.ny;
+			mc = new EcranJeux(sauvegarde, config1, config2);
 			window.addWindowListener(mc);
 			SwingBuilder sb = new SwingBuilder(window);
 			mc.soldatDetruit1 = new JLabel();
@@ -105,6 +113,9 @@ public class JeuxExecuteur implements Executeur {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -177,7 +188,8 @@ public class JeuxExecuteur implements Executeur {
 				JeuxExecuteur je = new JeuxExecuteur();
 				Verificateur verificateur;
 				try {
-					verificateur = new Verificateur(je.classAPI(),je.typeReserve(),"F://GitHub//LgBasic//src//monde");
+					chemin ="F://GitHub//LgBasic//src//monde";
+					verificateur = new Verificateur(je.classAPI(),je.typeReserve(),chemin);
 					if (verificateur.erreurs.isEmpty()) {
 					try {
 						je.executer(verificateur, "main");
