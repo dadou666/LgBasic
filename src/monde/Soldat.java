@@ -71,7 +71,7 @@ public class Soldat extends Entite {
 		DeplacerProjectile deplacerProjectile= new DeplacerProjectile(projectile,cible.position, vitesseTire() * ecranJeux.vitesseTireFactor);
 		projectile.attaquant = this;
 		projectile.etat =deplacerProjectile;
-		etat = new Attaque(deplacerProjectile);
+		etat = new Attaquer(deplacerProjectile);
 		ecranJeux.projectiles.add(projectile);
 	}
 

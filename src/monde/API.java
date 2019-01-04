@@ -65,6 +65,8 @@ public class API {
 		public int porte;
 		public int vitesse;
 		public int vitesseTire;
+		public api$boolean ressourcesActif ;
+		public api$boolean populationActif ;
 
 	}
 	static public class api$ecrire extends api$action {

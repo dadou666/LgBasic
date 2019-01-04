@@ -17,8 +17,10 @@ public class Config {
 	public int porte;
 	public int vitesse;
 	public int vitesseTire;
-	public int nombreDetruit=0;
-	
+	public int nombreDetruit = 0;
+	public boolean ressourcesActif = true;
+	public boolean populationActif = true;
+
 	public List<Soldat> soldats = new ArrayList<>();
 	public List<Soldat> nvSoldats = new ArrayList<>();
 	public List<Ressource> tmp = new ArrayList<>();
@@ -78,6 +80,8 @@ public class Config {
 		this.vitesse = o.vitesse;
 		this.vitesseTire = o.vitesseTire;
 		this.porte = o.porte;
+		this.ressourcesActif = (o.ressourcesActif instanceof API.api$vrai);
+		this.populationActif = (o.populationActif instanceof API.api$vrai);
 	}
 
 	public void deplacer(EcranJeux ecranDessin) {
@@ -93,7 +97,7 @@ public class Config {
 
 	public void gererActions(EcranJeux ecran, Config adversaire) {
 
-		if (soldats.size() < population) {
+		if (soldats.size() < population && this.populationActif) {
 			this.gererAugmentationPopulation(ecran, population - soldats.size());
 			return;
 		}
@@ -141,32 +145,33 @@ public class Config {
 			return;
 		}
 		Ressource r = null;
-		if (soldat.vies.size() < vie) {
-			r = ecranDessin.donnerRessource(Vie.class, soldat);
-		}
-		if (r == null && soldat.puissances.size() < puissance) {
-			r = ecranDessin.donnerRessource(Puissance.class, soldat);
+		if (this.ressourcesActif) {
+			if (soldat.vies.size() < vie) {
+				r = ecranDessin.donnerRessource(Vie.class, soldat);
+			}
+			if (r == null && soldat.puissances.size() < puissance) {
+				r = ecranDessin.donnerRessource(Puissance.class, soldat);
 
-		}
+			}
 
-		if (r == null && soldat.vitesses.size() < vitesse) {
-			r = ecranDessin.donnerRessource(Vitesse.class, soldat);
+			if (r == null && soldat.vitesses.size() < vitesse) {
+				r = ecranDessin.donnerRessource(Vitesse.class, soldat);
 
-		}
-		if (r == null && soldat.vitesseTires.size() < vitesseTire) {
-			r = ecranDessin.donnerRessource(VitesseTire.class, soldat);
+			}
+			if (r == null && soldat.vitesseTires.size() < vitesseTire) {
+				r = ecranDessin.donnerRessource(VitesseTire.class, soldat);
 
-		}
-		if (r == null && soldat.portes.size() < porte) {
-			r = ecranDessin.donnerRessource(Porte.class, soldat);
+			}
+			if (r == null && soldat.portes.size() < porte) {
+				r = ecranDessin.donnerRessource(Porte.class, soldat);
 
+			}
+			if (r != null) {
+				soldat.deplacerPourRessource(r.position, soldat.vitesse() * ecranDessin.vitesseFactor, r);
+				tmp.add(r);
+				return;
+			}
 		}
-		if (r != null) {
-			soldat.deplacerPourRessource(r.position, soldat.vitesse() * ecranDessin.vitesseFactor, r);
-			tmp.add(r);
-			return;
-		}
-		
 		this.attaquer(soldat, adversaire, ecranDessin);
 
 	}
@@ -189,12 +194,12 @@ public class Config {
 			}
 		}
 		if (cible == null) {
-		
+
 			return;
 		}
 		float d = soldat.distance(cible);
 		if (d > 0) {
-			
+
 			float p = ecranDessin.porteFactor * soldat.porte();
 			if (d > p) {
 

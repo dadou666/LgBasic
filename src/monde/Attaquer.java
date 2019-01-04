@@ -1,8 +1,8 @@
 package monde;
 
-public class Attaque extends EtatEntite {
+public class Attaquer extends EtatEntite {
 	public DeplacerProjectile deplacerProjectile;
-	public Attaque(DeplacerProjectile deplacerProjectile) {
+	public Attaquer(DeplacerProjectile deplacerProjectile) {
 		this.deplacerProjectile =deplacerProjectile;
 	}
 	
