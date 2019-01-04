@@ -149,10 +149,7 @@ public class Config {
 			if (soldat.vies.size() < vie) {
 				r = ecranDessin.donnerRessource(Vie.class, soldat);
 			}
-			if (r == null && soldat.puissances.size() < puissance) {
-				r = ecranDessin.donnerRessource(Puissance.class, soldat);
 
-			}
 
 			if (r == null && soldat.vitesses.size() < vitesse) {
 				r = ecranDessin.donnerRessource(Vitesse.class, soldat);
@@ -177,6 +174,14 @@ public class Config {
 	}
 
 	public void attaquer(Soldat soldat, Config adversaire, EcranJeux ecranDessin) {
+		if (soldat.puissances.size() < puissance) {
+			Puissance r = ecranDessin.donnerRessource(Puissance.class, soldat);
+			if (r != null) {
+				soldat.deplacerPourRessource(r.position, soldat.vitesse() * ecranDessin.vitesseFactor, r);
+				tmp.add(r);
+				return;
+			}
+		}
 		Soldat cible = null;
 		if (soldat.cible != null) {
 			return;
