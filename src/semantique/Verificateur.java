@@ -62,8 +62,8 @@ public class Verificateur implements VisiteurExpression {
 
 	}
 
-	public Verificateur(Class clsAPI,Map<Class,String> typeReserve,String nomRepertoire) throws IOException {
-		this(Univers.creerUnivers(clsAPI,typeReserve,nomRepertoire, null));
+	public Verificateur(Class clsAPI, Map<Class, String> typeReserve, String nomRepertoire) throws IOException {
+		this(Univers.creerUnivers(clsAPI, typeReserve, nomRepertoire, null));
 		this.executer();
 	}
 
@@ -130,6 +130,28 @@ public class Verificateur implements VisiteurExpression {
 			}
 		}
 		return sousTypes;
+
+	}
+
+	public void listerTypesCompatible(String t, List<String> resultat, boolean exclureTypeAbstrait) {
+		TypeDef td = types.get(t);
+		if (exclureTypeAbstrait) {
+			if (!td.estAbstrait) {
+				resultat.add(t);
+			}
+		} else {
+			resultat.add(t);
+		}
+
+		for (Map.Entry<String, TypeDef> e : types.entrySet()) {
+			td = e.getValue();
+			if (td.superType != null) {
+				if (td.superType.nomRef().equals(t)) {
+					this.listerTypesCompatible(e.getKey(), resultat, exclureTypeAbstrait);
+				}
+			}
+		}
+
 
 	}
 
@@ -604,7 +626,7 @@ public class Verificateur implements VisiteurExpression {
 		}
 		TypeDef td = this.types.get(objet.typeOrVar.nomRef());
 		if (td != null && td.estAbstrait) {
-			CreationTypeAbstrait erreur= new CreationTypeAbstrait();
+			CreationTypeAbstrait erreur = new CreationTypeAbstrait();
 			erreur.nomRef = nomRef;
 			erreur.nom = objet.typeOrVar.nomRef();
 			erreurs.add(erreur);
@@ -953,7 +975,7 @@ public class Verificateur implements VisiteurExpression {
 
 					}
 					if (validation.valider(opRef.nom)) {
-						op.expression = new VarRef(refs.get(idxLiteral).nom,true);
+						op.expression = new VarRef(refs.get(idxLiteral).nom, true);
 						opRef.type = RefLiteral.Type.Symbol;
 						idxLiteral++;
 					} else {

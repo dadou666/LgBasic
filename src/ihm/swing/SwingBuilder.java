@@ -81,9 +81,14 @@ public class SwingBuilder extends UIBuilder<JComponent> {
 		frame.getContentPane().removeAll();
 
 		composite.build(this);
+		composite = null;
 		// frame.pack();
 		frame.setVisible(true);
 
+	}
+	public void reopen(String title) {
+		
+		this.openIn(title, frame);
 	}
 
 	@Override
