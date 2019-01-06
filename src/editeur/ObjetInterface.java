@@ -1,5 +1,6 @@
 package editeur;
 
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -22,7 +24,10 @@ import semantique.VerificationType;
 
 public class ObjetInterface {
 	public Verificateur verificateur;
-	public int tailleColonne = 150;
+	static public int tailleColonne = 150;
+	static public int tailleLigne = 25;
+	static public int nbColonne = 5;
+	static public int nbLigne = 10;
 	public List<ChampInterface> champs = new ArrayList<>();
 	public ChampObjet champ;
 	public String type;
@@ -35,7 +40,9 @@ public class ObjetInterface {
 	public ObjetInterface(String type, Verificateur verificateur, SwingBuilder sb) {
 		this.sb = sb;
 		this.verificateur = verificateur;
+		this.sb.size = new Point(nbColonne*tailleColonne,nbLigne*tailleLigne);
 		this.sb.beginY();
+		
 		this.creer(type, 0);
 		this.sb.end();
 	}
@@ -62,7 +69,7 @@ public class ObjetInterface {
 
 				sb.beginX();
 				sb.space(profondeur * tailleColonne);
-				sb.setSize(tailleColonne, 20);
+				sb.setSize(tailleColonne, tailleLigne);
 				sb.add(champSaisie.label = new JLabel(champNom));
 				JTextField textField = new JTextField();
 				champSaisie.jTextField = textField;
@@ -88,18 +95,22 @@ public class ObjetInterface {
 				}
 				jcomboBox.setModel(model);
 				sb.space(profondeur * tailleColonne);
-				sb.setSize(tailleColonne, 20);
+				sb.setSize(tailleColonne, tailleLigne);
 				sb.add(champObjet.label = new JLabel(champNom));
 				sb.add(jcomboBox);
 				JCheckBox jcheckbox = new JCheckBox();
 				sb.add(jcheckbox);
+				JButton focusOrParent = new JButton("Focus");
+				sb.add(focusOrParent);
 				ObjetInterface oi = new ObjetInterface();
 				oi.verificateur = verificateur;
 				jcomboBox.addActionListener(champObjet);
 				jcheckbox.addActionListener(champObjet);
+				focusOrParent.addActionListener(champObjet);
 				oi.champ = champObjet;
 				champObjet.jComboBox = jcomboBox;
 				champObjet.jCheckBox = jcheckbox;
+				champObjet.focusOrParent = focusOrParent;
 				champObjet.objetInterface = oi;
 				champObjet.parent = this;
 				sb.end();

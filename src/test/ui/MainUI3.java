@@ -19,6 +19,7 @@ public class MainUI3 {
 		JFrame window = new JFrame();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SwingBuilder sb = new SwingBuilder(window);
+		ObjetInterface.nbColonne = 4;
 		ObjetInterface oi = new ObjetInterface("model$contrat",verificateur,sb);
 		assertTrue(oi.champs.size() == 2);
 		oi.sb.open("Test");

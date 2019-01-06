@@ -11,7 +11,7 @@ public class ChampSaisie extends ChampInterface {
 	public void reconstruire(ChampObjet champObjet,String nouveauType,SwingBuilder sb,int tailleColonne,int profondeur) {
 		sb.beginX();
 		sb.space(profondeur * tailleColonne);
-		sb.setSize(tailleColonne, 20);
+		sb.setSize(tailleColonne, ObjetInterface.tailleLigne);
 		sb.add(label);
 
 		sb.add(jTextField);

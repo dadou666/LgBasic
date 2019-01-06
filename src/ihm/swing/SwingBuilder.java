@@ -2,6 +2,7 @@ package ihm.swing;
 
 import java.awt.Color;
 import java.awt.Insets;
+import java.awt.Point;
 
 import ihm.Component;
 import ihm.UIBuilder;
@@ -13,6 +14,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 public class SwingBuilder extends UIBuilder<JComponent> {
 	public JFrame frame;
+	public Point size;
 
 	public SwingBuilder(JFrame frame) {
 		this.frame = frame;
@@ -51,8 +53,12 @@ public class SwingBuilder extends UIBuilder<JComponent> {
 		frame.setResizable(false);
 		frame.setTitle(title);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		if (size != null) {
+			frame.setSize(size.x+ i.left + i.right, size.y
+					+ i.top + i.bottom);	
+		} else {
 		frame.setSize(composite.width + i.left + i.right, composite.height
-				+ i.top + i.bottom);
+				+ i.top + i.bottom); }
 		frame.setLayout(null);
 
 		composite.build(this);
@@ -75,8 +81,12 @@ public class SwingBuilder extends UIBuilder<JComponent> {
 		frame.setResizable(false);
 		frame.setTitle(title);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		if (size != null) {
+			frame.setSize(size.x+ i.left + i.right, size.y
+					+ i.top + i.bottom);	
+		} else {
 		frame.setSize(composite.width + i.left + i.right, composite.height
-				+ i.top + i.bottom);
+				+ i.top + i.bottom); }
 		frame.setLayout(null);
 		frame.getContentPane().removeAll();
 
