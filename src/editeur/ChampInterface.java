@@ -6,13 +6,17 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-public class ChampInterface {
-	public JComponent component;
-	public ObjetInterface parent;
-	public ObjetInterface objetInterface;
+import ihm.swing.SwingBuilder;
+
+abstract public class ChampInterface {
+	
+	
+
 	public String nom;
 	public String type;
 	public JLabel label;
-	public Map<String,ObjetInterface> historique = new HashMap<>();
+	abstract	public void reconstruire(ChampObjet champObjet,String nouveauType,SwingBuilder sb,int tailleColonne,int profondeur); 
+
+
 
 }
