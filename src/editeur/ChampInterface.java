@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 
 public class ChampInterface {
 	public JComponent component;
+	public ObjetInterface parent;
 	public ObjetInterface objetInterface;
 	public String nom;
 	public String type;

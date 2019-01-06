@@ -561,7 +561,16 @@ public class Verificateur implements VisiteurExpression {
 		}
 
 	}
+	public void listeVarAvecType(String nomRef, List<Var> r) {
+		TypeDef td = this.types.get(nomRef);
+		for (Var var : td.vars) {
+			r.add(var);
+		}
+		if (td.superType != null) {
+			this.listeVarAvecType(td.superType.nomRef(), r);
+		}
 
+	}
 	public void verifierDoublonVar(String nomType) {
 		TypeDef type = this.types.get(nomType);
 		List<String> nomsHeritage = new ArrayList<>();

@@ -1,0 +1,30 @@
+abstrait type entite {}
+type entreprise:entite {
+	string:nom
+	personne:president
+}
+type personne:entite {
+	string:nom
+	string:prenom
+	int:age
+}
+type contrat {
+	entite:souscripteur
+	string:numero
+}
+
+ type objet { listeVide:liste}
+
+type listeVide {}
+abstrait type liste:listeVide {
+	
+
+}
+type listeString:liste {
+	string:chaine
+	listeVide:suivant
+}
+type listeInt:liste {
+	int:int
+	listeVide:suivant
+}

@@ -14,6 +14,8 @@ import javax.swing.JTextField;
 
 import ihm.swing.SwingBuilder;
 import model.TypeDef;
+import model.Var;
+import semantique.TypeReserveValidation;
 import semantique.Verificateur;
 import semantique.VerificationType;
 
@@ -21,27 +23,42 @@ public class ObjetInterface implements ActionListener {
 	public Verificateur verificateur;
 	public int tailleColonne = 150;
 	public List<ChampInterface> champs = new ArrayList<>();
-	public ChampInterface parent;
+	public ChampInterface champ;
 	public String type;
 	public SwingBuilder sb;
+	public ObjetInterface() {
+		
+	}
+	public ObjetInterface(String type,Verificateur verificateur,SwingBuilder sb) {
+		this.sb=sb;
+		this.verificateur = verificateur;
+		this.sb.beginY();
+		this.creer(type, 0);
+		this.sb.end();
+	}
 
 	public void creer(String type, int profondeur) {
 		this.type = type;
-		Map<String, String> map = new HashMap<>();
-		verificateur.listeVarAvecType(type, map);
-		for (Map.Entry<String, String> e : map.entrySet()) {
+		List<Var> vars = new ArrayList<>();
+		verificateur.listeVarAvecType(type, vars);
+		if (champ != null) {
+			champ.historique.put(type, this);
+		}
+		for (Var var:vars) {
 
-			String champType = e.getValue();
-			String champNom = e.getKey();
-			VerificationType vt = verificateur.verificationTypes.get(champType);
+			String champType = var.type.nomRef();
+			String champNom = var.nom;
+			TypeReserveValidation trv = verificateur.validations.get(champType);
 			TypeDef td = verificateur.types.get(champType);
 			ChampInterface champInterface = new ChampInterface();
 			champInterface.nom = champNom;
 			champInterface.type = champType;
 			champs.add(champInterface);
-			if (vt != null) {
+			champInterface.parent = this;
+			
+			if (trv != null) {
 				sb.beginX();
-				sb.space(2 * profondeur * tailleColonne);
+				sb.space( profondeur * tailleColonne);
 				sb.setSize(tailleColonne, 20);
 				sb.add(champInterface.label = new JLabel(champNom));
 				JTextField textField = new JTextField();
@@ -63,19 +80,21 @@ public class ObjetInterface implements ActionListener {
 					model.addElement(tp);
 				}
 				jcomboBox.setModel(model);
-				sb.space(2 * profondeur * tailleColonne);
+				sb.space( profondeur * tailleColonne);
 				sb.setSize(tailleColonne, 20);
 				sb.add(champInterface.label = new JLabel(champNom));
 				sb.add(jcomboBox);
 				ObjetInterface oi = new ObjetInterface();
 				oi.verificateur = verificateur;
 				jcomboBox.addActionListener(oi);
-				oi.parent = champInterface;
+				oi.champ = champInterface;
 				champInterface.component = jcomboBox;
+				champInterface.objetInterface = oi;
 
 				sb.end();
 				oi.sb = sb;
-				oi.creer(champType, profondeur + 1);
+				
+				oi.creer(champType, profondeur + 1); 
 
 			}
 
@@ -88,44 +107,62 @@ public class ObjetInterface implements ActionListener {
 
 		JComboBox cb = (JComboBox) e.getSource();
 		String nouveauType = (String) cb.getSelectedItem();
-		this.racine().reconstruire(parent, nouveauType, 0);
-
+	//	sb.frame.getRootPane().removeAll();
+		sb.beginY();
+		this.racine().reconstruire(champ, nouveauType, 0);
+		sb.end();
+		this.sb.reopen("Test");
 	}
 
 	public ObjetInterface racine() {
-		if (parent == null) {
+		if (champ == null) {
 			return this;
 		}
-		return parent.objetInterface.racine();
+		return champ.parent.racine();
 	}
 
 	public void reconstruire(ChampInterface ci, String nouveauType, int profondeur) {
-		if (ci == parent) {
-			ci.historique.put(type, ci.objetInterface);
+		if (ci != null &&ci == champ) {
+
 			type = nouveauType;
-			ObjetInterface oi = ci.historique.get(nouveauType);
+			ObjetInterface oi =ci.historique.get(nouveauType);
 			if (oi != null) {
 				ci.objetInterface = oi;
-				oi.reconstruire(ci, nouveauType, profondeur);
+				oi.reconstruire(null, nouveauType, profondeur);
 			} else {
 				oi = new ObjetInterface();
 				ci.objetInterface = oi;
+				oi.sb=sb;
 				oi.verificateur = this.verificateur;
+				oi.champ =ci;
 				oi.creer(nouveauType, profondeur );
+				
+				
 
 			}
+			JComboBox<String> jcb = (JComboBox<String>) ci.component;
+			jcb.removeActionListener(this);
+			
+			jcb.addActionListener(oi);
 
 		} else {
-			for (ChampInterface champ : this.champs) {
+			for (ChampInterface champTmp : this.champs) {
 				sb.beginX();
-				sb.space(2 * profondeur * tailleColonne);
+				sb.space(profondeur * tailleColonne);
 				sb.setSize(tailleColonne, 20);
-				sb.add(champ.label);
+				sb.add(champTmp.label);
 
-				sb.add(champ.component);
+				sb.add(champTmp.component);
 				sb.end();
-				if (champ.objetInterface != null) {
-					champ.objetInterface.reconstruire(ci, nouveauType, profondeur + 1);
+				if (champTmp.objetInterface != null) {
+					int d=1;
+					if (champ!=null && champ.type.equals(champTmp.type)) {
+						d=0;
+						sb.beginX();
+						sb.add(new JLabel());
+						sb.end();
+					}
+					champTmp.objetInterface.reconstruire(ci, nouveauType, profondeur + d);
 
 				}
 
