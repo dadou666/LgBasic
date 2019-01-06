@@ -9,13 +9,23 @@ public class Deplacer extends EtatEntite{
 	public float vitesse;
 	public float vx;
 	public float vy;
-	public Point destination;
-	public Point depart;
+	
+	public float px;
+	public float py;
+	public float ix;
+	public float iy;
+	
+	public float destx;
+	public float desty;
+	
 
 	public Deplacer(Entite balle, Point destination, float vitesse, float d) {
 		float dx = destination.x - balle.position.x;
 		float dy = destination.y - balle.position.y;
-		depart = new Point(balle.position);
+		px = balle.position.x;
+		py=  balle.position.y;
+		ix=px;
+		iy=py;
 		distance = (float) Math.sqrt(dx * dx + dy * dy);
 
 		if (distance > 0.0f) {
@@ -26,7 +36,9 @@ public class Deplacer extends EtatEntite{
 			float y = balle.position.y;
 			x += d * dx / distance;
 			y += d * dy / distance;
-			this.destination = new Point((int) x, (int) y);
+
+			this.destx=x;
+			this.desty=y;
 			this.vitesse = vitesse;
 			return;
 		}
@@ -37,13 +49,18 @@ public class Deplacer extends EtatEntite{
 	public Deplacer(Entite balle, Point destination, float vitesse) {
 		float dx = destination.x - balle.position.x;
 		float dy = destination.y - balle.position.y;
-		depart = new Point(balle.position);
+
+		px= balle.position.x;
+		py= balle.position.y;
+		ix=px;
+		iy=py;
 		distance = (float) Math.sqrt(dx * dx + dy * dy);
 		if (distance >= 0.0f) {
 
 			vx = vitesse * (dx / distance);
 			vy = vitesse * (dy / distance);
-			this.destination = destination;
+			this.destx= destination.x;
+			this.desty =destination.y;
 			this.vitesse = vitesse;
 			return;
 		}
@@ -56,20 +73,19 @@ public class Deplacer extends EtatEntite{
 	}
 
 	public void deplacer(EcranJeux ecran, Entite balle) {
-		float dx = depart.x - balle.position.x;
-		float dy = depart.y - balle.position.y;
+		float dx = ix - px;
+		float dy = iy - py;
 
-		float x = balle.position.x;
-		float y = balle.position.y;
-		x += vx;
-		y += vy;
-		balle.position.x = (int) x;
-		balle.position.y = (int) y;
+
+		px += vx;
+		py += vy;
+		balle.position.x = (int) px;
+		balle.position.y = (int) py;
 		float d = (float) Math.sqrt(dx * dx + dy * dy);
 
 		if (d >= distance) {
 
-			balle.position.setLocation(destination.x, destination.y);
+			balle.position.setLocation(destx, desty);
 			balle.etat.finEtat(ecran, balle);
 		
 			return;

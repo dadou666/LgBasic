@@ -8,7 +8,7 @@ public class Projectile extends Entite {
 	Soldat attaquant;
 	int puissance;
 	public Projectile() {
-		this.rayon=8;
+		this.rayon=4;
 	}
 	
 	@Override

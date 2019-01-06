@@ -9,6 +9,7 @@ import java.util.Stack;
 public class Soldat extends Entite {
 	public Color color;
 	public Stack<Vie> vies = new Stack<>();
+	public boolean estMort = false;
 
 	public List<Porte> portes = new ArrayList<>();
 	public List<Vitesse> vitesses = new ArrayList<>();
@@ -36,7 +37,7 @@ public class Soldat extends Entite {
 		
 		
 	}
-	public void detruire() {
+	public void detruire(EcranJeux ecranJeux) {
 		if (reproduction != null) {
 			reproduction.libre = true;
 		}
@@ -53,7 +54,10 @@ public class Soldat extends Entite {
 		for (Puissance p : puissances) {
 			p.libre = true;
 		}
-		
+		estMort = true;
+		if (etat != null) {
+			etat.finEtat(ecranJeux, this);
+		}
 		config.soldats.remove(this);
 	}
 

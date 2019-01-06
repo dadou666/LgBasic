@@ -11,6 +11,10 @@ public class Porte extends Ressource {
 
 	@Override
 	public void executer(EcranJeux ed, Soldat soldat) {
+		if (soldat.estMort) {
+			this.libre = true;
+			return;
+		}
 		soldat.portes.add(this);
 		
 	}

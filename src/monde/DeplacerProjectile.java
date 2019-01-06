@@ -23,7 +23,7 @@ public class DeplacerProjectile extends Deplacer {
 
 			while (!projectile.attaquant.puissances.isEmpty()) {
 				if (projectile.cible.vies.isEmpty()) {
-					projectile.cible.detruire();
+					projectile.cible.detruire(ecranJeux);
 					projectile.cible.config.nombreDetruit++;
 					return;
 				}

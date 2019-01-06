@@ -23,7 +23,7 @@ public class Config {
 
 	public List<Soldat> soldats = new ArrayList<>();
 	public List<Soldat> nvSoldats = new ArrayList<>();
-	public List<Ressource> tmp = new ArrayList<>();
+	
 	public API api;
 	public Method method;
 
@@ -101,41 +101,33 @@ public class Config {
 			this.gererAugmentationPopulation(ecran, population - soldats.size());
 			return;
 		}
-		tmp.clear();
+
 		for (Soldat soldat : soldats) {
 			this.gererActions(soldat, ecran, adversaire);
 
 		}
-		// System.out.println(" ressources ="+tmp);
-		for (Ressource r : tmp) {
-			r.libre = true;
-		}
+	
 
 	}
 
 	public void gererAugmentationPopulation(EcranJeux ecran, int n) {
-		tmp.clear();
+		
 		for (Soldat soldat : soldats) {
 			if (soldat.etat == null) {
 				Reproduction reproduction = ecran.donnerRessource(Reproduction.class, soldat);
 				if (reproduction != null) {
 
-					tmp.add(reproduction);
-
+		
 					soldat.deplacerPourRessource(reproduction.position, soldat.vitesse() * ecran.vitesseFactor,
 							reproduction);
 					n--;
 					if (n == 0) {
-						for (Ressource r : tmp) {
-							r.libre = true;
-						}
+						return;
 					}
 				}
 			}
 		}
-		for (Ressource r : tmp) {
-			r.libre = true;
-		}
+		
 
 	}
 
@@ -165,7 +157,7 @@ public class Config {
 			}
 			if (r != null) {
 				soldat.deplacerPourRessource(r.position, soldat.vitesse() * ecranDessin.vitesseFactor, r);
-				tmp.add(r);
+			
 				return;
 			}
 		}
@@ -178,7 +170,7 @@ public class Config {
 			Puissance r = ecranDessin.donnerRessource(Puissance.class, soldat);
 			if (r != null) {
 				soldat.deplacerPourRessource(r.position, soldat.vitesse() * ecranDessin.vitesseFactor, r);
-				tmp.add(r);
+			
 				return;
 			}
 		}

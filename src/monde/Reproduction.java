@@ -13,6 +13,10 @@ public class Reproduction extends Ressource {
 
 	@Override
 	public void executer(EcranJeux ed, Soldat soldat) {
+		if (soldat.estMort) {
+			this.libre = true;
+			return;
+		}
 		Soldat nvSoldat = new Soldat();
 		nvSoldat.position = new Point(position.x,position.y);
 		nvSoldat.config = soldat.config;

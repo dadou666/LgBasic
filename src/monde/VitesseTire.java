@@ -12,7 +12,10 @@ public class VitesseTire extends Ressource {
 
 	@Override
 	public void executer(EcranJeux ed, Soldat soldat) {
-		// TODO Auto-generated method stub
+		if (soldat.estMort) {
+			this.libre = true;
+			return;
+		}
 		soldat.vitesseTires.add(this);
 		
 	}

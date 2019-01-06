@@ -40,7 +40,7 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 	public Config config2;
 	public static int tailleCase = 40;
 	public float vitesseFactor = 3;
-	public float vitesseTireFactor = 3;
+	public float vitesseTireFactor = 7;
 	public int porteFactor = 15;
 	public List<Projectile> projectiles = new ArrayList<>();
 	public List<Projectile> projectilesTmp = new ArrayList<>();
@@ -106,32 +106,31 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 		return (T) rs;
 	}
 
-	public EcranJeux(Sauvegarde sauvegarde,Config config1, Config config2)
+	public EcranJeux(Sauvegarde sauvegarde, Config config1, Config config2)
 			throws InstantiationException, IllegalAccessException {
-		
+
 		RessourceSauvegardeVide tmp = sauvegarde.ressources;
 		while (tmp instanceof RessourceSauvegarde) {
-			RessourceSauvegarde rs =(RessourceSauvegarde) tmp;
-			Point p = new Point(rs.x*tailleCase+tailleCase/2,rs.y*tailleCase+tailleCase/2);
+			RessourceSauvegarde rs = (RessourceSauvegarde) tmp;
+			Point p = new Point(rs.x * tailleCase + tailleCase / 2, rs.y * tailleCase + tailleCase / 2);
 
 			Ressource ressource = rs.ressource;
 			ressource.libre = true;
 			ressource.position = p;
-			
 
 			this.ressources.add(ressource);
 			tmp = rs.suivant;
 
 		}
-		Point p =  new Point(sauvegarde.x1*tailleCase+tailleCase/2,sauvegarde.y1*tailleCase+tailleCase/2);
-		
+		Point p = new Point(sauvegarde.x1 * tailleCase + tailleCase / 2, sauvegarde.y1 * tailleCase + tailleCase / 2);
+
 		this.config1 = config1;
 		Soldat s = new Soldat();
 		s.position = p;
 		s.config = this.config1;
 		this.config1.soldats.add(s);
 		this.config2 = config2;
-		p =  new Point(sauvegarde.x2*tailleCase+tailleCase/2,sauvegarde.y2*tailleCase+tailleCase/2);
+		p = new Point(sauvegarde.x2 * tailleCase + tailleCase / 2, sauvegarde.y2 * tailleCase + tailleCase / 2);
 		s = new Soldat();
 		s.position = p;
 		s.config = this.config2;
@@ -182,16 +181,16 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 		this.config1.deplacer(this);
 		this.config2.deplacer(this);
 		projectilesTmp.clear();
-		for (Projectile p : projectiles) {
-			p.etat.step(this, p);
-			if (p.etat != null) {
-				projectilesTmp.add(p);
-			}
+		projectilesTmp.addAll(projectiles);
+		projectiles.clear();
+		for (Projectile p : projectilesTmp) {
+			
+				p.etat.step(this, p);
+				if (p.etat != null) {
+					projectiles.add(p);
+				}
+			
 		}
-		List<Projectile> tmp = projectiles;
-
-		projectiles = projectilesTmp;
-		projectilesTmp = tmp;
 
 		config1.executer(this, config2);
 		config2.executer(this, config1);
@@ -219,8 +218,6 @@ public class EcranJeux extends JComponent implements KeyListener, WindowListener
 	}
 
 	public static void main(String[] a) {
-
-
 
 		try {
 			String srcSauvegarde = new String(Files.readAllBytes(Paths.get(JeuxExecuteur.chemin, "sauvegarde.txt")));
