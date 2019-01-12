@@ -311,32 +311,35 @@ public class Traducteur implements VisiteurExpression {
 		}
 
 		Map<String, CtMethod> methodes = new HashMap<>();
-		for (Map.Entry<String, VerificationFonction> vf : this.verificateur.fonctions.entrySet()) {
-			String tmp[] = vf.getKey().split("\\$");
-			if (vf.getValue().fonction.expression != null) {
+		for (Map.Entry<String, List<VerificationFonction>> vfs : this.verificateur.fonctions.entrySet()) {
+			String tmp[] = vfs.getKey().split("\\$");
+			for(VerificationFonction vf:vfs.getValue()) {
+			if (vf.fonction.expression != null) {
 
-				List<Var> vars = vf.getValue().fonction.params;
+				List<Var> vars = vf.fonction.params;
 				CtClass typesParam[] = new CtClass[vars.size()];
 				for (int i = 0; i < vars.size(); i++) {
 					typesParam[i] = types.get(vars.get(i).type.nomRef());
 				}
-				CtClass typeRetour = types.get(vf.getValue().typeRetour);
-				String nomFonction = vf.getValue().module + "$" + this.nomFonction(vf.getValue().fonction.nom);
+				CtClass typeRetour = types.get(vf.typeRetour);
+				String nomFonction = vf.module + "$" + this.nomFonction(vf.fonction.nom)+"_"+vf.fonction.idx;
 				CtMethod m = new CtMethod(typeRetour, nomFonction, typesParam, resultClass);
 
 				resultClass.addMethod(m);
-				methodes.put(vf.getKey(), m);
+				methodes.put(nomFonction, m);
 
-			}
+			} }
 
 		}
-		for (Map.Entry<String, VerificationFonction> vf : this.verificateur.fonctions.entrySet()) {
-			CtMethod method = methodes.get(vf.getKey());
+		for (Map.Entry<String, List<VerificationFonction>> vfs : this.verificateur.fonctions.entrySet()) {
+			for(VerificationFonction vf:vfs.getValue()) {
+				String nomFonction = vf.module + "$" + this.nomFonction(vf.fonction.nom)+"_"+vf.fonction.idx;
+				CtMethod method = methodes.get(nomFonction);
 			if (method != null) {
 				this.source = new StringBuilder();
 				this.varCast.clear();
 				indexVars = new HashMap<>();
-				fonctionDef = vf.getValue().fonction;
+				fonctionDef = vf.fonction;
 				int idx = 1;
 				for (Var var : fonctionDef.params) {
 					indexVars.put(var.nom, "$" + idx);
@@ -362,7 +365,7 @@ public class Traducteur implements VisiteurExpression {
 				method.setBody(source.toString());
 			}
 
-		}
+		}}
 		resultClass.setModifiers(resultClass.getModifiers() & ~Modifier.ABSTRACT);
 		for (Map.Entry<String, CtClass> e : types.entrySet()) {
 			this.defineClass(types, e.getKey(), e.getValue());
@@ -500,11 +503,15 @@ public class Traducteur implements VisiteurExpression {
 		String var = "_$" + this.idxTmpVar;
 		this.tmpVars.put(appel, var);
 		this.idxTmpVar++;
-		String fonction = this.nomFonction(appel.nom);
+		VerificationFonction vf = this.verificateur.fonctions.get(appel.nomRef()).get(appel.idx);
+		String fonction = this.nomFonction(appel.nom)+"_"+appel.idx;
+		if (vf.fonction.expression == null) {
+			fonction = this.nomFonction(appel.nom);
+		}
 		for (Expression e : appel.params) {
 			e.visiter(this);
 		}
-		VerificationFonction vf = this.verificateur.fonctions.get(appel.nomRef());
+
 		String typeRetour = vf.typeRetour;
 		if (typesReserve.get(typeRetour) != null) {
 

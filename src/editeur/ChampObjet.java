@@ -30,6 +30,11 @@ public class ChampObjet extends ChampInterface implements ActionListener {
 			// sb.frame.getRootPane().removeAll();
 			objetInterface.sb.beginY();
 			ObjetInterface racine = objetInterface.racine();
+			if (racine.champ != null) {
+				objetInterface.sb.add(parent.champ.focusOrParent);	
+				parent.champ.focusOrParent.setText("Parent");
+				parent.champ.focus = true;
+			}
 			racine.reconstruire(this, nouveauType, 0);
 			objetInterface.sb.end();
 			objetInterface.sb.reopen(racine.type);
@@ -38,6 +43,11 @@ public class ChampObjet extends ChampInterface implements ActionListener {
 			hide = jCheckBox.isSelected();
 			objetInterface.sb.beginY();
 			ObjetInterface racine = objetInterface.racine();
+			if (racine.champ != null) {
+				objetInterface.sb.add(parent.champ.focusOrParent);	
+				parent.champ.focusOrParent.setText("Parent");
+				parent.champ.focus = true;
+			}
 			racine.reconstruire(null, null, 0);
 			objetInterface.sb.end();
 			objetInterface.sb.reopen(racine.type);
@@ -71,7 +81,7 @@ public class ChampObjet extends ChampInterface implements ActionListener {
 	@Override
 	public void reconstruire(ChampObjet champObjet, String nouveauType, SwingBuilder sb, int tailleColonne,
 			int profondeur) {
-		int d = 1;
+		
 		sb.beginX();
 		sb.space(profondeur * tailleColonne);
 		sb.setSize(tailleColonne, ObjetInterface.tailleLigne);
@@ -81,14 +91,9 @@ public class ChampObjet extends ChampInterface implements ActionListener {
 		sb.add(jCheckBox);
 		sb.add(focusOrParent);
 		sb.end();
-		if (parent.champ != null && parent.champ.type.equals(type)) {
-			d = 0;
-			sb.beginX();
-			sb.add(new JLabel());
-			sb.end();
-		}
+	
 		if (!hide) {
-			objetInterface.reconstruire(champObjet, nouveauType, profondeur + d);
+			objetInterface.reconstruire(champObjet, nouveauType, profondeur + 1);
 		}
 	}
 }

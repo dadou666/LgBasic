@@ -57,7 +57,7 @@ public class SimpleExecuteur implements Executeur {
 			return false;
 		}
 		if (terminal.verificateur != null) {
-			VerificationFonction fd =terminal.verificateur.fonctions.get(module+"$main/0");
+			VerificationFonction fd =terminal.verificateur.fonctions.get(module+"$main/0").get(0);
 			if  (fd != null) {
 				return true;
 			}

@@ -215,22 +215,7 @@ class TestSemantique {
 
 	}
 
-	@Test
-	void testNomFonctionEnDouble() {
-		Parseur parser = new Parseur();
-		Map<String, String> sources = new HashMap<>();
-		sources.put("m1", "fonction a string:a | a   fonction a string:v | v");
-		Univers univers = parser.lireSourceCode(sources, null);
-		Verificateur verif = new Verificateur(univers);
-		verif.executerPourTypes();
-		verif.executerPourFonctions();
-		assertTrue(verif.erreurs.size() == 1);
-		Erreur erreur = verif.erreurs.get(0);
-		assertTrue(erreur instanceof DoublonNomFonction);
-		DoublonNomFonction doublonNomFonction = (semantique.DoublonNomFonction) erreur;
-		assertTrue(doublonNomFonction.nom.equals("m1$a/1"));
 
-	}
 
 	@Test
 	void testTypeInconnuDansParametreFonction() {
@@ -294,7 +279,7 @@ class TestSemantique {
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
 		assertTrue(verif.erreurs.isEmpty());
-		VerificationFonction vf = verif.fonctions.get("m1$not/1");
+		VerificationFonction vf = verif.fonctions.get("m1$not/1").get(0);
 		assertTrue(vf.typeRetour.equals("m1$bool"));
 
 	}
@@ -698,7 +683,7 @@ class TestSemantique {
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
 		assertTrue(verif.erreurs.isEmpty());
-		VerificationFonction vf = verif.fonctions.get("m1$f/1");
+		VerificationFonction vf = verif.fonctions.get("m1$f/1").get(0);
 		assertTrue(vf.typeRetour.equals("base$symbol"));
 
 	}
@@ -715,7 +700,7 @@ class TestSemantique {
 
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		VerificationFonction vf = verif.fonctions.get("m1$f/2");
+		VerificationFonction vf = verif.fonctions.get("m1$f/2").get(0);
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression != null);
 		Objet o = l.expression;
@@ -743,7 +728,7 @@ class TestSemantique {
 
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		VerificationFonction vf = verif.fonctions.get("m1$f/2");
+		VerificationFonction vf = verif.fonctions.get("m1$f/2").get(0);
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression == null);
 		assertTrue(verif.erreurs.size() == 1);
@@ -765,7 +750,7 @@ class TestSemantique {
 
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		VerificationFonction vf = verif.fonctions.get("m1$f/2");
+		VerificationFonction vf = verif.fonctions.get("m1$f/2").get(0);
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression == null);
 		assertTrue(verif.erreurs.size() == 1);
@@ -787,7 +772,7 @@ class TestSemantique {
 
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		VerificationFonction vf = verif.fonctions.get("m1$f/2");
+		VerificationFonction vf = verif.fonctions.get("m1$f/2").get(0);
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression != null);
 
@@ -805,7 +790,7 @@ class TestSemantique {
 
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		VerificationFonction vf = verif.fonctions.get("m1$f/1");
+		VerificationFonction vf = verif.fonctions.get("m1$f/1").get(0);
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression != null);
 
@@ -823,7 +808,7 @@ class TestSemantique {
 
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		VerificationFonction vf = verif.fonctions.get("m1$f/1");
+		VerificationFonction vf = verif.fonctions.get("m1$f/1").get(0);
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression == null);
 		assertTrue(verif.erreurs.size() == 1);
@@ -843,7 +828,7 @@ class TestSemantique {
 
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		VerificationFonction vf = verif.fonctions.get("m1$f/1");
+		VerificationFonction vf = verif.fonctions.get("m1$f/1").get(0);
 		assertTrue(vf.fonction.expression != null);
 		Literal l = (Literal) vf.fonction.expression;
 		assertTrue(l.expression == null);
@@ -966,7 +951,7 @@ class TestSemantique {
 
 		verif.executerPourTypes();
 		verif.executerPourFonctions();
-		VerificationFonction vf = verif.fonctions.get("m1$u/1");
+		VerificationFonction vf = verif.fonctions.get("m1$u/1").get(0);
 		assertTrue(vf != null);
 		TestType test = (TestType) vf.fonction.expression;
 		Objet objet = (Objet) test.alors;
@@ -1248,7 +1233,7 @@ class TestSemantique {
 		verif.executerPourParams();
 		verif.executerPourFonctions();
 		Afficheur afficheur = new Afficheur();
-		System.out.println(verif.fonctions.get("m1$commutation/2").fonction.expression.transformer(afficheur));
+		System.out.println(verif.fonctions.get("m1$commutation/2").get(0).fonction.expression.transformer(afficheur));
 		assertTrue(verif.erreurs.isEmpty());
 
 	}
@@ -1268,7 +1253,7 @@ class TestSemantique {
 		verif.executerPourParams();
 		verif.executerPourFonctions();
 		assertTrue(verif.erreurs.isEmpty());
-		assertTrue(verif.fonctions.get("m1$=/2").typeRetour != null);
+		assertTrue(verif.fonctions.get("m1$=/2").get(0).typeRetour != null);
 
 	}
 
@@ -1324,5 +1309,22 @@ class TestSemantique {
 		// StandardCharsets.UTF_8.name() > JDK 7
 		return result.toString("UTF-8");
 	}
+	@Test
+	public void testAppelFonctionAvecPlusieurDef() {
+		String source = "type a {} type b {}  fonction + a:a a:b | a fonction + b:a b:b | b  fonction main1 | a {} + a {} fonction main2 | b {} + b {} ";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
 
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
+		verif.validations.put("base$int", (String s) -> estInt(s));
+		verif.validations.put("base$float", (String s) -> estFloat(s));
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		assertTrue(verif.erreurs.isEmpty());
+
+
+	}
 }

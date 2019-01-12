@@ -81,7 +81,7 @@ class TestGeneralisation {
 		assertTrue(gen != null);
 		TestModuleInit testModuleInit = new TestModuleInit();
 		gen.element.et.expression.visiter(testModuleInit);
-		verificateur.fonctions.get("arbre$=/2").fonction.expression.visiter(testModuleInit);
+		verificateur.fonctions.get("arbre$=/2").get(0).fonction.expression.visiter(testModuleInit);
 		gen.calculer();
 		assertFalse(gen.element.transformation == null);
 		assertFalse(gen.enfants.isEmpty());

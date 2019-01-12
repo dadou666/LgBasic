@@ -7,6 +7,7 @@ import semantique.VerificationFonction;
 
 public class Appel extends Expression {
 	public Ref nom;
+	public int idx;
 	public boolean erreur = false;
 	public VerificationFonction vf;
 

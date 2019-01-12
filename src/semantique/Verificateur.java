@@ -34,7 +34,7 @@ public class Verificateur implements VisiteurExpression {
 	public Map<String, TypeDef> types = new HashMap<>();
 	public Map<String, ParamDef> params = new HashMap<>();
 	public Map<String, VerificationType> verificationTypes = new HashMap<>();
-	public Map<String, VerificationFonction> fonctions = new HashMap<>();
+	public Map<String, List<VerificationFonction>> fonctions = new HashMap<>();
 	public List<Erreur> erreurs = new ArrayList<>();
 	public String nomRef;
 	public Set<String> modules = new HashSet<>();
@@ -68,12 +68,12 @@ public class Verificateur implements VisiteurExpression {
 	}
 
 	public Generalisation creerGeneralisation(String fonction, String type) {
-		VerificationFonction vf = this.fonctions.get(fonction);
-		if (vf == null) {
+		List<VerificationFonction> vfs = this.fonctions.get(fonction);
+		if (vfs.isEmpty()) {
 			return null;
 		}
+		VerificationFonction vf = vfs.get(0);
 
-		TypeDef typeDef = this.types.get(type);
 		if (type == null) {
 			return null;
 		}
@@ -152,14 +152,13 @@ public class Verificateur implements VisiteurExpression {
 			}
 		}
 
-
 	}
 
 	public String simplifierFonction(String nom) {
 		String tmp[] = nom.split("\\$");
-		VerificationFonction vf = null;
+		List<VerificationFonction> vf = null;
 		for (String module : modules) {
-			if (vf == null) {
+			if (vf.isEmpty()) {
 				vf = fonctions.get(module + "$" + tmp[1]);
 
 			} else {
@@ -236,22 +235,26 @@ public class Verificateur implements VisiteurExpression {
 
 		if (appel.nom.moduleInit) {
 
-			VerificationFonction vf = fonctions.get(appel.nomRef());
-			if (vf != null) {
-				rs.add(vf);
+			List<VerificationFonction> vf = fonctions.get(appel.nomRef());
+			if (vf != null && vf.size() == 1) {
+				rs.add(vf.get(0));
 				return rs;
 
+			}
+			if (vf != null) {
+			//	rs.addAll(vf);
 			}
 
 			for (String module : modules) {
 				String nomRefTmp = module + "$" + appel.nomRefPartiel();
 
 				vf = fonctions.get(nomRefTmp);
-				if (vf != null) {
-					vf.module = module;
-					vf.nomFonction = nomRefTmp;
-					rs.add(vf);
-				}
+				if (vf != null)
+					for (VerificationFonction v : vf) {
+						v.module = module;
+						v.nomFonction = nomRefTmp;
+						rs.add(v);
+					}
 			}
 			if (rs.isEmpty()) {
 				FonctionInexistante fonctionInexistante = new FonctionInexistante();
@@ -265,8 +268,8 @@ public class Verificateur implements VisiteurExpression {
 
 		}
 
-		VerificationFonction vf = fonctions.get(appel.nomRef());
-		if (vf == null) {
+		List<VerificationFonction> vf = fonctions.get(appel.nomRef());
+		if (vf == null || vf.isEmpty()) {
 			FonctionInexistante fonctionInexistante = new FonctionInexistante();
 			fonctionInexistante.nom = appel.nom.nomRef();
 			fonctionInexistante.nomRef = nomRef;
@@ -274,7 +277,7 @@ public class Verificateur implements VisiteurExpression {
 			erreurs.add(fonctionInexistante);
 			return rs;
 		}
-		rs.add(vf);
+		rs.addAll(vf);
 		return rs;
 	}
 
@@ -305,104 +308,109 @@ public class Verificateur implements VisiteurExpression {
 		for (Map.Entry<String, Module> module : univers.modules.entrySet()) {
 			for (FonctionDef fonction : module.getValue().fonctions) {
 				String nomRefTmp = module.getKey() + "$" + fonction.nom + "/" + fonction.params.size();
-				if (fonctions.get(nomRefTmp) != null) {
-					DoublonNomFonction doublon = new DoublonNomFonction();
-					doublon.nom = nomRefTmp;
+				List<VerificationFonction> ls = fonctions.get(nomRefTmp);
+				if (fonctions.get(nomRefTmp) == null) {
+					ls = new ArrayList<VerificationFonction>();
+					fonctions.put(nomRefTmp, ls);
 
-					erreurs.add(doublon);
-					erreur = true;
-
-				} else {
-					VerificationFonction vf = new VerificationFonction();
-					vf.fonction = fonction;
-					vf.module = module.getKey();
-					fonctions.put(nomRefTmp, vf);
 				}
+				VerificationFonction vf = new VerificationFonction();
+				vf.fonction = fonction;
+				vf.module = module.getKey();
+				fonction.idx = ls.size();
+				ls.add(vf);
+
 			}
 
 		}
 		if (erreur) {
 			return;
 		}
-		for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
-			FonctionDef fonction = vf.getValue().fonction;
-			List<String> noms = new ArrayList<>();
-			for (Var var : fonction.params) {
-				if (noms.contains(var.nom)) {
-					DoublonParamFonction e = new DoublonParamFonction();
-					e.nom = var.nom;
-					e.nomFonction = vf.getKey();
-					erreurs.add(e);
-					erreur = true;
+		for (Map.Entry<String, List<VerificationFonction>> vfs : fonctions.entrySet()) {
+			for (VerificationFonction vf : vfs.getValue()) {
+				FonctionDef fonction = vf.fonction;
+				List<String> noms = new ArrayList<>();
+				for (Var var : fonction.params) {
+					if (noms.contains(var.nom)) {
+						DoublonParamFonction e = new DoublonParamFonction();
+						e.nom = var.nom;
+						e.nomFonction = vfs.getKey();
+						erreurs.add(e);
+						erreur = true;
 
-				} else {
-					noms.add(var.nom);
+					} else {
+						noms.add(var.nom);
+					}
+					if (!this.trouverType(var.type, FonctionDef.class, vfs.getKey())) {
+						erreur = true;
+					}
 				}
-				if (!this.trouverType(var.type, FonctionDef.class, vf.getKey())) {
-					erreur = true;
-				}
-			}
-			if (vf.getValue().fonction.typeRetour != null) {
-				if (!this.trouverType(vf.getValue().fonction.typeRetour, FonctionDef.class, vf.getKey())) {
-					erreur = true;
+				if (vf.fonction.typeRetour != null) {
+					if (!this.trouverType(vf.fonction.typeRetour, FonctionDef.class, vfs.getKey())) {
+						erreur = true;
+					}
 				}
 			}
 		}
 		if (erreur) {
 			return;
 		}
-		for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
-			this.variables = new HashMap<String, String>();
-			for (Var var : vf.getValue().fonction.params) {
-				this.variables.put(var.nom, var.type.nomRef());
+		for (Map.Entry<String, List<VerificationFonction>> vfs : fonctions.entrySet()) {
+			for (VerificationFonction vf : vfs.getValue()) {
+				this.variables = new HashMap<String, String>();
+				for (Var var : vf.fonction.params) {
+					this.variables.put(var.nom, var.type.nomRef());
+				}
+				this.nomRef = vfs.getKey();
+				if (vf.fonction.expression == null) {
+
+					vf.typeRetour = vf.fonction.typeRetour.nomRef();
+				} else {
+					vf.fonction.expression.visiter(this);
+
+				}
 			}
-			this.nomRef = vf.getKey();
-			if (vf.getValue().fonction.expression == null) {
-
-				vf.getValue().typeRetour = vf.getValue().fonction.typeRetour.nomRef();
-			} else {
-				vf.getValue().fonction.expression.visiter(this);
-
-			}
-
 		}
-		for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
-			this.variables = new HashMap<String, String>();
-			for (Var var : vf.getValue().fonction.params) {
-				this.variables.put(var.nom, var.type.nomRef());
+		for (Map.Entry<String, List<VerificationFonction>> vfs : fonctions.entrySet()) {
+			for (VerificationFonction vf : vfs.getValue()) {
+				this.variables = new HashMap<String, String>();
+				for (Var var : vf.fonction.params) {
+					this.variables.put(var.nom, var.type.nomRef());
+				}
+				this.nomRef = vfs.getKey();
+				if (vf.fonction.expression == null) {
+
+					vf.typeRetour = vf.fonction.typeRetour.nomRef();
+				} else {
+					// vf.getValue().fonction.expression.visiter(this);
+					CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
+					calculerTypeRetour.variables.putAll(variables);
+					calculerTypeRetour.verificateur = this;
+
+					vf.fonction.expression.visiter(calculerTypeRetour);
+					vf.typeRetour = calculerTypeRetour.type;
+				}
+
 			}
-			this.nomRef = vf.getKey();
-			if (vf.getValue().fonction.expression == null) {
-
-				vf.getValue().typeRetour = vf.getValue().fonction.typeRetour.nomRef();
-			} else {
-				// vf.getValue().fonction.expression.visiter(this);
-				CalculerTypeRetour calculerTypeRetour = new CalculerTypeRetour();
-				calculerTypeRetour.variables.putAll(variables);
-				calculerTypeRetour.verificateur = this;
-
-				vf.getValue().fonction.expression.visiter(calculerTypeRetour);
-				vf.getValue().typeRetour = calculerTypeRetour.type;
-			}
-
 		}
 		if (this.erreurs.isEmpty()) {
-			for (Map.Entry<String, VerificationFonction> vf : fonctions.entrySet()) {
+			for (Map.Entry<String, List<VerificationFonction>> vfs : fonctions.entrySet()) {
+				for (VerificationFonction vf : vfs.getValue()) {
+					if (vf.fonction.expression != null) {
+						this.variables = new HashMap<String, String>();
+						for (Var var : vf.fonction.params) {
+							this.variables.put(var.nom, var.type.nomRef());
+						}
+						ResoudreModuleRef resoudre = new ResoudreModuleRef();
+						resoudre.nom = vfs.getKey();
+						resoudre.variables = variables;
+						resoudre.verificateur = this;
+						this.nomRef = vfs.getKey();
+						vf.fonction.expression.visiter(resoudre);
 
-				if (vf.getValue().fonction.expression != null) {
-					this.variables = new HashMap<String, String>();
-					for (Var var : vf.getValue().fonction.params) {
-						this.variables.put(var.nom, var.type.nomRef());
 					}
-					ResoudreModuleRef resoudre = new ResoudreModuleRef();
-					resoudre.nom = vf.getKey();
-					resoudre.variables = variables;
-					resoudre.verificateur = this;
-					this.nomRef = vf.getKey();
-					vf.getValue().fonction.expression.visiter(resoudre);
 
 				}
-
 			}
 		}
 	}
@@ -561,6 +569,7 @@ public class Verificateur implements VisiteurExpression {
 		}
 
 	}
+
 	public void listeVarAvecType(String nomRef, List<Var> r) {
 		TypeDef td = this.types.get(nomRef);
 		for (Var var : td.vars) {
@@ -571,6 +580,7 @@ public class Verificateur implements VisiteurExpression {
 		}
 
 	}
+
 	public void verifierDoublonVar(String nomType) {
 		TypeDef type = this.types.get(nomType);
 		List<String> nomsHeritage = new ArrayList<>();
@@ -795,6 +805,7 @@ public class Verificateur implements VisiteurExpression {
 		}
 		appel.nom.module = lsValide.get(0).module;
 		appel.erreur = false;
+		appel.idx = lsValide.get(0).fonction.idx;
 		appel.nom.moduleInit = false;
 		appel.vf = lsValide.get(0);
 	}

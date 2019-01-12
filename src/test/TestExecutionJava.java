@@ -61,7 +61,7 @@ class TestExecutionJava {
 		Class cls = traducteur.traduire();
 		Class math$zero = traducteur.mapClass.get("math$zero");
 		assertTrue(math$zero != null);
-		Method m = cls.getMethod("math$add", math$zero, math$zero);
+		Method m = cls.getMethod("math$add_0", math$zero, math$zero);
 		Object a = traducteur.construire("n n   zero");
 		Object b = traducteur.construire("n   zero");
 		Object r = m.invoke(cls.newInstance(), a, b);
@@ -91,7 +91,7 @@ class TestExecutionJava {
 		Class math$zero = traducteur.mapClass.get("math$zero");
 		assertTrue(math$zero != null);
 		assertTrue(math$zero == APITestExcution.math$zero.class);
-		Method m = cls.getMethod("main$add", math$zero, math$zero);
+		Method m = cls.getMethod("main$add_0", math$zero, math$zero);
 		Object a = traducteur.construire("n n   zero");
 		Object b = traducteur.construire("n   zero");
 		Object r = m.invoke(cls.newInstance(), a, b);
@@ -119,7 +119,7 @@ class TestExecutionJava {
 		Class math$zero = traducteur.mapClass.get("math$zero");
 		assertTrue(math$zero != null);
 		assertTrue(math$zero == APITestExcution.math$zero.class);
-		Method m = cls.getMethod("main$nb");
+		Method m = cls.getMethod("main$nb_0");
 		Object r = m.invoke(cls.newInstance());
 		assertTrue(traducteur.source(r).equals(traducteur.source(traducteur.construire("n n n zero"))));
 
@@ -144,7 +144,7 @@ class TestExecutionJava {
 		Class math$zero = traducteur.mapClass.get("math$zero");
 		assertTrue(math$zero != null);
 		assertTrue(math$zero == APITestExcution.math$zero.class);
-		Method m = cls.getMethod("main$nb");
+		Method m = cls.getMethod("main$nb_0");
 		Object r = m.invoke(cls.newInstance());
 		assertTrue(traducteur.source(r).equals(traducteur.source(traducteur.construire(" n n zero"))));
 
@@ -169,12 +169,12 @@ class TestExecutionJava {
 		traducteur.typesReserve.put("base$symbol", String.class);
 		traducteur.api = APITestExcution2.class;
 		Class cls = traducteur.traduire();
-		Method m = cls.getMethod("main$f", APITestExcution2.truc$t.class);
+		Method m = cls.getMethod("main$f_0", APITestExcution2.truc$t.class);
 		APITestExcution2.truc$t t = new APITestExcution2.truc$t();
 		t.val = "hello";
 		Object r = m.invoke(cls.newInstance(), t);
 		assertTrue(r.equals(t.val));
-		m = cls.getMethod("main$id", APITestExcution2.truc$t.class);
+		m = cls.getMethod("main$id_0", APITestExcution2.truc$t.class);
 
 		assertTrue(m.invoke(cls.newInstance(), t) == t);
 
@@ -199,7 +199,7 @@ class TestExecutionJava {
 		traducteur.typesReserve.put("base$string", String.class);
 		traducteur.api = APITestExcution2.class;
 		Class cls = traducteur.traduire();
-		Method m = cls.getMethod("main$cons", String.class);
+		Method m = cls.getMethod("main$cons_0", String.class);
 
 		APITestExcution2.truc$t t = (truc$t) m.invoke(cls.newInstance(), "hello");
 		assertTrue(t.val.equals("hello"));
@@ -230,7 +230,7 @@ class TestExecutionJava {
 		traducteur.literalTracducteurs.put("base$string", (String s) -> "\"" + s + "\"");
 		traducteur.literalTracducteurs.put("base$int", (String s) -> s);
 		Class cls = traducteur.traduire();
-		Method m = cls.getMethod("main$cons", String.class);
+		Method m = cls.getMethod("main$cons_0", String.class);
 
 		APITestExcution3.truc$t t = (APITestExcution3.truc$t) m.invoke(cls.newInstance(), "hello");
 		assertTrue(t.val.equals("hello"));
@@ -279,7 +279,7 @@ class TestExecutionJava {
 		traducteur.literalTracducteurs.put("base$symbol", (String s) -> "\"" + s + "\"");
 		traducteur.literalTracducteurs.put("base$int", (String s) -> s);
 		Class cls = traducteur.traduire();
-		Method m = cls.getMethod("main$cons", String.class);
+		Method m = cls.getMethod("main$cons_0", String.class);
 
 		APITestExcution3.truc$u t = (APITestExcution3.truc$u) m.invoke(cls.newInstance(), "hello");
 		assertTrue(t.val.equals("hello"));
@@ -313,7 +313,7 @@ class TestExecutionJava {
 		traducteur.literalTracducteurs.put("base$symbol", (String s) -> "\"" + s + "\"");
 		traducteur.literalTracducteurs.put("base$int", (String s) -> s);
 		Class cls = traducteur.traduire();
-		Method m = cls.getMethod("main$m");
+		Method m = cls.getMethod("main$m_0");
 
 		Object t =  m.invoke(cls.newInstance());
 		String src = traducteur.source(t);
@@ -348,7 +348,7 @@ class TestExecutionJava {
 		traducteur.literalTracducteurs.put("base$symbol", (String s) -> "\"" + s + "\"");
 		traducteur.literalTracducteurs.put("base$int", (String s) -> s);
 		Class cls = traducteur.traduire();
-		Method m = cls.getMethod("main$f");
+		Method m = cls.getMethod("main$f_0");
 		APITestExcution4 api =(APITestExcution4) cls.newInstance();
 		api.in = new APITestExcution4.math$zero();
 		APITestExcution4.math$zero t = (APITestExcution4.math$zero) m.invoke(api);
@@ -391,7 +391,7 @@ class TestExecutionJava {
 		traducteur.literalTracducteurs.put("base$symbol", (String s) -> "\"" + s + "\"");
 		traducteur.literalTracducteurs.put("base$int", (String s) -> s);
 		Class cls = traducteur.traduire();
-		Method m = cls.getMethod("main$f");
+		Method m = cls.getMethod("main$f_0");
 		APITestExcution5 api =(APITestExcution5) cls.newInstance();
 		api.a = 5;
 		api.b = 5;

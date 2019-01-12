@@ -30,10 +30,10 @@ class TestSimplificateur {
 		verif.executerPourFonctions();
 		assertTrue(verif.erreurs.isEmpty());
 		Simplificateur s = new Simplificateur();
-		s.variables.put("a", verif.fonctions.get("m1$c1/0").fonction.expression);
-		s.variables.put("b", verif.fonctions.get("m1$c2/0").fonction.expression);
+		s.variables.put("a", verif.fonctions.get("m1$c1/0").get(0).fonction.expression);
+		s.variables.put("b", verif.fonctions.get("m1$c2/0").get(0).fonction.expression);
 		s.verificateur = verif;
-		Expression a = verif.fonctions.get("m1$+/2").fonction.expression;
+		Expression a = verif.fonctions.get("m1$+/2").get(0).fonction.expression;
 		Expression e = a.transformer(s);
 		Afficheur afficheur = new Afficheur();
 		afficheur.verif = verif;

@@ -40,9 +40,9 @@ public class ObjetInterface {
 	public ObjetInterface(String type, Verificateur verificateur, SwingBuilder sb) {
 		this.sb = sb;
 		this.verificateur = verificateur;
-		this.sb.size = new Point(nbColonne*tailleColonne,nbLigne*tailleLigne);
+		this.sb.size = new Point(nbColonne * tailleColonne, nbLigne * tailleLigne);
 		this.sb.beginY();
-		
+
 		this.creer(type, 0);
 		this.sb.end();
 	}
@@ -127,6 +127,9 @@ public class ObjetInterface {
 	public ObjetInterface racine() {
 		if (champ == null) {
 			return this;
+		}
+		if (champ.focus) {
+			return champ.objetInterface;
 		}
 		return champ.parent.racine();
 	}

@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JFrame;
@@ -158,21 +159,21 @@ public class JeuxExecuteur implements Executeur {
 			return false;
 		}
 		if (terminal.verificateur != null) {
-			VerificationFonction fd1 = terminal.verificateur.fonctions.get(module + "$config1/0");
-			VerificationFonction fd2 = terminal.verificateur.fonctions.get(module + "$config2/0");
-			if (fd1 == null) {
+			List<VerificationFonction> fd1 = terminal.verificateur.fonctions.get(module + "$config1/0");
+			List<VerificationFonction> fd2 = terminal.verificateur.fonctions.get(module + "$config2/0");
+			if (fd1.size() != 1) {
 				terminal.msgImpossibleExecuter.setText("Il manque dans le module une fonction config1/0");
 				return false;
 			}
-			if (fd2 == null) {
+			if (fd2.size() != 1) {
 				terminal.msgImpossibleExecuter.setText("Il manque dans le module une fonction config2/0");
 				return false;
 			}
-			if (!terminal.verificateur.herite(fd1.typeRetour, "api$action")) {
+			if (!terminal.verificateur.herite(fd1.get(0).typeRetour, "api$action")) {
 				terminal.msgImpossibleExecuter.setText("Le type de la fonction config1/0 doit être api$action");
 				return false;
 			}
-			if (!terminal.verificateur.herite(fd2.typeRetour, "api$action")) {
+			if (!terminal.verificateur.herite(fd2.get(0).typeRetour, "api$action")) {
 				terminal.msgImpossibleExecuter.setText("Le type de la fonction config2/0 doit être api$action");
 				return false;
 			}

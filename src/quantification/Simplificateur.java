@@ -70,7 +70,7 @@ public class Simplificateur implements TransformationExpression<Expression> {
 	@Override
 	public Expression transformer(Appel appel) {
 		if (this.appels != null && appels.contains(appel)) {
-			VerificationFonction vf = this.verificateur.fonctions.get(appel.nomRef());
+			VerificationFonction vf = this.verificateur.fonctions.get(appel.nomRef()).get(appel.idx);
 			 if (vf == null) {
 				 System.out.println(" vf ");
 			 }
