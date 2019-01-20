@@ -1,6 +1,3 @@
-/Porte.class
-/editeur/
-/execution/
 /grammaire/
 /ihm/
 /model/
@@ -10,4 +7,3 @@
 /semantique/
 /syntaxe/
 /test/
-/gen.src

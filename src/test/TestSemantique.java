@@ -1327,4 +1327,23 @@ class TestSemantique {
 
 
 	}
+	@Test
+	public void testAppelFonctionAvecPlusieurDefBis() {
+		String source = "type a {} type b {}  fonction + { a:a a:b | a  b:a b:b | b } fonction main1 | a {} + a {} fonction main2 | b {} + b {} ";
+		Parseur parser = new Parseur();
+		Map<String, String> sources = new HashMap<>();
+		sources.put("m1", source);
+
+		Univers univers = parser.lireSourceCode(sources, null);
+		Verificateur verif = new Verificateur(univers);
+		verif.validations.put("base$symbol", (String s) -> !Character.isDigit(s.charAt(0)));
+		verif.validations.put("base$int", (String s) -> estInt(s));
+		verif.validations.put("base$float", (String s) -> estFloat(s));
+		verif.executerPourTypes();
+		verif.executerPourFonctions();
+		
+		assertTrue(verif.erreurs.isEmpty());
+
+
+	}
 }

@@ -17,7 +17,10 @@ public class Vitesse extends Ressource {
 			return;
 		}
 		soldat.vitesses.add(this);
-		
+		if (soldat.configUnit.vie == soldat.vies.size() && soldat.configUnit.vitesse == soldat.vitesses.size()) {
+			soldat.init = true;
+		}
+
 	}
 
 	@Override

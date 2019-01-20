@@ -18,7 +18,11 @@ public class Energie extends Ressource {
 
 	@Override
 	public void executer(EcranJeux ed, Soldat soldat) {
-		// TODO Auto-generated method stub
+		if (soldat.estMort) {
+			this.libre = true;
+			return;
+		}
+		soldat.energies.add(this);
 
 	}
 

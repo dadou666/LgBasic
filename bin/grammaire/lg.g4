@@ -25,8 +25,8 @@ testEgalite : code '==' code;
 testDifference : code '<>' code;
 si :  'si' (testType | testEgalite |testDifference) 'alors' code 'sinon' ( si |code );
 negation : '!' | ;  
-fonction : 'fonction'   (ID|operateur)  champs  ( ('|' tmpCode)  | ( '->' typeRef )) ;
-
+fonction : 'fonction'   (ID|operateur)  ( ( champs   ( ('|' tmpCode)  | ( '->' typeRef )))  | ('{' fonctionDef+ '}' )) ;
+fonctionDef : champs  ( ('|' tmpCode)  | ( '->' typeRef )) ;
 tmpCode :     literal|appel |si  |code |  '(' tmpCode ')'  ;
 ref: (ID| id_externe);
 

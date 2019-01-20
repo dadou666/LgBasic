@@ -1,0 +1,12 @@
+<t>
+
+type main { t:a }
+
+fonction test t:x | main  { a=x }
+
+
+appel
+
+gen<int> creer un module  _i_   
+
+ref du type gen<int>$main

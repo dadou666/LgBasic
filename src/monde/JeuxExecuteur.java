@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import editeur.Executeur;
+import editeur.ObjetInterface;
 import editeur.Terminal;
 import execution.Traducteur;
 import ihm.swing.SwingBuilder;
@@ -139,9 +140,9 @@ public class JeuxExecuteur implements Executeur {
 			Config config = new Config();
 			config.api = o;
 			if (estConfig1) {
-				config.method = cls.getMethod(module + "$config1");
+				config.method = cls.getMethod(module + "$strategie1_0");
 			} else {
-				config.method = cls.getMethod(module + "$config2");
+				config.method = cls.getMethod(module + "$strategie2_0");
 
 			}
 			return config;
@@ -159,21 +160,21 @@ public class JeuxExecuteur implements Executeur {
 			return false;
 		}
 		if (terminal.verificateur != null) {
-			List<VerificationFonction> fd1 = terminal.verificateur.fonctions.get(module + "$config1/0");
-			List<VerificationFonction> fd2 = terminal.verificateur.fonctions.get(module + "$config2/0");
-			if (fd1.size() != 1) {
-				terminal.msgImpossibleExecuter.setText("Il manque dans le module une fonction config1/0");
+			List<VerificationFonction> fd1 = terminal.verificateur.fonctions.get(module + "$strategie1/0");
+			List<VerificationFonction> fd2 = terminal.verificateur.fonctions.get(module + "$strategie2/0");
+			if (fd1==null || fd1.size() != 1) {
+				terminal.msgImpossibleExecuter.setText("Il manque dans le module une fonction strategie/0");
 				return false;
 			}
-			if (fd2.size() != 1) {
-				terminal.msgImpossibleExecuter.setText("Il manque dans le module une fonction config2/0");
+			if (fd2==null || fd2.size() != 1) {
+				terminal.msgImpossibleExecuter.setText("Il manque dans le module une fonction strategie2/0");
 				return false;
 			}
-			if (!terminal.verificateur.herite(fd1.get(0).typeRetour, "api$action")) {
+			if (!terminal.verificateur.herite(fd1.get(0).typeRetour, "api$operation")) {
 				terminal.msgImpossibleExecuter.setText("Le type de la fonction config1/0 doit être api$action");
 				return false;
 			}
-			if (!terminal.verificateur.herite(fd2.get(0).typeRetour, "api$action")) {
+			if (!terminal.verificateur.herite(fd2.get(0).typeRetour, "api$operation")) {
 				terminal.msgImpossibleExecuter.setText("Le type de la fonction config2/0 doit être api$action");
 				return false;
 			}
@@ -192,30 +193,16 @@ public class JeuxExecuteur implements Executeur {
 					chemin ="F://GitHub//LgBasic//src//monde";
 					verificateur = new Verificateur(je.classAPI(),je.typeReserve(),chemin);
 					if (verificateur.erreurs.isEmpty()) {
-					try {
-						je.executer(verificateur, "main");
-					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InstantiationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (NoSuchMethodException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (SecurityException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (NotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (CannotCompileException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				
+						JFrame window = new JFrame();
+						window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+						SwingBuilder sb = new SwingBuilder(window);
+						ObjetInterface.nbColonne = 6;
+						ObjetInterface.nbLigne = 30;
+						ObjetInterface oi = new ObjetInterface("api$strategie",verificateur,sb);
+						oi.sb.open("Test");
+						//je.executer(verificateur, "main");
+				
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

@@ -23,6 +23,7 @@ import grammaire.lgParser.ChampsContext;
 import grammaire.lgParser.CodeContext;
 import grammaire.lgParser.ElementContext;
 import grammaire.lgParser.FonctionContext;
+import grammaire.lgParser.FonctionDefContext;
 import grammaire.lgParser.Id_externeContext;
 import grammaire.lgParser.ModuleContext;
 import grammaire.lgParser.ObjetContext;
@@ -142,8 +143,8 @@ public class Parseur implements ANTLRErrorListener {
 				module.types.add(td);
 			}
 			if (ec.fonction() != null) {
-				FonctionDef fd = this.transformer(ec.fonction());
-				module.fonctions.add(fd);
+			
+				module.fonctions.addAll(this.transformer(ec.fonction()));
 			}
 			if (ec.param() != null ) {
 				ParamDef pd = this.transformer(ec.param());
@@ -198,8 +199,7 @@ public class Parseur implements ANTLRErrorListener {
 
 		return type;
 	}
-
-	public FonctionDef transformer(FonctionContext fd) {
+	public FonctionDef _transformer(FonctionContext fd) {
 		FonctionDef fonction = new FonctionDef();
 		if (fd.operateur() != null) {
 			OperateurContext oc = fd.operateur();
@@ -213,14 +213,37 @@ public class Parseur implements ANTLRErrorListener {
 			fonction.debut = tn.getSymbol().getStartIndex();
 			fonction.fin = tn.getSymbol().getStopIndex();
 		}
-		fonction.params = this.transformer(fd.champs());
+
+		return fonction;
+	}
+	public List<FonctionDef> transformer(FonctionContext fd) {
+		List<FonctionDef> fonctions = new ArrayList<>();
+		if (fd.fonctionDef().isEmpty()) {
+		FonctionDef fonction = this._transformer(fd);
+
 		if (fd.typeRef() != null) {
 			fonction.typeRetour = this.transformer(fd.typeRef());
 		} else {
 			fonction.expression = this.transformer(fd.tmpCode());
 		}
-		return fonction;
+		fonction.params = this.transformer(fd.champs());
+		fonctions.add(fonction);
 
+		} else {
+			for(FonctionDefContext fdc:fd.fonctionDef()) {
+				FonctionDef fonction = this._transformer(fd);
+				fonction.params = this.transformer(fdc.champs());
+				if (fdc.typeRef() != null) {
+					fonction.typeRetour = this.transformer(fdc.typeRef());
+				} else {
+					fonction.expression = this.transformer(fdc.tmpCode());
+				}
+				fonctions.add(fonction);
+				
+			}
+			
+		}
+		return fonctions;
 	}
 
 	public List<Var> transformer(ChampsContext champs) {

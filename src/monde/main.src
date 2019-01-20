@@ -1,4 +1,3 @@
 
-fonction config1 | objectif {  vie=10 puissance=5 porte=10 vitesse=6 vitesseTire=15 population= 20 populationActif=vrai ressourcesActif=vrai}
-fonction config2 |objectif {  vie=10 puissance=5 porte=10 vitesse=6 vitesseTire=15 population= 20 populationActif=vrai ressourcesActif=vrai}
-fonction augmenterVie objectif:obj | si obj.vie > 10 est vrai alors obj sinon obj { vie=obj.vie+1 }    
+fonction strategie1 | strategie
+fonction strategie2 | strategie    

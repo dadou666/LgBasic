@@ -76,6 +76,7 @@ public class ObjetInterface {
 				sb.add(textField);
 				sb.end();
 			} else if (td != null) {
+				boolean estTypeVide = this.verificateur.estTypeVide(type);
 				ChampObjet champObjet = new ChampObjet();
 				champObjet.nom = champNom;
 				champObjet.type = champType;
@@ -88,6 +89,7 @@ public class ObjetInterface {
 					champType = typesCompatible.get(0);
 				}
 				JComboBox<String> jcomboBox = new JComboBox<String>();
+
 				jcomboBox.setSelectedItem(champType);
 				DefaultComboBoxModel<String> model = new DefaultComboBoxModel();
 				for (String tp : typesCompatible) {
@@ -98,19 +100,24 @@ public class ObjetInterface {
 				sb.setSize(tailleColonne, tailleLigne);
 				sb.add(champObjet.label = new JLabel(champNom));
 				sb.add(jcomboBox);
-				JCheckBox jcheckbox = new JCheckBox();
-				sb.add(jcheckbox);
-				JButton focusOrParent = new JButton("Focus");
-				sb.add(focusOrParent);
+				if (!estTypeVide) {
+					JCheckBox jcheckbox = new JCheckBox();
+					sb.add(jcheckbox);
+					JButton focusOrParent = new JButton("Focus");
+					sb.add(focusOrParent);
+					jcheckbox.addActionListener(champObjet);
+					focusOrParent.addActionListener(champObjet);
+					champObjet.jCheckBox = jcheckbox;
+					champObjet.focusOrParent = focusOrParent;
+
+				}
+
+				jcomboBox.addActionListener(champObjet);
 				ObjetInterface oi = new ObjetInterface();
 				oi.verificateur = verificateur;
-				jcomboBox.addActionListener(champObjet);
-				jcheckbox.addActionListener(champObjet);
-				focusOrParent.addActionListener(champObjet);
+
 				oi.champ = champObjet;
 				champObjet.jComboBox = jcomboBox;
-				champObjet.jCheckBox = jcheckbox;
-				champObjet.focusOrParent = focusOrParent;
 				champObjet.objetInterface = oi;
 				champObjet.parent = this;
 				sb.end();

@@ -580,6 +580,16 @@ public class Verificateur implements VisiteurExpression {
 		}
 
 	}
+	public boolean estTypeVide(String nomRef) {
+		TypeDef td = this.types.get(nomRef);
+		if (!td.vars.isEmpty()) {
+			return false;
+		}
+		if (td.superType != null) {
+			return estTypeVide(td.superType.nomRef());
+		}
+		return true;
+	}
 
 	public void verifierDoublonVar(String nomType) {
 		TypeDef type = this.types.get(nomType);
@@ -758,7 +768,9 @@ public class Verificateur implements VisiteurExpression {
 			this.variables = oldVariables;
 			if (nbErreur == this.erreurs.size()) {
 				e.visiter(calculerTypeRetour);
-
+				if (calculerTypeRetour.type == null) {
+					return;
+				}
 				appelTypes.add(calculerTypeRetour.type);
 
 			} else {

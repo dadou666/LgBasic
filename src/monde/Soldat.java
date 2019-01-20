@@ -10,13 +10,14 @@ public class Soldat extends Entite {
 	public Color color;
 	public Stack<Vie> vies = new Stack<>();
 	public boolean estMort = false;
-
+	public boolean init = false;
 	public List<Porte> portes = new ArrayList<>();
 	public List<Vitesse> vitesses = new ArrayList<>();
 	public List<VitesseTire> vitesseTires = new ArrayList<>();
+	public List<Energie> energies = new ArrayList<>();
 	public Stack<Puissance> puissances = new Stack<>();
 	public Reproduction reproduction;
-	
+	public API.api$configUnit configUnit;
 	public Config config;
 	
 	public Soldat() {
@@ -24,7 +25,7 @@ public class Soldat extends Entite {
 	}
 	public int rayon() {
 		float v= this.vies.size();
-		float maxv = config.vie;
+		float maxv = configUnit.vie;
 		float p=v/maxv;
 		float r = rayon;
 		r =r *p;
@@ -50,7 +51,9 @@ public class Soldat extends Entite {
 		for (VitesseTire vt : vitesseTires) {
 			vt.libre = true;
 		}
-
+		for (Energie e : energies) {
+			e.libre = true;
+		}
 		for (Puissance p : puissances) {
 			p.libre = true;
 		}

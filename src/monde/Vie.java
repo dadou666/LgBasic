@@ -18,6 +18,9 @@ public class Vie extends Ressource {
 			return;
 		}
 		soldat.vies.add(this);
+		if (soldat.configUnit.vie == soldat.vies.size() && soldat.configUnit.vitesse ==soldat.vitesses.size()) {
+			soldat.init = true;
+		}
 		
 	}
 
