@@ -28,3 +28,11 @@ type listeInt:liste {
 	int:int
 	listeVide:suivant
 }
+
+type affichage { 
+	addition:addition
+	int:resultat
+}
+
+fonction afficher | affichage { addition = addition resultat = addition.a+addition.b }
+

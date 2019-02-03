@@ -198,7 +198,7 @@ public class JeuxExecuteur implements Executeur {
 						window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 						SwingBuilder sb = new SwingBuilder(window);
 						ObjetInterface.nbColonne = 6;
-						ObjetInterface.nbLigne = 30;
+						ObjetInterface.nbLigne = 32;
 						ObjetInterface oi = new ObjetInterface("api$strategie",verificateur,sb);
 						oi.sb.open("Test");
 						//je.executer(verificateur, "main");

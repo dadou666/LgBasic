@@ -152,7 +152,7 @@ public class API {
 	}
 
 	static abstract public class api$objectif {
-		api$boolean recupererVie;
+		public api$boolean recupererVie;
 	}
 
 	static public class api$recolter extends api$objectif {

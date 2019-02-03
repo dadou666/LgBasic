@@ -8,6 +8,6 @@ public class TypeExpressionInvalideDansObjet extends Erreur {
 	public String nomFonction;
 	public Objet objet;
 	public String nom;
-	
+		
 
 }

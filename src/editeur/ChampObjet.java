@@ -15,6 +15,7 @@ import ihm.swing.SwingBuilder;
 
 public class ChampObjet extends ChampInterface implements ActionListener {
 	public JComboBox<String> jComboBox;
+	public JLabel labelType;
 	public JCheckBox jCheckBox;
 	public ObjetInterface objetInterface;
 	public ObjetInterface parent;
@@ -31,7 +32,7 @@ public class ChampObjet extends ChampInterface implements ActionListener {
 			objetInterface.sb.beginY();
 			ObjetInterface racine = objetInterface.racine();
 			if (racine.champ != null) {
-				objetInterface.sb.add(parent.champ.focusOrParent);	
+				objetInterface.sb.add(parent.champ.focusOrParent);
 				parent.champ.focusOrParent.setText("Parent");
 				parent.champ.focus = true;
 			}
@@ -44,7 +45,7 @@ public class ChampObjet extends ChampInterface implements ActionListener {
 			objetInterface.sb.beginY();
 			ObjetInterface racine = objetInterface.racine();
 			if (racine.champ != null) {
-				objetInterface.sb.add(parent.champ.focusOrParent);	
+				objetInterface.sb.add(parent.champ.focusOrParent);
 				parent.champ.focusOrParent.setText("Parent");
 				parent.champ.focus = true;
 			}
@@ -58,22 +59,22 @@ public class ChampObjet extends ChampInterface implements ActionListener {
 				objetInterface.sb.add(focusOrParent);
 				objetInterface.reconstruire(null, null, 0);
 				objetInterface.sb.end();
-				objetInterface.sb.reopen(objetInterface.type);	
+				objetInterface.sb.reopen(objetInterface.type);
 				focus = true;
 				focusOrParent.setText("Parent");
 			} else {
 				objetInterface.sb.beginY();
 				if (parent.champ != null) {
-					objetInterface.sb.add(parent.champ.focusOrParent);	
+					objetInterface.sb.add(parent.champ.focusOrParent);
 					parent.champ.focusOrParent.setText("Parent");
 					parent.champ.focus = true;
 				}
 				parent.reconstruire(null, null, 0);
 				objetInterface.sb.end();
-				objetInterface.sb.reopen(objetInterface.type);	
+				objetInterface.sb.reopen(objetInterface.type);
 				focus = false;
 				focusOrParent.setText("Focus");
-				
+
 			}
 		}
 	}
@@ -81,17 +82,23 @@ public class ChampObjet extends ChampInterface implements ActionListener {
 	@Override
 	public void reconstruire(ChampObjet champObjet, String nouveauType, SwingBuilder sb, int tailleColonne,
 			int profondeur) {
-		
+
 		sb.beginX();
 		sb.space(profondeur * tailleColonne);
+		
 		sb.setSize(tailleColonne, ObjetInterface.tailleLigne);
 		sb.add(label);
-
-		sb.add(jComboBox);
-		sb.add(jCheckBox);
-		sb.add(focusOrParent);
+		if (labelType != null) {
+			sb.add(labelType);
+		} else {
+			sb.add(jComboBox);
+		}
+		if (jCheckBox != null) {
+			sb.add(jCheckBox);
+			sb.add(focusOrParent);
+		}
 		sb.end();
-	
+
 		if (!hide) {
 			objetInterface.reconstruire(champObjet, nouveauType, profondeur + 1);
 		}

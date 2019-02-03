@@ -3,6 +3,8 @@ package ihm.swing;
 import java.awt.Color;
 import java.awt.Insets;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 import ihm.Component;
 import ihm.UIBuilder;
@@ -15,9 +17,23 @@ import javax.swing.UIManager.LookAndFeelInfo;
 public class SwingBuilder extends UIBuilder<JComponent> {
 	public JFrame frame;
 	public Point size;
+	public List<Painter> painter = new ArrayList<>();
 
 	public SwingBuilder(JFrame frame) {
 		this.frame = frame;
+	}
+
+	public SwingBuilder() {
+
+	}
+
+	public void paint(String titre) {
+
+		for (Painter p : painter) {
+			p.paint(this);
+		}
+		open(titre);
+
 	}
 
 	static public void setLookAndFeel() {
@@ -54,13 +70,12 @@ public class SwingBuilder extends UIBuilder<JComponent> {
 		frame.setTitle(title);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		if (size != null) {
-			frame.setSize(size.x+ i.left + i.right, size.y
-					+ i.top + i.bottom);	
+			frame.setSize(size.x + i.left + i.right, size.y + i.top + i.bottom);
 		} else {
-		frame.setSize(composite.width + i.left + i.right, composite.height
-				+ i.top + i.bottom); }
+			frame.setSize(composite.width + i.left + i.right, composite.height + i.top + i.bottom);
+		}
 		frame.setLayout(null);
-
+		frame.getContentPane().removeAll();
 		composite.build(this);
 		// frame.pack();
 		frame.setVisible(true);
@@ -82,11 +97,10 @@ public class SwingBuilder extends UIBuilder<JComponent> {
 		frame.setTitle(title);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		if (size != null) {
-			frame.setSize(size.x+ i.left + i.right, size.y
-					+ i.top + i.bottom);	
+			frame.setSize(size.x + i.left + i.right, size.y + i.top + i.bottom);
 		} else {
-		frame.setSize(composite.width + i.left + i.right, composite.height
-				+ i.top + i.bottom); }
+			frame.setSize(composite.width + i.left + i.right, composite.height + i.top + i.bottom);
+		}
 		frame.setLayout(null);
 		frame.getContentPane().removeAll();
 
@@ -96,8 +110,9 @@ public class SwingBuilder extends UIBuilder<JComponent> {
 		frame.setVisible(true);
 
 	}
+
 	public void reopen(String title) {
-		
+
 		this.openIn(title, frame);
 	}
 

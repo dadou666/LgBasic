@@ -7,8 +7,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Stack;
 
+import editeur.Arbre;
+import editeur.ArbreAvecContenu;
+import editeur.ArbreContenu;
+import editeur.ArbreSansContenu;
+import editeur.ChampInterface;
+import editeur.ChampObjet;
+import editeur.ChampSaisie;
+import editeur.Feuille;
+import editeur.Noeud;
+import editeur.ObjetInterface;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -631,5 +642,61 @@ public class Traducteur implements VisiteurExpression {
 		this.tmpVars.put(literal, var);
 
 	}
+public Object  construire(String type,ObjetInterface oi) throws InstantiationException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	Class cls = this.mapClass.get(type);
+	Object r = cls.newInstance();
+	
+	for(ChampInterface champ:oi.champs) {
+		Field field = cls.getField(champ.nom);
+		if (champ instanceof ChampObjet) {
+			ChampObjet champObjet = (ChampObjet) champ;
+			field.set(r, construire(champObjet.type,champObjet.objetInterface));
+			
+		} else {
+			ChampSaisie champSaisie = (ChampSaisie) champ;
+			String valeur = champSaisie.jTextField.getText();
+			if (field.getType() == int.class || field.getType() == Integer.class) {
+				field.set(r,Integer.parseInt(valeur));
+			}
+			if (field.getType() == String.class) {
+				field.set(r,valeur);
+			}
+		}
+		
+	}
+	return r;
+	
+	
+	
+}
+public Object  construire(ArbreContenu oi) throws InstantiationException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	Class cls = this.mapClass.get(oi.type);
 
+	Object r = cls.newInstance();
+	if (oi instanceof ArbreSansContenu) {
+		return r;
+	}
+	for(Entry<String, Noeud> e:(((ArbreAvecContenu)oi).noeuds).entrySet()) {
+		Field field = cls.getField(e.getKey());
+		if (e.getValue() instanceof Arbre) {
+			Arbre champObjet = (Arbre) e.getValue();
+			field.set(r, construire(champObjet.contenu));
+			
+		} else {
+			Feuille champSaisie = (Feuille) e.getValue();
+			String valeur = champSaisie.valeur.getText();
+			if (field.getType() == int.class || field.getType() == Integer.class) {
+				field.set(r,Integer.parseInt(valeur));
+			}
+			if (field.getType() == String.class) {
+				field.set(r,valeur);
+			}
+		}
+		
+	}
+	return r;
+	
+	
+	
+}
 }

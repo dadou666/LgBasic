@@ -76,7 +76,8 @@ public class ObjetInterface {
 				sb.add(textField);
 				sb.end();
 			} else if (td != null) {
-				boolean estTypeVide = this.verificateur.estTypeVide(type);
+				boolean estTypeVide = this.verificateur.estTypeVide(champType);
+	
 				ChampObjet champObjet = new ChampObjet();
 				champObjet.nom = champNom;
 				champObjet.type = champType;
@@ -87,11 +88,12 @@ public class ObjetInterface {
 
 				if (td.estAbstrait) {
 					champType = typesCompatible.get(0);
+					champObjet.type = champType;
 				}
 				JComboBox<String> jcomboBox = new JComboBox<String>();
 
 				jcomboBox.setSelectedItem(champType);
-				DefaultComboBoxModel<String> model = new DefaultComboBoxModel();
+				DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
 				for (String tp : typesCompatible) {
 					model.addElement(tp);
 				}
@@ -99,7 +101,15 @@ public class ObjetInterface {
 				sb.space(profondeur * tailleColonne);
 				sb.setSize(tailleColonne, tailleLigne);
 				sb.add(champObjet.label = new JLabel(champNom));
-				sb.add(jcomboBox);
+				
+				
+				if (typesCompatible.size() == 1) {
+					champObjet.labelType = new JLabel(typesCompatible.get(0));
+					sb.add(champObjet.labelType);
+				} else {
+					champObjet.jComboBox = jcomboBox;
+					sb.add(jcomboBox);
+				}
 				if (!estTypeVide) {
 					JCheckBox jcheckbox = new JCheckBox();
 					sb.add(jcheckbox);
@@ -117,7 +127,7 @@ public class ObjetInterface {
 				oi.verificateur = verificateur;
 
 				oi.champ = champObjet;
-				champObjet.jComboBox = jcomboBox;
+
 				champObjet.objetInterface = oi;
 				champObjet.parent = this;
 				sb.end();
